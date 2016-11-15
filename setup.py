@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 requirements = open('requirements.txt').read().splitlines()
 test_requirements = open('tests/requirements.txt').read().splitlines()
@@ -13,11 +13,8 @@ setup(
     author="Claudio Salazar",
     author_email='csalazar@spect.cl',
     url='https://github.com/spectresearch/detectem',
-    packages=[
-        'detectem',
-    ],
-    package_dir={'detectem':
-                 'detectem'},
+    packages=find_packages(exclude=('tests', 'docs')),
+    package_dir={'detectem': 'detectem'},
     entry_points={
         'console_scripts': [
             'det=detectem.cli:main'
