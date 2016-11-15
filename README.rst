@@ -8,28 +8,28 @@ detectem
 .. image:: https://img.shields.io/travis/spectresearch/detectem.svg
         :target: https://travis-ci.org/spectresearch/detectem
 
-.. image:: https://pyup.io/repos/github/spectresearch/detectem/shield.svg
-     :target: https://pyup.io/repos/github/spectresearch/detectem/
-     :alt: Updates
 
-
-Detect software in websites.
+detectem detects software and its version in websites.
+For a great introduction about it, please check
+`this blog post <http://www.spect.cl/blog/2016/11/introducing-detectem/>`_.
 
 
 Installation
 ------------
 
 1. Install Docker_ and add your user to the docker group, then you avoid to use sudo.
+
 2. Pull the image::
 
     $ docker pull scrapinghub/splash
 
-3. Create a virtual environment with python >= 3.5 .
+3. Create a virtual environment with Python >= 3.5 .
+
 4. Install detectem::
 
     $ pip install detectem
 
-4. Run it against some URL::
+5. Run it against some URL::
 
     $ det http://domain.tld
 
