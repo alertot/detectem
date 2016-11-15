@@ -1,0 +1,12 @@
+- plugin: jquery
+  matches:
+    - url: http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
+      version: 1.8.3
+    - url: https://code.jquery.com/jquery-1.11.3.min.js
+      version: 1.11.3
+    - url: https://code.jquery.com/jquery-1.11.4.js
+      version: 1.11.4
+    - body: /*! jQuery v1.12.4 | (c) jQuery Foundation | jquery.org/license */
+      version: 1.12.4
+    - body: \* jQuery JavaScript Library v1.4.4
+      version: 1.4.4

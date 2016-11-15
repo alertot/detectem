@@ -1,0 +1,4 @@
+- plugin: contact-form-7
+  matches:
+    - url: http://www.domain.tld/wp-content/plugins/contact-form-7/includes/js/scripts.js?ver=3.3.3
+      version: 3.3.3

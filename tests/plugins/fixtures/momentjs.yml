@@ -1,0 +1,4 @@
+- plugin: moment.js
+  matches:
+    - url: //cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js
+      version: 2.8.2
