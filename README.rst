@@ -19,12 +19,13 @@ Detect software in websites.
 Installation
 ------------
 
-1. Install Docker_.
+1. Install Docker_ and add your user to the docker group, then you avoid to use sudo.
 2. Pull the image::
 
-    $ sudo docker pull scrapinghub/splash
+    $ docker pull scrapinghub/splash
 
-3. Install detectem::
+3. Create a virtual environment with python >= 3.5 .
+4. Install detectem::
 
     $ pip install detectem
 
