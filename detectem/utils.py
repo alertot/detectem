@@ -44,7 +44,7 @@ def docker_container():
     if not os.path.exists(DOCKER_SOCKET):
         raise FileNotFoundError('DOCKER_SOCKET not found')
 
-    docker_cli = docker.Client(base_url='unix:/{}'.format(DOCKER_SOCKET))
+    docker_cli = docker.Client(base_url='unix:/{}'.format(DOCKER_SOCKET), version='auto')
 
     container = docker_cli.create_container(
         image='scrapinghub/splash',
