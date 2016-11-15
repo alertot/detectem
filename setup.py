@@ -8,7 +8,7 @@ test_requirements = open('tests/requirements.txt').read().splitlines()
 
 setup(
     name='detectem',
-    version='0.1.0',
+    version='0.1.1',
     description="Detect software in websites.",
     author="Claudio Salazar",
     author_email='csalazar@spect.cl',
