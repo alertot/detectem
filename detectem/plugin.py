@@ -69,6 +69,7 @@ def load_plugins():
 class IPlugin(Interface):
     name = Attribute(""" Name to identify the plugin. """)
     matchers = Attribute(""" List of matches to find plugin versions. """)
+    homepage = Attribute(""" Plugin homepage. """)
 
 
 @implementer(IPlugin)

@@ -3,6 +3,7 @@ from detectem.plugin import Plugin
 
 class JqueryPlugin(Plugin):
     name = 'jquery'
+    homepage = 'https://jquery.com/'
     matchers = [
         {'body': '/\*\!? jQuery v(?P<version>[0-9\.]+) \| \(c\)'},
         {'body': '\* jQuery JavaScript Library v(?P<version>[0-9\.]+)'},
