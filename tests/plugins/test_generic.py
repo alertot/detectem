@@ -43,4 +43,5 @@ class TestGenericMatches(object):
         plugin = get_plugin_by_name(plugin_name, plugin_list)
 
         results = method(plugin, fake_har_entry)
+        assert results
         assert match['version'] in results
