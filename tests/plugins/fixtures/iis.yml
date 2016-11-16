@@ -1,0 +1,6 @@
+- plugin: iis
+  matches:
+    - header:
+        name: Server
+        value: Microsoft-IIS/6.0
+      version: '6.0'

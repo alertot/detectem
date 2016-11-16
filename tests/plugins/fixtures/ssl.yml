@@ -1,0 +1,13 @@
+- plugin: modssl
+  matches:
+    - header:
+        name: Server
+        value: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o
+      version: 2.2.16
+
+- plugin: openssl
+  matches:
+    - header:
+        name: Server
+        value: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o
+      version: 0.9.8o

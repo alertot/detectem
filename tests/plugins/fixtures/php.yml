@@ -1,0 +1,6 @@
+- plugin: php
+  matches:
+    - header:
+        name: X-Powered-By
+        value: PHP/5.4.45
+      version: 5.4.45
