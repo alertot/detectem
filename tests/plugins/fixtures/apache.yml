@@ -4,3 +4,9 @@
         name: Server
         value: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o
       version: 2.2.16
+- plugin: apache_coyote
+  matches:
+    - header:
+        name: Server
+        value: Apache-Coyote/1.1
+      version: '1.1'
