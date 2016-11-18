@@ -39,6 +39,7 @@ from detectem.plugin import Plugin
 
 class {title}Plugin(Plugin):
     name = '{name}'
+    homepage = ''
     matchers = [
         {{'{matcher}': '{value}'}},
     ]
