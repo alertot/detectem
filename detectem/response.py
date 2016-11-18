@@ -20,6 +20,17 @@ def is_url_allowed(url, blacklist):
     return True
 
 
+def get_charset(response):
+    # Set default charset
+    charset = 'iso-8859-1'
+
+    m = re.findall(';charset=(.*)', response['mimeType'])
+    if m:
+        charset = m[0]
+
+    return charset
+
+
 def get_har(url):
     page_url = '{}/render.har?url={}&response_body=1&wait=3&images=0'.format(
         SPLASH_URL, url
@@ -54,7 +65,8 @@ def get_har(url):
         if not response.get('text'):
             continue
 
-        response['text'] = str(base64.b64decode(response['text']))
+        charset = get_charset(response)
+        response['text'] = base64.b64decode(response['text']).decode(charset)
         new_entries.append(entry)
 
         logger.debug('[+] Added URL: %(url)s ...', {'url': url[:100]})
