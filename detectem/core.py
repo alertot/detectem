@@ -19,7 +19,8 @@ class Detector():
                 version = self.detect_plugin_version(plugin, entry)
                 if version:
                     t = (plugin.name, version)
-                    self.results.append(t)
+                    if t not in self.results:
+                        self.results.append(t)
 
     def get_results(self, format=None):
         if format == 'json':
