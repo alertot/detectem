@@ -1,0 +1,6 @@
+- plugin: phusion_passenger
+  matches:
+    - header:
+        name: Server
+        value: Apache Phusion_Passenger/4.0.10 mod_bwlimited/1.4 mod_fcgid/2.3.9
+      version: 4.0.10
