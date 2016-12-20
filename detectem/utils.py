@@ -1,13 +1,13 @@
 import re
 import time
-import os
 
 from contextlib import contextmanager
 
 import docker
+import requests
 
-from detectem.exceptions import DockerStartError, NotVersionNamedParameterFound
-from detectem.settings import DOCKER_SOCKET
+from detectem.exceptions import NotVersionNamedParameterFound
+from detectem.settings import SPLASH_URL
 
 
 def extract_version(text, matchers):
@@ -36,34 +36,32 @@ def extract_version_from_headers(headers, matchers):
 
 @contextmanager
 def docker_container():
-    """ Setup and teardown docker container for doing requests
-    It's a temporary implementation until cache managements is supported
-    by splash.
+    """ Start a container for doing requests.
+    If it doesn't exist, it creates the container named 'splash-detectem'.
 
     """
-    if not os.path.exists(DOCKER_SOCKET):
-        raise FileNotFoundError('DOCKER_SOCKET not found')
-
-    docker_cli = docker.Client(base_url='unix:/{}'.format(DOCKER_SOCKET), version='auto')
-
-    container = docker_cli.create_container(
-        image='scrapinghub/splash',
-        ports=[5023, 8050, 8051],
-        host_config=docker_cli.create_host_config(
-            port_bindings={5023: 5023, 8050: 8050, 8051: 8051}
-        )
-    )
+    docker_cli = docker.from_env()
+    container_name = 'splash-detectem'
 
     try:
-        docker_cli.start(container['Id'])
-    except docker.errors.APIError:
-        raise DockerStartError
+        container = docker_cli.containers.get(container_name)
+    except docker.errors.NotFound:
+        # Create docker container
+        container = docker_cli.containers.create(
+            name=container_name,
+            image='scrapinghub/splash',
+            ports={
+                '5023/tcp': 5023,
+                '8050/tcp': 8050,
+                '8051/tcp': 8051,
+            },
+        )
 
-    # Wait to container to start
-    time.sleep(1)
+    if container.status != 'running':
+        container.start()
+        time.sleep(1)
+
+    # Send request to delete cache
+    requests.post('{}/_gc'.format(SPLASH_URL))
 
     yield
-
-    # Container clean-up
-    docker_cli.stop(container['Id'])
-    docker_cli.remove_container(container['Id'])
