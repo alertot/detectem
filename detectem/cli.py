@@ -34,12 +34,16 @@ def main(debug, format, url):
     else:
         ch.setLevel(logging.ERROR)
 
+    print(get_detection_results(url, format))
+
+
+def get_detection_results(url, format):
     har_data = get_har(url)
     plugins = load_plugins()
 
     det = Detector(har_data, plugins, url)
     det.start_detection()
-    print(det.get_results(format=format))
+    return det.get_results(format=format)
 
 
 if __name__ == "__main__":
