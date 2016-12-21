@@ -16,4 +16,4 @@ def do_detection():
     return get_detection_results(url, format='json')
 
 
-run(host='localhost', port=5723)
+run(host='0.0.0.0', port=5723)
