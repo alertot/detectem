@@ -7,7 +7,7 @@ import docker
 import requests
 
 from detectem.exceptions import NotVersionNamedParameterFound
-from detectem.settings import SPLASH_URL
+from detectem.settings import SPLASH_URL, SETUP_SPLASH
 
 
 def extract_version(text, matchers):
@@ -40,26 +40,27 @@ def docker_container():
     If it doesn't exist, it creates the container named 'splash-detectem'.
 
     """
-    docker_cli = docker.from_env()
-    container_name = 'splash-detectem'
+    if SETUP_SPLASH:
+        docker_cli = docker.from_env()
+        container_name = 'splash-detectem'
 
-    try:
-        container = docker_cli.containers.get(container_name)
-    except docker.errors.NotFound:
-        # Create docker container
-        container = docker_cli.containers.create(
-            name=container_name,
-            image='scrapinghub/splash',
-            ports={
-                '5023/tcp': 5023,
-                '8050/tcp': 8050,
-                '8051/tcp': 8051,
-            },
-        )
+        try:
+            container = docker_cli.containers.get(container_name)
+        except docker.errors.NotFound:
+            # Create docker container
+            container = docker_cli.containers.create(
+                name=container_name,
+                image='scrapinghub/splash',
+                ports={
+                    '5023/tcp': 5023,
+                    '8050/tcp': 8050,
+                    '8051/tcp': 8051,
+                },
+            )
 
-    if container.status != 'running':
-        container.start()
-        time.sleep(1)
+        if container.status != 'running':
+            container.start()
+            time.sleep(1)
 
     # Send request to delete cache
     requests.post('{}/_gc'.format(SPLASH_URL))
