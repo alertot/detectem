@@ -9,7 +9,7 @@ from detectem.core import Detector
 # Set up logging
 logger = logging.getLogger('detectem')
 ch = logging.StreamHandler()
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.ERROR)
 logger.addHandler(ch)
 
 
