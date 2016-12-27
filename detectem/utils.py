@@ -1,5 +1,7 @@
 import re
 import time
+import sys
+import logging
 
 from contextlib import contextmanager
 
@@ -7,7 +9,10 @@ import docker
 import requests
 
 from detectem.exceptions import NotVersionNamedParameterFound
-from detectem.settings import SPLASH_URL, SETUP_SPLASH
+from detectem.settings import SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE
+
+
+logger = logging.getLogger('detectem')
 
 
 def extract_version(text, matchers):
@@ -47,10 +52,20 @@ def docker_container():
         try:
             container = docker_cli.containers.get(container_name)
         except docker.errors.NotFound:
+            try:
+                docker_cli.images.get(DOCKER_SPLASH_IMAGE)
+            except docker.errors.ImageNotFound:
+                logger.error(
+                    "%(evar)s not found. Please install the docker image or "
+                    "set an image using DOCKER_SPLASH_IMAGE environment variable.",
+                    {'evar': DOCKER_SPLASH_IMAGE}
+                )
+                sys.exit(-1)
+
             # Create docker container
             container = docker_cli.containers.create(
                 name=container_name,
-                image='scrapinghub/splash',
+                image=DOCKER_SPLASH_IMAGE,
                 ports={
                     '5023/tcp': 5023,
                     '8050/tcp': 8050,
