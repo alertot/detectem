@@ -1,9 +1,12 @@
 import logging
 import json
+import collections
 
 from detectem.utils import extract_version, extract_version_from_headers
 
 logger = logging.getLogger('detectem')
+
+Result = collections.namedtuple('Result', 'plugin version')
 
 
 class Detector():
@@ -18,15 +21,24 @@ class Detector():
             for plugin in self.plugins:
                 version = self.detect_plugin_version(plugin, entry)
                 if version:
-                    t = (plugin.name, version)
+                    t = Result(plugin, version)
                     if t not in self.results:
                         self.results.append(t)
 
-    def get_results(self, format=None):
+    def get_results(self, format=None, metadata=False):
+        results_data = []
+
+        for rt in self.results:
+            rdict = {'name': rt.plugin.name, 'version': rt.version}
+            if metadata:
+                rdict['homepage'] = rt.plugin.homepage
+
+            results_data.append(rdict)
+
         if format == 'json':
-            return json.dumps(self.results)
+            return json.dumps(results_data)
         else:
-            return self.results
+            return results_data
 
     @staticmethod
     def get_most_complete_version(versions):

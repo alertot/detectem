@@ -13,7 +13,10 @@ from detectem.cli import get_detection_results
 @post('/detect')
 def do_detection():
     url = request.forms.get('url')
-    return get_detection_results(url, format='json')
+    metadata = request.forms.get('metadata')
+
+    metadata = bool(metadata == '1')
+    return get_detection_results(url, format='json', metadata=metadata)
 
 
 run(host='0.0.0.0', port=5723)
