@@ -3,6 +3,7 @@ import json
 import collections
 
 from detectem.utils import extract_version, extract_version_from_headers
+from detectem.plugin import get_plugin_by_name
 
 logger = logging.getLogger('detectem')
 
@@ -10,8 +11,9 @@ Result = collections.namedtuple('Result', 'plugin version')
 
 
 class Detector():
-    def __init__(self, har, plugins, requested_url):
-        self.har = har
+    def __init__(self, response, plugins, requested_url):
+        self.har = response['har']
+        self.softwares = response['softwares']
         self.plugins = plugins
         self.results = []
         self.requested_url = requested_url
@@ -24,6 +26,10 @@ class Detector():
                     t = Result(plugin, version)
                     if t not in self.results:
                         self.results.append(t)
+
+        for software in self.softwares:
+            plugin = get_plugin_by_name(software['name'], self.plugins)
+            self.results.append(Result(plugin, software['version']))
 
     def get_results(self, format=None, metadata=False):
         results_data = []

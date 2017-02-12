@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from detectem.response import get_har
+from detectem.response import get_response
 from detectem.plugin import load_plugins
 from detectem.core import Detector
 
@@ -37,6 +37,7 @@ def main(debug, format, metadata, url):
     if debug:
         click.echo("[+] Enabling debug mode.")
         ch.setLevel(logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
     else:
         ch.setLevel(logging.ERROR)
 
@@ -44,10 +45,10 @@ def main(debug, format, metadata, url):
 
 
 def get_detection_results(url, format, metadata):
-    har_data = get_har(url)
     plugins = load_plugins()
+    response = get_response(url, plugins)
 
-    det = Detector(har_data, plugins, url)
+    det = Detector(response, plugins, url)
     det.start_detection()
     return det.get_results(format=format, metadata=metadata)
 
