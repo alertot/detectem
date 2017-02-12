@@ -46,10 +46,12 @@ def main(debug, format, metadata, url):
 
 def get_detection_results(url, format, metadata):
     plugins = load_plugins()
-    response = get_response(url, plugins)
+    logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
+    response = get_response(url, plugins)
     det = Detector(response, plugins, url)
     det.start_detection()
+
     return det.get_results(format=format, metadata=metadata)
 
 
