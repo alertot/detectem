@@ -1,4 +1,5 @@
 import pytest
+import dukpy
 
 from detectem.core import Detector
 from detectem.plugin import load_plugins, get_plugin_by_name
@@ -16,6 +17,7 @@ class TestGenericMatches(object):
 
         plugin = pytest.config.getoption('plugin', None)
         if plugin:
+            plugin = plugin.replace('.', '')
             data = load_from_yaml(__file__, 'fixtures/{}.yml'.format(plugin))
         else:
             data = load_from_yaml(__file__, 'fixtures/')
@@ -27,6 +29,14 @@ class TestGenericMatches(object):
                     cases.append([entry['plugin'], match])
 
             metafunc.parametrize('plugin_name,match', cases)
+        elif fname == 'test_js_matches':
+            cases = []
+            for entry in data:
+                for match in entry.get('js_matches', []):
+                    cases.append([entry['plugin'], match])
+
+            metafunc.parametrize('plugin_name,match', cases)
+
 
     def test_matches(self, plugin_name, match, plugin_list):
         fake_har_entry = tree()
@@ -45,3 +55,23 @@ class TestGenericMatches(object):
         results = method(plugin, fake_har_entry)
         assert results
         assert match['version'] in results
+
+    def test_js_matches(self, plugin_name, match, plugin_list):
+        was_asserted = False
+        js_code = match['js']
+
+        interpreter = dukpy.JSInterpreter()
+        # Create window browser object
+        interpreter.evaljs('window = {};')
+        interpreter.evaljs(js_code)
+
+        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        for matcher in plugin.js_matchers:
+            is_present = interpreter.evaljs(matcher['check'])
+            if is_present is not None:
+                version = interpreter.evaljs(matcher['version'])
+                assert match['version'] == version
+                was_asserted = True
+
+        assert was_asserted
+
