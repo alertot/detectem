@@ -4,19 +4,19 @@
         name: Server
         value: Apache/2.2.16 (Debian) mod_ssl/2.2.16 OpenSSL/0.9.8o
       version: 2.2.16
-- plugin: apache_coyote
+- plugin: apache-coyote
   matches:
     - header:
         name: Server
         value: Apache-Coyote/1.1
       version: '1.1'
-- plugin: apache_mod_bwlimited
+- plugin: apache-mod_bwlimited
   matches:
     - header:
         name: Server
         value: Apache Phusion_Passenger/4.0.10 mod_bwlimited/1.4 mod_fcgid/2.3.9
       version: '1.4'
-- plugin: apache_mod_fcgid
+- plugin: apache-mod_fcgid
   matches:
     - header:
         name: Server

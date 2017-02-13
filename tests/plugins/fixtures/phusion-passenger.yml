@@ -1,4 +1,4 @@
-- plugin: phusion_passenger
+- plugin: phusion-passenger
   matches:
     - header:
         name: Server

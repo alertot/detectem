@@ -14,16 +14,16 @@ class JqueryPlugin(Plugin):
 
 
 class ColorBoxPlugin(Plugin):
-    name = 'jquery_colorbox'
+    name = 'jquery-colorbox'
     homepage = 'http://www.jacklmoore.com/colorbox/'
     matchers = [
         {'body': '// ColorBox v(?P<version>[0-9\.]+) - a full featured'}
     ]
 
+
 class JqueryMigratePlugin(Plugin):
-    name = 'jquery_migrate'
+    name = 'jquery-migrate'
     homepage = 'https://github.com/jquery/jquery-migrate'
     matchers = [
-        {'body': '/*! jQuery Migrate v(?P<version>[0-9\.]+) \| \(c\) jQuery'
- },
+        {'body': '/*! jQuery Migrate v(?P<version>[0-9\.]+) \| \(c\) jQuery'},
     ]
