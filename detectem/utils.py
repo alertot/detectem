@@ -2,6 +2,7 @@ import re
 import time
 import sys
 import logging
+import json
 
 from contextlib import contextmanager
 
@@ -81,3 +82,10 @@ def docker_container():
     requests.post('{}/_gc'.format(SPLASH_URL))
 
     yield
+
+
+def print_error_message(error_dict, format):
+    if format == 'json':
+        print(json.dumps(error_dict))
+    else:
+        print(error_dict)

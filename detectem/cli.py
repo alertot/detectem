@@ -1,10 +1,13 @@
 import logging
+import sys
 
 import click
 
 from detectem.response import get_response
 from detectem.plugin import load_plugins
 from detectem.core import Detector
+from detectem.exceptions import SplashError
+from detectem.utils import print_error_message
 
 # Set up logging
 logger = logging.getLogger('detectem')
@@ -48,7 +51,13 @@ def get_detection_results(url, format, metadata):
     plugins = load_plugins()
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
-    response = get_response(url, plugins)
+    try:
+        response = get_response(url, plugins)
+    except SplashError as e:
+        error_dict = {'error': 'Splash error: {}'.format(e)}
+        print_error_message(error_dict, format=format)
+        sys.exit(0)
+
     det = Detector(response, plugins, url)
     det.start_detection()
 
