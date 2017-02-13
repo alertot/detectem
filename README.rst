@@ -9,9 +9,42 @@ detectem
         :target: https://travis-ci.org/spectresearch/detectem
 
 
-detectem detects software and its version in websites.
-For a great introduction about it, please check
-`this blog post <http://www.spect.cl/blog/2016/11/introducing-detectem/>`_.
+detectem is a specialized software detector.
+Let's see it in action.
+
+.. code-block:: bash
+
+  $ det http://domain.tld
+  [{'name': 'phusion-passenger', 'version': '4.0.10'},
+   {'name': 'apache-mod_bwlimited', 'version': '1.4'},
+   {'name': 'apache-mod_fcgid', 'version': '2.3.9'},
+   {'name': 'jquery', 'version': '1.11.3'},
+   {'name': 'crayon-syntax-highlighter', 'version': '_2.7.2_beta'}]
+
+
+Using a serie of indicators, it's able to detect software running on a site
+and extract accurately its version information.
+It uses Splash_ API
+to render the website and start the detection routine.
+It does full analysis on requests, responses and even on the DOM!
+
+There are two important articles to mention:
+
+* `Reasons to create detectem <http://www.spect.cl/blog/2016/11/challenges-in-web-software-detection/>`_.
+* `Introduction to detectem <http://www.spect.cl/blog/2016/11/introducing-detectem/>`_.
+
+
+Features
+--------
+
+* Detect software in modern web technologies.
+* Browser support provided by Splash_.
+* Analysis on requests made and responses received by the browser.
+* Get software information from the DOM.
+* Great performance (less than 10 seconds to get a fingerprint).
+* Plugin system to add new software easily.
+* Test suite to ensure plugin result integrity.
+* Continuous development to support new features.
 
 
 Installation
@@ -32,15 +65,6 @@ Installation
 5. Run it against some URL::
 
     $ det http://domain.tld
-
-
-Features
---------
-
-* Detect software in modern web technologies.
-* Browser support provided by Splash_.
-* Plugin system to add new software easily.
-* Test suite to ensure plugin functionality.
 
 
 .. _Docker: http://docker.io
