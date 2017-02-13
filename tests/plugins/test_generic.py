@@ -25,7 +25,7 @@ class TestGenericMatches(object):
         if fname == 'test_matches':
             cases = []
             for entry in data:
-                for match in entry['matches']:
+                for match in entry.get('matches', []):
                     cases.append([entry['plugin'], match])
 
             metafunc.parametrize('plugin_name,match', cases)
