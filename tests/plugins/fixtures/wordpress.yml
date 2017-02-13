@@ -1,0 +1,5 @@
+- plugin: crayon-syntax-highlighter
+  js_matches:
+    - js: "window.CrayonSyntaxSettings = {version: '1.0.0'}"
+      version: 1.0.0
+
