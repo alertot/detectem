@@ -1,10 +1,13 @@
 import pytest
 import json
 
+import detectem.utils
 from detectem.response import (
     is_url_allowed, get_charset, create_lua_script,
     get_valid_har, get_response, DEFAULT_CHARSET
 )
+from detectem.exceptions import SplashError
+from detectem.response import requests
 
 
 @pytest.mark.parametrize("url,blacklist,result", [
@@ -38,11 +41,10 @@ def test_create_lua_script():
 
 def test_get_response(monkeypatch):
     class TestResponse():
+        status_code = 200
         def json(self):
             return {'har': {}, 'softwares': []}
 
-    from detectem.response import requests
-    import detectem.utils
     monkeypatch.setattr(requests, 'get', lambda v: TestResponse())
     monkeypatch.setattr(requests, 'post', lambda v: v)
     monkeypatch.setattr(detectem.utils, 'SETUP_SPLASH', False)
@@ -51,6 +53,21 @@ def test_get_response(monkeypatch):
     assert response
     assert 'har' in response
     assert 'softwares' in response
+
+
+def test_get_response_with_error_status_codes(monkeypatch):
+    class TestResponse():
+        status_code = 504
+
+        def json(self):
+            return {'description': 'error 100'}
+
+    monkeypatch.setattr(requests, 'get', lambda v: TestResponse())
+    monkeypatch.setattr(requests, 'post', lambda v: v)
+    monkeypatch.setattr(detectem.utils, 'SETUP_SPLASH', False)
+
+    with pytest.raises(SplashError):
+        response = get_response('http://domain.tld', {})
 
 
 @pytest.mark.parametrize("har_data,result_len", [

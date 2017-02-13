@@ -10,10 +10,12 @@ import urllib.parse
 from string import Template
 
 from detectem.settings import SPLASH_URL
-from detectem.exceptions import DockerStartError
+from detectem.exceptions import DockerStartError, SplashError
 from detectem.utils import docker_container
 
 DEFAULT_CHARSET = 'iso-8859-1'
+ERROR_STATUS_CODES = [504]
+
 logger = logging.getLogger('detectem')
 
 
@@ -75,6 +77,10 @@ def get_response(url, plugins):
     logger.debug('[+] Response received')
 
     json_data = res.json()
+
+    if res.status_code in ERROR_STATUS_CODES:
+        raise SplashError(json_data['description'])
+
     softwares = json_data['softwares']
     har = get_valid_har(json_data['har'])
 
