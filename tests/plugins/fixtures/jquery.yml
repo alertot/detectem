@@ -12,7 +12,15 @@
       version: 1.11.3
     - body: \* jQuery JavaScript Library v1.4.4
       version: 1.4.4
+    - body: /*! jQuery v1.7.2 jquery.com | jquery.org/license */
+      version: 1.7.2
+
 - plugin: jquery_colorbox
   matches:
     - body: // ColorBox v1.3.15 - a full featured, light-weight, customizable lightbox based on jQuery 1.3+
       version: 1.3.15
+
+- plugin: jquery_migrate
+  matches:
+    - body: /*! jQuery Migrate v1.4.1 | (c) jQuery Foundation
+      version: 1.4.1
