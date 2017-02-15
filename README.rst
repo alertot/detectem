@@ -26,12 +26,12 @@ Using a serie of indicators, it's able to detect software running on a site
 and extract accurately its version information.
 It uses Splash_ API
 to render the website and start the detection routine.
-It does full analysis on requests, responses and even on the DOM!
+It does full analysis on requests, responses and even on the DOM_!
 
-There are two important articles to mention:
+There are two important articles to read:
 
-* `Reasons to create detectem <http://www.spect.cl/blog/2016/11/challenges-in-web-software-detection/>`_.
-* `Introduction to detectem <http://www.spect.cl/blog/2016/11/introducing-detectem/>`_.
+* `Reasons to create detectem <http://www.spect.cl/blog/2016/11/challenges-in-web-software-detection/>`_
+* `Introduction to detectem <http://www.spect.cl/blog/2016/11/introducing-detectem/>`_
 
 
 Features
@@ -67,5 +67,12 @@ Installation
     $ det http://domain.tld
 
 
+Documentation
+-------------
+
+The documentation is at `ReadTheDocs <https://detectem.readthedocs.io>`_.
+
 .. _Docker: http://docker.io
 .. _Splash: https://github.com/scrapinghub/splash
+.. _DOM: https://en.wikipedia.org/wiki/Document_Object_Model
+
