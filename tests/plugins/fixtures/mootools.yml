@@ -1,0 +1,9 @@
+- plugin: mootools-core
+  js_matches:
+    - js: "window.MooTools = {version: '1.0.0'}"
+      version: 1.0.0
+
+- plugin: mootools-more
+  js_matches:
+    - js: "window.MooTools = {More: {version: '1.0.0'}}"
+      version: 1.0.0
