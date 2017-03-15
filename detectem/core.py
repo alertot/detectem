@@ -15,32 +15,35 @@ Result = collections.namedtuple('Result', 'name version homepage')
 class Detector():
     def __init__(self, response, plugins, requested_url):
         self.har = response['har']
-        self.softwares = response['softwares']
         self.plugins = plugins
-        self.results = []
         self.requested_url = requested_url
 
-    def start_detection(self):
+        self._softwares = response['softwares']
+        self._results = []
+
+    def process_har(self):
         for entry in self.har:
             for plugin in self.plugins:
                 version = self.get_plugin_version(plugin, entry)
                 if version:
                     name = self.get_plugin_name(plugin, entry)
                     t = Result(name, version, plugin.homepage)
-                    if t not in self.results:
-                        self.results.append(t)
+                    if t not in self._results:
+                        self._results.append(t)
 
         # Feedback from Javascript
-        for software in self.softwares:
+        for software in self._softwares:
             plugin = get_plugin_by_name(software['name'], self.plugins)
-            self.results.append(
+            self._results.append(
                 Result(plugin.name, software['version'], plugin.homepage)
             )
 
-    def get_results(self, format=None, metadata=False):
+    def get_results(self, metadata=False):
         results_data = []
 
-        for rt in self.results:
+        self.process_har()
+
+        for rt in self._results:
             rdict = {'name': rt.name, 'version': rt.version}
             if metadata:
                 rdict['homepage'] = rt.homepage
@@ -75,6 +78,7 @@ class Detector():
         versions = self.get_values_from_matchers(
             entry, grouped_matchers, extract_version
         )
+
         return get_most_complete_version(versions)
 
     def get_plugin_name(self, plugin, entry):

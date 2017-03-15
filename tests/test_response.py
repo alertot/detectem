@@ -42,6 +42,7 @@ def test_create_lua_script():
 def test_get_response(monkeypatch):
     class TestResponse():
         status_code = 200
+
         def json(self):
             return {'har': {}, 'softwares': []}
 
@@ -67,7 +68,7 @@ def test_get_response_with_error_status_codes(monkeypatch):
     monkeypatch.setattr(detectem.utils, 'SETUP_SPLASH', False)
 
     with pytest.raises(SplashError):
-        response = get_response('http://domain.tld', {})
+        get_response('http://domain.tld', {})
 
 
 @pytest.mark.parametrize("har_data,result_len", [
@@ -113,4 +114,3 @@ def test_get_response_with_error_status_codes(monkeypatch):
 ])
 def test_get_valid_har(har_data, result_len):
     assert len(get_valid_har(har_data)) == result_len
-

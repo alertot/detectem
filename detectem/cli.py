@@ -1,6 +1,6 @@
 import logging
 import sys
-
+import json
 import click
 
 from detectem.response import get_response
@@ -59,7 +59,6 @@ def get_detection_results(url, format, metadata):
         sys.exit(0)
 
     det = Detector(response, plugins, url)
-    det.start_detection()
     results = det.get_results(metadata=metadata)
 
     if format == 'json':
