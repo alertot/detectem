@@ -2,7 +2,7 @@ class DockerStartError(Exception):
     pass
 
 
-class NotVersionNamedParameterFound(Exception):
+class NotNamedParameterFound(Exception):
     pass
 
 
