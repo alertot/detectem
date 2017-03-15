@@ -74,14 +74,20 @@ class IPlugin(Interface):
 
 @implementer(IPlugin)
 class Plugin():
-    def _get_matchers(self, value):
-        return [m[value] for m in self.matchers if value in m]
+    def _get_matchers(self, value, source='matchers'):
+        matchers_dict = getattr(self, source)
+        return [m[value] for m in matchers_dict if value in m]
 
-    def get_url_matchers(self):
-        return self._get_matchers('url')
+    def get_grouped_matchers(self, source='matchers'):
+        """ Return dictionary of matchers (not empty ones) """
+        data = {}
+        for k in ['url', 'body', 'headers']:
+            m = self._get_matchers(k, source)
+            if m:
+                data[k] = m
 
-    def get_body_matchers(self):
-        return self._get_matchers('body')
+        return data
 
-    def get_header_matchers(self):
-        return self._get_matchers('header')
+    @property
+    def is_modular(self):
+        return bool(hasattr(self, 'modular_matchers'))
