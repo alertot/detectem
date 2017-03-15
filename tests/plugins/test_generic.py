@@ -3,11 +3,13 @@ import dukpy
 
 from detectem.core import Detector
 from detectem.plugin import load_plugins, get_plugin_by_name
-
+from detectem.utils import extract_version, extract_name
 from tests import load_from_yaml, tree
 
 
 class TestGenericMatches(object):
+    FIELDS = ['body', 'url', 'header']
+
     @pytest.fixture()
     def plugin_list(self):
         return load_plugins()
@@ -23,36 +25,42 @@ class TestGenericMatches(object):
             data = load_from_yaml(__file__, 'fixtures/')
 
         if fname == 'test_matches':
-            cases = []
-            for entry in data:
-                for match in entry.get('matches', []):
-                    cases.append([entry['plugin'], match])
-
-            metafunc.parametrize('plugin_name,match', cases)
+            entry_name = 'matches'
         elif fname == 'test_js_matches':
-            cases = []
-            for entry in data:
-                for match in entry.get('js_matches', []):
-                    cases.append([entry['plugin'], match])
+            entry_name = 'js_matches'
+        elif fname == 'test_modular_matches':
+            entry_name = 'modular_matches'
 
-            metafunc.parametrize('plugin_name,match', cases)
+        cases = []
+        for entry in data:
+            for match in entry.get(entry_name, []):
+                cases.append([entry['plugin'], match])
 
+        metafunc.parametrize('plugin_name,match', cases)
 
-    def test_matches(self, plugin_name, match, plugin_list):
+    def _get_har_entry_and_method(self, field, match):
         fake_har_entry = tree()
-        if 'url' in match:
-            method = Detector.get_version_from_url
+
+        if field == 'url':
+            method = Detector.from_url
             fake_har_entry['request']['url'] = match['url']
-        elif 'body' in match:
-            method = Detector.get_version_from_body
+        elif field == 'body':
+            method = Detector.from_body
             fake_har_entry['response']['content']['text'] = match['body']
-        elif 'header' in match:
-            method = Detector.get_version_from_headers
+        elif field == 'header':
+            method = Detector.from_headers
             fake_har_entry['response']['headers'] = [match['header']]
 
-        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        return (fake_har_entry, method)
 
-        results = method(plugin, fake_har_entry)
+    def test_matches(self, plugin_name, match, plugin_list):
+        field = [k for k in match.keys()][0]
+        fake_har_entry, method = self._get_har_entry_and_method(field, match)
+
+        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        matchers = plugin._get_matchers(field)
+        results = method(fake_har_entry, matchers, extract_version)
+
         assert results
         assert match['version'] in results
 
@@ -75,3 +83,25 @@ class TestGenericMatches(object):
 
         assert was_asserted
 
+    def test_modular_matches(self, plugin_name, match, plugin_list):
+        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        keys_to_search = [
+            ('software', 'modular_matchers', extract_name),
+            ('version', 'matchers', extract_version),
+        ]
+
+        for kts, source, extraction_fn in keys_to_search:
+            flag = False
+
+            for field in match.keys():
+                if field not in self.FIELDS:
+                    continue
+
+                fake_har_entry, method = self._get_har_entry_and_method(field, match)
+                matchers = plugin._get_matchers(field, source)
+                results = method(fake_har_entry, matchers, extraction_fn)
+                if results and match[kts] in results:
+                    flag = True
+                    break
+
+            assert flag

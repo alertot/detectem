@@ -2,12 +2,14 @@ import logging
 import json
 import collections
 
-from detectem.utils import extract_version, extract_version_from_headers
+from detectem.utils import (
+    extract_version, extract_name, extract_version_from_headers
+)
 from detectem.plugin import get_plugin_by_name
 
 logger = logging.getLogger('detectem')
 
-Result = collections.namedtuple('Result', 'plugin version')
+Result = collections.namedtuple('Result', 'name version homepage')
 
 
 class Detector():
@@ -23,21 +25,25 @@ class Detector():
             for plugin in self.plugins:
                 version = self.detect_plugin_version(plugin, entry)
                 if version:
-                    t = Result(plugin, version)
+                    name = self.detect_plugin_name(plugin, entry)
+                    t = Result(name, version, plugin.homepage)
                     if t not in self.results:
                         self.results.append(t)
 
+        # Feedback from Javascript
         for software in self.softwares:
             plugin = get_plugin_by_name(software['name'], self.plugins)
-            self.results.append(Result(plugin, software['version']))
+            self.results.append(
+                Result(plugin.name, software['version'], plugin.homepage)
+            )
 
     def get_results(self, format=None, metadata=False):
         results_data = []
 
         for rt in self.results:
-            rdict = {'name': rt.plugin.name, 'version': rt.version}
+            rdict = {'name': rt.name, 'version': rt.version}
             if metadata:
-                rdict['homepage'] = rt.plugin.homepage
+                rdict['homepage'] = rt.homepage
 
             results_data.append(rdict)
 
@@ -60,66 +66,73 @@ class Detector():
     def _is_first_request(self, entry):
         return entry['request']['url'].rstrip('/') == self.requested_url.rstrip('/')
 
+    def get_values_from_matchers(self, entry, matchers, extraction_function):
+        values = []
+
+        for key, matchers in matchers.items():
+            method = getattr(self, 'from_{}'.format(key))
+            value = method(entry, matchers, extraction_function)
+            if value:
+                values.append(value)
+
+        return values
+
     def detect_plugin_version(self, plugin, entry):
         """ Return a list of (name, version) after applying every plugin matcher. """
-        versions = []  # avoid duplicates
+        versions = []
+        grouped_matchers = plugin.get_grouped_matchers()
 
-        methods = [
-            self.get_version_from_url,
-            self.get_version_from_body,
-        ]
+        # Check headers just for the first request
+        if not self._is_first_request(entry) and 'headers' in grouped_matchers:
+            del grouped_matchers['headers']
 
-        for method in methods:
-            version = method(plugin, entry)
-            if version:
-                versions.append(version)
-
-        # Run this method just for the first request
-        if self._is_first_request(entry):
-            version = self.get_version_from_headers(plugin, entry)
-            if version:
-                versions.append(version)
-
+        versions = self.get_values_from_matchers(
+            entry, grouped_matchers, extract_version
+        )
         return self.get_most_complete_version(versions)
 
+    def detect_plugin_name(self, plugin, entry):
+        if not plugin.is_modular:
+            return plugin.name
+
+        grouped_matchers = plugin.get_grouped_matchers('modular_matchers')
+        module_name = self.get_values_from_matchers(
+            entry, grouped_matchers, extract_name
+        )
+
+        if module_name:
+            name = '{}-{}'.format(plugin.name, module_name[0])
+        else:
+            name = plugin.name
+
+        return name
+
     @staticmethod
-    def get_version_from_url(plugin, entry):
+    def from_url(entry, matchers, extraction_function):
         """ Return version from request or response url.
         Both could be different because of redirects.
 
         """
-        matchers = plugin.get_url_matchers()
-        if not matchers:
-            return
-
         for rtype in ['request', 'response']:
             url = entry[rtype]['url']
-            version = extract_version(url, matchers)
+            version = extraction_function(url, matchers)
             if version:
                 return version
 
     @staticmethod
-    def get_version_from_body(plugin, entry):
-        matchers = plugin.get_body_matchers()
-        if not matchers:
-            return
-
+    def from_body(entry, matchers, extraction_function):
         body = entry['response']['content']['text']
 
-        version = extract_version(body, matchers)
+        version = extraction_function(body, matchers)
         if version:
             return version
 
     @staticmethod
-    def get_version_from_headers(plugin, entry):
+    def from_headers(entry, matchers, _):
         """ Return version from valid headers.
         It only applies on first request.
 
         """
-        matchers = plugin.get_header_matchers()
-        if not matchers:
-            return
-
         headers = entry['response']['headers']
         version = extract_version_from_headers(headers, matchers)
         if version:
