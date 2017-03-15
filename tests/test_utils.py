@@ -3,7 +3,7 @@ import re
 import pytest
 
 from detectem.utils import extract_version, extract_version_from_headers
-from detectem.exceptions import NotVersionNamedParameterFound
+from detectem.exceptions import NotNamedParameterFound
 
 
 @pytest.mark.parametrize("matcher", [
@@ -23,7 +23,7 @@ def test_extract_version_with_not_matching_matcher(matcher):
 
 
 def test_extract_version_with_invalid_matcher():
-    with pytest.raises(NotVersionNamedParameterFound):
+    with pytest.raises(NotNamedParameterFound):
         assert extract_version('the version is v1.0.0', ["version is v([0-9\.]+)"])
 
 

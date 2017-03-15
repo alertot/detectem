@@ -9,26 +9,37 @@ from contextlib import contextmanager
 import docker
 import requests
 
-from detectem.exceptions import NotVersionNamedParameterFound
+from detectem.exceptions import NotNamedParameterFound
 from detectem.settings import SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE
 
 
 logger = logging.getLogger('detectem')
 
 
-def extract_version(text, matchers):
+def extract_data(text, matchers, parameter):
     for matcher in matchers:
         if isinstance(matcher, str):
             v = re.search(matcher, text, flags=re.DOTALL)
             if v:
                 try:
-                    return v.group('version')
+                    return v.group(parameter)
                 except IndexError:
-                    raise NotVersionNamedParameterFound
+                    raise NotNamedParameterFound(
+                        'Parameter %s not found in regexp' %
+                        parameter
+                    )
         elif callable(matcher):
             v = matcher(text)
             if v:
                 return v
+
+
+def extract_version(text, matchers):
+    return extract_data(text, matchers, 'version')
+
+
+def extract_name(text, matchers):
+    return extract_data(text, matchers, 'name')
 
 
 def extract_version_from_headers(headers, matchers):
