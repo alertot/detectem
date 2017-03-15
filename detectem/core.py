@@ -1,9 +1,9 @@
 import logging
-import json
 import collections
 
 from detectem.utils import (
-    extract_version, extract_name, extract_version_from_headers
+    extract_version, extract_name, extract_version_from_headers,
+    get_most_complete_version
 )
 from detectem.plugin import get_plugin_by_name
 
@@ -23,9 +23,9 @@ class Detector():
     def start_detection(self):
         for entry in self.har:
             for plugin in self.plugins:
-                version = self.detect_plugin_version(plugin, entry)
+                version = self.get_plugin_version(plugin, entry)
                 if version:
-                    name = self.detect_plugin_name(plugin, entry)
+                    name = self.get_plugin_name(plugin, entry)
                     t = Result(name, version, plugin.homepage)
                     if t not in self.results:
                         self.results.append(t)
@@ -47,21 +47,7 @@ class Detector():
 
             results_data.append(rdict)
 
-        if format == 'json':
-            return json.dumps(results_data)
-        else:
-            return results_data
-
-    @staticmethod
-    def get_most_complete_version(versions):
-        """ Return the most complete version.
-
-        i.e. `versions=['1.4', '1.4.4']` it returns '1.4.4' since it's more complete.
-        """
-        if not versions:
-            return
-
-        return max(versions)
+        return results_data
 
     def _is_first_request(self, entry):
         return entry['request']['url'].rstrip('/') == self.requested_url.rstrip('/')
@@ -77,7 +63,7 @@ class Detector():
 
         return values
 
-    def detect_plugin_version(self, plugin, entry):
+    def get_plugin_version(self, plugin, entry):
         """ Return a list of (name, version) after applying every plugin matcher. """
         versions = []
         grouped_matchers = plugin.get_grouped_matchers()
@@ -89,9 +75,9 @@ class Detector():
         versions = self.get_values_from_matchers(
             entry, grouped_matchers, extract_version
         )
-        return self.get_most_complete_version(versions)
+        return get_most_complete_version(versions)
 
-    def detect_plugin_name(self, plugin, entry):
+    def get_plugin_name(self, plugin, entry):
         if not plugin.is_modular:
             return plugin.name
 

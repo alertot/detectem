@@ -60,8 +60,12 @@ def get_detection_results(url, format, metadata):
 
     det = Detector(response, plugins, url)
     det.start_detection()
+    results = det.get_results(metadata=metadata)
 
-    return det.get_results(format=format, metadata=metadata)
+    if format == 'json':
+        return json.dumps(results)
+    else:
+        return results
 
 
 if __name__ == "__main__":

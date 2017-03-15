@@ -16,6 +16,17 @@ from detectem.settings import SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE
 logger = logging.getLogger('detectem')
 
 
+def get_most_complete_version(versions):
+    """ Return the most complete version.
+
+    i.e. `versions=['1.4', '1.4.4']` it returns '1.4.4' since it's more complete.
+    """
+    if not versions:
+        return
+
+    return max(versions)
+
+
 def extract_data(text, matchers, parameter):
     for matcher in matchers:
         if isinstance(matcher, str):
