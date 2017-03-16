@@ -54,7 +54,7 @@ class TestGenericMatches(object):
         return (fake_har_entry, method)
 
     def test_matches(self, plugin_name, match, plugin_list):
-        field = [k for k in match.keys()][0]
+        field = [k for k in match.keys() if k in self.FIELDS][0]
         fake_har_entry, method = self._get_har_entry_and_method(field, match)
 
         plugin = get_plugin_by_name(plugin_name, plugin_list)
