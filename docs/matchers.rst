@@ -64,5 +64,28 @@ For sanity purposes,
 it's a good idea to keep the ``window`` object
 since without it could lead to unexpected results in presence of iframes.
 
+
+Modular matchers
+^^^^^^^^^^^^^^^^
+
+Some projects like AngularJS_ have modules that could be included
+to add functionality.
+The issue is that both core library and module
+have the same signature for the version,
+then it's needed to determine the software module too.
+Here comes *modular matchers* to detect the module name.
+They use the static matchers but with ``name``
+as the named parameter for the regular expression.
+
+In example, *AngularJS* plugin has the following modular matcher:
+
+.. code-block:: python
+
+  modular_matchers = [
+    {'url': '/(?:angular-)(?P<name>\w+)\.min\.js'},
+  ]
+
+
 .. _DOM: https://en.wikipedia.org/wiki/Document_Object_Model
 .. _D3.js: https://d3js.org/
+.. _AngularJS: https://angularjs.org/
