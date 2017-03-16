@@ -81,7 +81,7 @@ class Plugin():
     def get_grouped_matchers(self, source='matchers'):
         """ Return dictionary of matchers (not empty ones) """
         data = {}
-        for k in ['url', 'body', 'headers']:
+        for k in ['url', 'body', 'header']:
             m = self._get_matchers(k, source)
             if m:
                 data[k] = m

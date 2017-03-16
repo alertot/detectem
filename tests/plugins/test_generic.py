@@ -48,7 +48,7 @@ class TestGenericMatches(object):
             method = Detector.from_body
             fake_har_entry['response']['content']['text'] = match['body']
         elif field == 'header':
-            method = Detector.from_headers
+            method = Detector.from_header
             fake_har_entry['response']['headers'] = [match['header']]
 
         return (fake_har_entry, method)

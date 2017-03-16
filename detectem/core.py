@@ -72,8 +72,8 @@ class Detector():
         grouped_matchers = plugin.get_grouped_matchers()
 
         # Check headers just for the first request
-        if not self._is_first_request(entry) and 'headers' in grouped_matchers:
-            del grouped_matchers['headers']
+        if not self._is_first_request(entry) and 'header' in grouped_matchers:
+            del grouped_matchers['header']
 
         versions = self.get_values_from_matchers(
             entry, grouped_matchers, extract_version
@@ -118,7 +118,7 @@ class Detector():
             return version
 
     @staticmethod
-    def from_headers(entry, matchers, _):
+    def from_header(entry, matchers, _):
         """ Return version from valid headers.
         It only applies on first request.
 
