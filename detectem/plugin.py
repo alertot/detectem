@@ -91,3 +91,7 @@ class Plugin():
     @property
     def is_modular(self):
         return bool(hasattr(self, 'modular_matchers'))
+
+    @property
+    def is_indicator(self):
+        return bool(hasattr(self, 'indicators'))

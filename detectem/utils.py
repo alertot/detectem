@@ -27,6 +27,20 @@ def get_most_complete_version(versions):
     return max(versions)
 
 
+def check_presence(text, matchers):
+    for matcher in matchers:
+        if isinstance(matcher, str):
+            v = re.search(matcher, text, flags=re.DOTALL)
+            if v:
+                return True
+        elif callable(matcher):
+            v = matcher(text)
+            if v:
+                return True
+
+    return False
+
+
 def extract_data(text, matchers, parameter):
     for matcher in matchers:
         if isinstance(matcher, str):
@@ -51,7 +65,6 @@ def extract_version(text, matchers):
 
 def extract_name(text, matchers):
     return extract_data(text, matchers, 'name')
-
 
 def extract_version_from_headers(headers, matchers):
     for matcher_name, matcher_value in matchers:

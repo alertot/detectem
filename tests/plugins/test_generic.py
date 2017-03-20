@@ -3,7 +3,7 @@ import dukpy
 
 from detectem.core import Detector
 from detectem.plugin import load_plugins, get_plugin_by_name
-from detectem.utils import extract_version, extract_name
+from detectem.utils import extract_version, extract_name, check_presence
 from tests import load_from_yaml, tree
 
 
@@ -30,6 +30,8 @@ class TestGenericMatches(object):
             entry_name = 'js_matches'
         elif fname == 'test_modular_matches':
             entry_name = 'modular_matches'
+        elif fname == 'test_indicators':
+            entry_name = 'indicators'
 
         cases = []
         for entry in data:
@@ -105,3 +107,13 @@ class TestGenericMatches(object):
                     break
 
             assert flag
+
+    def test_indicators(self, plugin_name, match, plugin_list):
+        field = [k for k in match.keys() if k in self.FIELDS][0]
+        fake_har_entry, method = self._get_har_entry_and_method(field, match)
+
+        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        matchers = plugin._get_matchers(field, 'indicators')
+        presence = method(fake_har_entry, matchers, check_presence)
+
+        assert presence

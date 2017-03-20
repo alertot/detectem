@@ -3,40 +3,51 @@ import collections
 
 from detectem.utils import (
     extract_version, extract_name, extract_version_from_headers,
-    get_most_complete_version
+    get_most_complete_version, check_presence
 )
 from detectem.plugin import get_plugin_by_name
 
 logger = logging.getLogger('detectem')
 
-Result = collections.namedtuple('Result', 'name version homepage')
+VersionResult = collections.namedtuple('VersionResult', 'name version homepage')
+IndicatorResult = collections.namedtuple('IndicatorResult', 'name homepage')
 
 
 class Detector():
     def __init__(self, response, plugins, requested_url):
         self.har = response['har']
-        self.plugins = plugins
         self.requested_url = requested_url
 
         self._softwares = response['softwares']
-        self._results = []
+        self._results = set()
+
+        self.version_plugins = [p for p in plugins if not p.is_indicator]
+        self.indicators = [p for p in plugins if p.is_indicator]
 
     def process_har(self):
         for entry in self.har:
-            for plugin in self.plugins:
+            for plugin in self.version_plugins:
                 version = self.get_plugin_version(plugin, entry)
                 if version:
                     name = self.get_plugin_name(plugin, entry)
-                    t = Result(name, version, plugin.homepage)
-                    if t not in self._results:
-                        self._results.append(t)
+                    self._results.add(
+                        VersionResult(name, version, plugin.homepage)
+                    )
 
         # Feedback from Javascript
         for software in self._softwares:
-            plugin = get_plugin_by_name(software['name'], self.plugins)
-            self._results.append(
-                Result(plugin.name, software['version'], plugin.homepage)
+            plugin = get_plugin_by_name(software['name'], self.version_plugins)
+            self._results.add(
+                VersionResult(plugin.name, software['version'], plugin.homepage)
             )
+
+        for entry in self.har:
+            for plugin in self.indicators:
+                is_present = self.check_indicator_presence(plugin, entry)
+                if is_present:
+                    self._results.add(
+                        IndicatorResult(plugin.name, plugin.homepage)
+                    )
 
     def get_results(self, metadata=False):
         results_data = []
@@ -44,7 +55,11 @@ class Detector():
         self.process_har()
 
         for rt in self._results:
-            rdict = {'name': rt.name, 'version': rt.version}
+            if isinstance(rt, VersionResult):
+                rdict = {'name': rt.name, 'version': rt.version}
+            elif isinstance(rt, IndicatorResult):
+                rdict = {'name': rt.name}
+
             if metadata:
                 rdict['homepage'] = rt.homepage
 
@@ -96,6 +111,15 @@ class Detector():
             name = plugin.name
 
         return name
+
+    def check_indicator_presence(self, plugin, entry):
+        grouped_matchers = plugin.get_grouped_matchers('indicators')
+
+        presence_list = self.get_values_from_matchers(
+            entry, grouped_matchers, check_presence
+        )
+
+        return any(presence_list)
 
     @staticmethod
     def from_url(entry, matchers, extraction_function):
