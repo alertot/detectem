@@ -49,7 +49,7 @@ def load_plugins():
         classes = inspect.getmembers(m, predicate=inspect.isclass)
 
         for name, klass in classes:
-            if klass == Plugin:
+            if klass == Plugin or 'Plugin' not in klass.__name__:
                 continue
 
             ins = klass()
@@ -68,7 +68,6 @@ def load_plugins():
 
 class IPlugin(Interface):
     name = Attribute(""" Name to identify the plugin. """)
-    matchers = Attribute(""" List of matches to find plugin versions. """)
     homepage = Attribute(""" Plugin homepage. """)
 
 
