@@ -74,7 +74,7 @@ class IPlugin(Interface):
 @implementer(IPlugin)
 class Plugin():
     def _get_matchers(self, value, source='matchers'):
-        matchers_dict = getattr(self, source)
+        matchers_dict = getattr(self, source, [])
         return [m[value] for m in matchers_dict if value in m]
 
     def get_grouped_matchers(self, source='matchers'):

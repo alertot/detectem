@@ -75,7 +75,6 @@ class Detector():
                     self._results.add(
                         IndicatorResult(plugin.name, plugin.homepage)
                     )
-                    import pudb; pudb.set_trace()
                     hints += self.get_hints(plugin, entry)
 
         for hint in hints:
