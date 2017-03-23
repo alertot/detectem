@@ -21,25 +21,52 @@ class Detector():
         self._softwares = response['softwares']
         self._results = set()
 
+        # Separate plugins according to its type
         self.version_plugins = [p for p in plugins if not p.is_indicator]
         self.indicators = [p for p in plugins if p.is_indicator]
 
+    def get_hints(self, plugin, entry):
+        """ Get plugins hints from `plugin` on `entry`.
+
+        Plugins hints could return `VersionResult`, `IndicatorResult` or `None`.
+
+        """
+        hints = []
+
+        for hint_function in getattr(plugin, 'hints', []):
+            hint = hint_function(entry)
+            if hint:
+                hints.append(hint)
+
+        return hints
+
     def process_har(self):
+        """ Detect plugins present in the page.
+
+        First, start with version plugins, then software from Splash
+        and finish with indicators.
+        In each phase try to detect plugin hints in already detected plugins.
+
+        """
+        hints = []
         for entry in self.har:
             for plugin in self.version_plugins:
                 version = self.get_plugin_version(plugin, entry)
                 if version:
+                    # Name can be different than plugin name in modular plugins
                     name = self.get_plugin_name(plugin, entry)
                     self._results.add(
                         VersionResult(name, version, plugin.homepage)
                     )
+                    hints += self.get_hints(plugin, entry)
 
-        # Feedback from Javascript
+        # Feedback from Javascript, it comes from Splash
         for software in self._softwares:
             plugin = get_plugin_by_name(software['name'], self.version_plugins)
             self._results.add(
                 VersionResult(plugin.name, software['version'], plugin.homepage)
             )
+            hints += self.get_hints(plugin, entry)
 
         for entry in self.har:
             for plugin in self.indicators:
@@ -48,8 +75,14 @@ class Detector():
                     self._results.add(
                         IndicatorResult(plugin.name, plugin.homepage)
                     )
+                    import pudb; pudb.set_trace()
+                    hints += self.get_hints(plugin, entry)
+
+        for hint in hints:
+            self._results.add(hint)
 
     def get_results(self, metadata=False):
+        """ Return results of the analysis. """
         results_data = []
 
         self.process_har()
