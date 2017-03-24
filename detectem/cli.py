@@ -2,12 +2,14 @@ import logging
 import sys
 import json
 import click
+import pprint
 
 from detectem.response import get_response
 from detectem.plugin import load_plugins
 from detectem.core import Detector
 from detectem.exceptions import SplashError
 from detectem.utils import print_error_message
+from detectem.settings import CMD_OUTPUT, JSON_OUTPUT
 
 # Set up logging
 logger = logging.getLogger('detectem')
@@ -25,8 +27,8 @@ logger.addHandler(ch)
 )
 @click.option(
     '--format',
-    default=None,
-    type=click.Choice(['json']),
+    default=CMD_OUTPUT,
+    type=click.Choice([CMD_OUTPUT, JSON_OUTPUT]),
     help='Set the format of the results.'
 )
 @click.option(
@@ -44,7 +46,11 @@ def main(debug, format, metadata, url):
     else:
         ch.setLevel(logging.ERROR)
 
-    print(get_detection_results(url, format, metadata))
+    results = get_detection_results(url, format, metadata)
+    if format == CMD_OUTPUT:
+        pprint.pprint(results)
+    elif format == JSON_OUTPUT:
+        print(results)
 
 
 def get_detection_results(url, format, metadata):
@@ -61,7 +67,7 @@ def get_detection_results(url, format, metadata):
     det = Detector(response, plugins, url)
     results = det.get_results(metadata=metadata)
 
-    if format == 'json':
+    if format == JSON_OUTPUT:
         return json.dumps(results)
     else:
         return results
