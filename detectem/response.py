@@ -22,7 +22,6 @@ logger = logging.getLogger('detectem')
 def is_url_allowed(url, blacklist):
     """ Return `True` if the `url` is not in the `blacklist`. """
     for ft in blacklist:
-        ft = re.escape(ft)
         if re.search(ft, url):
             return False
 
@@ -94,7 +93,9 @@ def get_valid_har(har_data):
     """ Return list of valid har entries. """
     new_entries = []
     entries = har_data.get('log', {}).get('entries', [])
-    blacklist = ['.ttf', '.woff', 'fonts.googleapis.com']
+    blacklist = [
+        '\.ttf', '\.woff', 'fonts\.googleapis\.com', '\.png', '\.jpe?g', '\.gif'
+    ]
 
     logger.debug('[+] Detected %(n)d entries in HAR', {'n': len(entries)})
 
