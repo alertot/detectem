@@ -1,5 +1,5 @@
 from detectem.plugin import Plugin
-from detectem.core import IndicatorResult
+from detectem.core import Result
 from detectem.plugins.joomla.joomla import JoomlaPlugin
 
 
@@ -10,5 +10,5 @@ class NewsShowProGk5Plugin(Plugin):
         {'body': '\* @package News Show Pro GK5\n'},
     ]
     hints = [
-        lambda entry: IndicatorResult(JoomlaPlugin.name, JoomlaPlugin.homepage)
+        lambda entry: Result(JoomlaPlugin.name, homepage=JoomlaPlugin.homepage)
     ]

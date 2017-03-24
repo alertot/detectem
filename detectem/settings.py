@@ -7,3 +7,7 @@ DOCKER_SPLASH_IMAGE = os.environ.get('DOCKER_SPLASH_IMAGE', 'scrapinghub/splash:
 
 JSON_OUTPUT = 'json'
 CMD_OUTPUT = 'cmd'
+
+VERSION_TYPE = 'version'
+INDICATOR_TYPE = 'indicator'
+HINT_TYPE = 'hint'

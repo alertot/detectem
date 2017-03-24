@@ -6,11 +6,17 @@ from detectem.utils import (
     get_most_complete_version, check_presence
 )
 from detectem.plugin import get_plugin_by_name
+from detectem.settings import VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE
 
 logger = logging.getLogger('detectem')
 
-VersionResult = collections.namedtuple('VersionResult', 'name version homepage')
-IndicatorResult = collections.namedtuple('IndicatorResult', 'name homepage')
+
+class Result():
+    def __init__(self, name, version=None, homepage=None, type=VERSION_TYPE):
+        self.name = name
+        self.type = type
+        self.version = version
+        self.homepage = homepage
 
 
 class Detector():
@@ -28,7 +34,7 @@ class Detector():
     def get_hints(self, plugin, entry):
         """ Get plugins hints from `plugin` on `entry`.
 
-        Plugins hints could return `VersionResult`, `IndicatorResult` or `None`.
+        Plugins hints return `Result` or `None`.
 
         """
         hints = []
@@ -36,6 +42,7 @@ class Detector():
         for hint_function in getattr(plugin, 'hints', []):
             hint = hint_function(entry)
             if hint:
+                hint.type = HINT_TYPE
                 hints.append(hint)
 
         return hints
@@ -56,7 +63,7 @@ class Detector():
                     # Name can be different than plugin name in modular plugins
                     name = self.get_plugin_name(plugin, entry)
                     self._results.add(
-                        VersionResult(name, version, plugin.homepage)
+                        Result(name, version, plugin.homepage)
                     )
                     hints += self.get_hints(plugin, entry)
 
@@ -64,7 +71,7 @@ class Detector():
         for software in self._softwares:
             plugin = get_plugin_by_name(software['name'], self.version_plugins)
             self._results.add(
-                VersionResult(plugin.name, software['version'], plugin.homepage)
+                Result(plugin.name, software['version'], plugin.homepage)
             )
             hints += self.get_hints(plugin, entry)
 
@@ -73,7 +80,11 @@ class Detector():
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
                     self._results.add(
-                        IndicatorResult(plugin.name, plugin.homepage)
+                        Result(
+                            plugin.name,
+                            homepage=plugin.homepage,
+                            type=INDICATOR_TYPE
+                        )
                     )
                     hints += self.get_hints(plugin, entry)
 
@@ -87,13 +98,13 @@ class Detector():
         self.process_har()
 
         for rt in self._results:
-            if isinstance(rt, VersionResult):
-                rdict = {'name': rt.name, 'version': rt.version}
-            elif isinstance(rt, IndicatorResult):
-                rdict = {'name': rt.name}
+            rdict = {'name': rt.name}
+            if rt.version:
+                rdict['version'] = rt.version
 
             if metadata:
                 rdict['homepage'] = rt.homepage
+                rdict['type'] = rt.type
 
             results_data.append(rdict)
 
