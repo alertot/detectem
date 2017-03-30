@@ -9,6 +9,29 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## 0.5.2 - 2017-03-24
+### Changed
+- Refactor of result types
+- Blacklist in HAR results
+- Output improvement
+
+## 0.5.1 - 2017-03-23
+### Added
+- Concept of hints
+- Documentation about modular matchers
+- Two Joomla plugins
+
+### Changed
+- Plugin interface to make it more flexible
+
+## 0.5.0 - 2017-03-20
+### Added
+- Concept of indicators
+- Documentation about modular matchers
+
+### Fixed
+- Tests
+
 ## 0.4.5 - 2017-03-15
 
 ## 0.4.4 - 2017-03-15
