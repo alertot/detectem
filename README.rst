@@ -56,13 +56,19 @@ Installation
 
     $ docker pull scrapinghub/splash
 
-3. Create a virtual environment with Python >= 3.5 .
+3. Start the container::
 
-4. Install detectem::
+    $ docker run -d -p 8050:8050 -p 8051:8051 scrapinghub/splash
+
+4. Splash is now available at 0.0.0.0 at ports 8050 (http) and 8051 (https).
+
+5. Create a virtual environment with Python >= 3.5 .
+
+6. Install detectem::
 
     $ pip install detectem
 
-5. Run it against some URL::
+7. Run it against some URL::
 
     $ det http://domain.tld
 
