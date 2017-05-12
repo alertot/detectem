@@ -82,7 +82,7 @@ def docker_container():
 
     """
     if SETUP_SPLASH:
-        docker_cli = docker.from_env()
+        docker_cli = docker.from_env(version='auto')
         container_name = 'splash-detectem'
 
         try:
