@@ -14,7 +14,7 @@ from detectem.exceptions import DockerStartError, SplashError
 from detectem.utils import docker_container
 
 DEFAULT_CHARSET = 'iso-8859-1'
-ERROR_STATUS_CODES = [504]
+ERROR_STATUS_CODES = [400, 504]
 
 logger = logging.getLogger('detectem')
 
