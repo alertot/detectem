@@ -1,5 +1,4 @@
 import logging
-import collections
 
 from detectem.utils import (
     extract_version, extract_name, extract_version_from_headers,
@@ -12,11 +11,14 @@ logger = logging.getLogger('detectem')
 
 
 class Result():
-    def __init__(self, name, version=None, homepage=None, type=VERSION_TYPE):
+    def __init__(
+        self, name, version=None, homepage=None, from_url=None, type=VERSION_TYPE
+    ):
         self.name = name
         self.type = type
         self.version = version
         self.homepage = homepage
+        self.from_url = from_url
 
 
 class Detector():
@@ -30,6 +32,13 @@ class Detector():
         # Separate plugins according to its type
         self.version_plugins = [p for p in plugins if not p.is_indicator]
         self.indicators = [p for p in plugins if p.is_indicator]
+
+    @staticmethod
+    def get_url(entry):
+        if 'response' in entry:
+            return entry['response']['url']
+
+        return entry['request']['url']
 
     def get_hints(self, plugin, entry):
         """ Get plugins hints from `plugin` on `entry`.
@@ -63,7 +72,12 @@ class Detector():
                     # Name can be different than plugin name in modular plugins
                     name = self.get_plugin_name(plugin, entry)
                     self._results.add(
-                        Result(name, version, plugin.homepage)
+                        Result(
+                            name=name,
+                            version=version,
+                            homepage=plugin.homepage,
+                            from_url=self.get_url(entry)
+                        )
                     )
                     hints += self.get_hints(plugin, entry)
 
@@ -71,7 +85,12 @@ class Detector():
         for software in self._softwares:
             plugin = get_plugin_by_name(software['name'], self.version_plugins)
             self._results.add(
-                Result(plugin.name, software['version'], plugin.homepage)
+                Result(
+                    name=plugin.name,
+                    version=software['version'],
+                    homepage=plugin.homepage,
+                    from_url=self.requested_url,
+                )
             )
             hints += self.get_hints(plugin, entry)
 
@@ -81,8 +100,9 @@ class Detector():
                 if is_present:
                     self._results.add(
                         Result(
-                            plugin.name,
+                            name=plugin.name,
                             homepage=plugin.homepage,
+                            from_url=self.get_url(entry),
                             type=INDICATOR_TYPE
                         )
                     )
@@ -105,6 +125,7 @@ class Detector():
             if metadata:
                 rdict['homepage'] = rt.homepage
                 rdict['type'] = rt.type
+                rdict['from_url'] = rt.from_url
 
             results_data.append(rdict)
 

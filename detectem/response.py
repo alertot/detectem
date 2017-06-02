@@ -83,7 +83,7 @@ def get_response(url, plugins):
     softwares = json_data['softwares']
     har = get_valid_har(json_data['har'])
 
-    logger.debug('[+] Detected %(n)d softwares', {'n': len(softwares)})
+    logger.debug('[+] Detected %(n)d softwares from the DOM', {'n': len(softwares)})
     logger.debug('[+] Final HAR has %(n)d valid entries', {'n': len(har)})
 
     return {'har': har, 'softwares': softwares}
