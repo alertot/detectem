@@ -51,8 +51,20 @@ class Detector():
         for hint_function in getattr(plugin, 'hints', []):
             hint = hint_function(entry)
             if hint:
-                hint.type = HINT_TYPE
-                hints.append(hint)
+                if isinstance(hint, Result):
+                    logger.debug(
+                        '%(pname)s & hint %(hname)s detected',
+                        {'pname': plugin.name, 'hname': hint.name}
+                    )
+
+                    hint.type = HINT_TYPE
+                    hints.append(hint)
+                else:
+                    logger.error(
+                        '%(pname)s has invalid plugin',
+                        {'pname': plugin.name}
+                    )
+                    continue
 
         return hints
 
@@ -146,7 +158,7 @@ class Detector():
         return values
 
     def get_plugin_version(self, plugin, entry):
-        """ Return a list of (name, version) after applying every plugin matcher. """
+        """ Return version after applying every plugin matcher. """
         versions = []
         grouped_matchers = plugin.get_grouped_matchers()
 
