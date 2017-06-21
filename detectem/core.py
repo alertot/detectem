@@ -26,7 +26,7 @@ class Detector():
         self.har = response['har']
         self.requested_url = requested_url
 
-        self._softwares = response['softwares']
+        self._softwares_from_splash = response['softwares']
         self._results = set()
 
         # Separate plugins according to its type
@@ -35,6 +35,7 @@ class Detector():
 
     @staticmethod
     def get_url(entry):
+        """ Return URL from response if it was received otherwise requested URL """
         if 'response' in entry:
             return entry['response']['url']
 
@@ -68,6 +69,18 @@ class Detector():
 
         return hints
 
+    def process_from_splash(self):
+        for software in self._softwares_from_splash:
+            plugin = get_plugin_by_name(software['name'], self.version_plugins)
+            self._results.add(
+                Result(
+                    name=plugin.name,
+                    version=software['version'],
+                    homepage=plugin.homepage,
+                    from_url=self.requested_url,
+                )
+            )
+
     def process_har(self):
         """ Detect plugins present in the page.
 
@@ -77,11 +90,12 @@ class Detector():
 
         """
         hints = []
+
         for entry in self.har:
             for plugin in self.version_plugins:
                 version = self.get_plugin_version(plugin, entry)
                 if version:
-                    # Name can be different than plugin name in modular plugins
+                    # Name could be different than plugin name in modular plugins
                     name = self.get_plugin_name(plugin, entry)
                     self._results.add(
                         Result(
@@ -93,20 +107,6 @@ class Detector():
                     )
                     hints += self.get_hints(plugin, entry)
 
-        # Feedback from Javascript, it comes from Splash
-        for software in self._softwares:
-            plugin = get_plugin_by_name(software['name'], self.version_plugins)
-            self._results.add(
-                Result(
-                    name=plugin.name,
-                    version=software['version'],
-                    homepage=plugin.homepage,
-                    from_url=self.requested_url,
-                )
-            )
-            hints += self.get_hints(plugin, entry)
-
-        for entry in self.har:
             for plugin in self.indicators:
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
@@ -128,6 +128,7 @@ class Detector():
         results_data = []
 
         self.process_har()
+        self.process_from_splash()
 
         for rt in self._results:
             rdict = {'name': rt.name}
