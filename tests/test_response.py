@@ -16,12 +16,12 @@ from detectem.exceptions import SplashError
 from detectem.response import requests
 
 
-@pytest.mark.parametrize("url,blacklist,result", [
-    ('http://domain.tld/black', ['black'], False),
-    ('http://domain.tld/black', ['white'], True),
+@pytest.mark.parametrize("url,result", [
+    ('http://domain.tld/font.ttf', False),
+    ('http://domain.tld/index.html', True),
 ])
-def test_is_url_allowed(url, blacklist, result):
-    assert is_url_allowed(url, blacklist) == result
+def test_is_url_allowed(url, result):
+    assert is_url_allowed(url) == result
 
 
 @pytest.mark.parametrize("response,result", [

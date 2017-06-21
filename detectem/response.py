@@ -19,12 +19,16 @@ ERROR_STATUS_CODES = [400, 504]
 logger = logging.getLogger('detectem')
 
 
-def is_url_allowed(url, blacklist):
+def is_url_allowed(url):
     """ Return ``True`` if ``url`` is not in ``blacklist``.
 
     :rtype: bool
 
     """
+    blacklist = [
+        '\.ttf', '\.woff', 'fonts\.googleapis\.com', '\.png', '\.jpe?g', '\.gif'
+    ]
+
     for ft in blacklist:
         if re.search(ft, url):
             return False
@@ -134,15 +138,11 @@ def get_valid_har(har_data):
     """
     new_entries = []
     entries = har_data.get('log', {}).get('entries', [])
-    blacklist = [
-        '\.ttf', '\.woff', 'fonts\.googleapis\.com', '\.png', '\.jpe?g', '\.gif'
-    ]
-
     logger.debug('[+] Detected %(n)d entries in HAR', {'n': len(entries)})
 
     for entry in entries:
         url = entry['request']['url']
-        if not is_url_allowed(url, blacklist):
+        if not is_url_allowed(url):
             continue
 
         response = entry['response']['content']
