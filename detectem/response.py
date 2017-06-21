@@ -20,7 +20,11 @@ logger = logging.getLogger('detectem')
 
 
 def is_url_allowed(url, blacklist):
-    """ Return `True` if the `url` is not in the `blacklist`. """
+    """ Return ``True`` if ``url`` is not in ``blacklist``.
+
+    :rtype: bool
+
+    """
     for ft in blacklist:
         if re.search(ft, url):
             return False
@@ -50,7 +54,11 @@ def is_valid_mimetype(response):
 
 
 def get_charset(response):
-    """ Return charset in `response` or default charset. """
+    """ Return charset from ``response`` or default charset.
+
+    :rtype: str
+
+    """
     # Set default charset
     charset = DEFAULT_CHARSET
 
@@ -62,7 +70,11 @@ def get_charset(response):
 
 
 def create_lua_script(plugins):
-    """ Return script template filled up with plugin javascript data. """
+    """ Return script template filled up with plugin javascript data.
+
+    :rtype: str
+
+    """
     lua_template = pkg_resources.resource_string('detectem', 'script.lua')
     template = Template(lua_template.decode('utf-8'))
 
@@ -77,7 +89,11 @@ def create_lua_script(plugins):
 
 
 def get_response(url, plugins):
-    """ Return response with har and detected software. """
+    """ Return response with har and detected software. i
+
+    :rtype: dict
+
+    """
     lua_script = create_lua_script(plugins)
     lua = urllib.parse.quote_plus(lua_script)
     page_url = '{}/execute?url={}&lua_source={}'.format(SPLASH_URL, url, lua)
@@ -111,7 +127,11 @@ def get_response(url, plugins):
 
 
 def get_valid_har(har_data):
-    """ Return list of valid har entries. """
+    """ Return list of valid har entries.
+
+    :rtype: list
+
+    """
     new_entries = []
     entries = har_data.get('log', {}).get('entries', [])
     blacklist = [
