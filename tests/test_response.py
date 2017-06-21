@@ -118,6 +118,35 @@ def test_get_response_with_error_status_codes(monkeypatch):
             'log': {
                 'entries': [
                     {
+                        'request': {'url': 'http://domain.tld/img.png'},
+                    }
+                ]
+            }
+        },
+        0
+    ),
+    (
+        {
+            'log': {
+                'entries': [
+                    {
+                        'request': {'url': 'http://domain.tld'},
+                        'response': {
+                            'content': {
+                                'text': 'blab', 'mimeType': 'image/gif'
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        0
+    ),
+    (
+        {
+            'log': {
+                'entries': [
+                    {
                         'request': {'url': 'http://domain.tld/'},
                         'response': {'content': {'text': 'blab'}}
                     }
@@ -127,6 +156,5 @@ def test_get_response_with_error_status_codes(monkeypatch):
         1
     ),
 ])
-
 def test_get_valid_har(har_data, result_len):
     assert len(get_valid_har(har_data)) == result_len
