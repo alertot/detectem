@@ -2,9 +2,15 @@ import pytest
 import json
 
 import detectem.utils
+
 from detectem.response import (
-    is_url_allowed, get_charset, create_lua_script,
-    get_valid_har, get_response, DEFAULT_CHARSET
+    DEFAULT_CHARSET,
+    is_url_allowed,
+    is_valid_mimetype,
+    get_charset,
+    create_lua_script,
+    get_valid_har,
+    get_response,
 )
 from detectem.exceptions import SplashError
 from detectem.response import requests
@@ -16,6 +22,15 @@ from detectem.response import requests
 ])
 def test_is_url_allowed(url, blacklist, result):
     assert is_url_allowed(url, blacklist) == result
+
+
+@pytest.mark.parametrize("response,result", [
+    ({}, True),
+    ({'mimeType': 'image/gif;charset=utf-8'}, False),
+    ({'mimeType': 'text/html'}, True),
+])
+def test_is_valid_mimetype(response, result):
+    assert is_valid_mimetype(response) == result
 
 
 @pytest.mark.parametrize("response,result", [
@@ -112,5 +127,6 @@ def test_get_response_with_error_status_codes(monkeypatch):
         1
     ),
 ])
+
 def test_get_valid_har(har_data, result_len):
     assert len(get_valid_har(har_data)) == result_len

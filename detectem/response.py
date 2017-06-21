@@ -28,6 +28,27 @@ def is_url_allowed(url, blacklist):
     return True
 
 
+def is_valid_mimetype(response):
+    """ Return ``True`` if the mimetype no contains words from the blacklist.
+
+    :rtype: bool
+
+    """
+    blacklist = [
+        'image/',
+    ]
+
+    mimetype = response.get('mimeType')
+    if not mimetype:
+        return True
+
+    for bw in blacklist:
+        if bw in mimetype:
+            return False
+
+    return True
+
+
 def get_charset(response):
     """ Return charset in `response` or default charset. """
     # Set default charset
@@ -105,6 +126,8 @@ def get_valid_har(har_data):
             continue
 
         response = entry['response']['content']
+        if not is_valid_mimetype(response):
+            continue
 
         # Some responses are empty, we delete them
         if not response.get('text'):
