@@ -2,7 +2,6 @@ import pytest
 
 from detectem.core import Detector, Result
 from detectem.plugin import Plugin
-from detectem.settings import HINT_TYPE
 
 
 class TestDetector():

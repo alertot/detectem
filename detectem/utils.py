@@ -66,6 +66,7 @@ def extract_version(text, matchers):
 def extract_name(text, matchers):
     return extract_data(text, matchers, 'name')
 
+
 def extract_version_from_headers(headers, matchers):
     for matcher_name, matcher_value in matchers:
         for header in headers:
