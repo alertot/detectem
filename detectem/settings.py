@@ -1,5 +1,6 @@
 import os
 
+PLUGIN_PACKAGES = os.environ.get('DET_PLUGIN_PACKAGES', 'detectem.plugins').split(',')
 
 SPLASH_URL = os.environ.get('SPLASH_URL', 'http://localhost:8050')
 SETUP_SPLASH = os.environ.get('SETUP_SPLASH', 'True') == 'True'

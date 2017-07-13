@@ -55,6 +55,10 @@ def main(debug, format, metadata, url):
 
 def get_detection_results(url, format, metadata):
     plugins = load_plugins()
+    if not plugins:
+        error_dict = {'error': 'No plugins found in $DET_PLUGIN_PACKAGES'}
+        print_error_message(error_dict, format=format)
+        sys.exit(0)
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
     try:

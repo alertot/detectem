@@ -9,6 +9,8 @@ from zope.interface import implementer, Interface, Attribute
 from zope.interface.verify import verifyObject
 from zope.interface.exceptions import BrokenImplementation
 
+from detectem.settings import PLUGIN_PACKAGES
+
 logger = logging.getLogger('detectem')
 
 
@@ -57,8 +59,15 @@ class _PluginLoader(object):
             )
 
     def load_plugins(self, plugins_package):
-        # Resolve directory in the filesystem
-        plugin_dir = find_spec(plugins_package).submodule_search_locations[0]
+        try:
+            # Resolve directory in the filesystem
+            plugin_dir = find_spec(plugins_package).submodule_search_locations[0]
+        except ImportError:
+            logger.debug(
+                "[+] Could not load plugins package '%(pkg)s'",
+                {'pkg': plugins_package}
+                )
+            return
 
         for module_path in self._get_plugin_module_paths(plugin_dir):
             # Load the module dynamically
@@ -79,7 +88,8 @@ class _PluginLoader(object):
 def load_plugins():
     """ Return the list of plugin instances """
     loader = _PluginLoader()
-    loader.load_plugins('detectem.plugins')
+    for pkg in PLUGIN_PACKAGES:
+        loader.load_plugins(pkg)
     return loader.plugins
 
 
