@@ -19,51 +19,57 @@ def get_plugin_by_name(name, plugins):
         return None
 
 
-def get_plugin_module_paths(plugin_dir):
-    filepaths = [
-        fp for fp in glob.glob('{}/**/*.py'.format(plugin_dir), recursive=True)
-        if not fp.endswith('__init__.py')
-    ]
+class _PluginLoader(object):
 
-    relative_paths = [re.sub(plugin_dir.rstrip('/') + '/', '', fp) for fp in filepaths]
-    module_paths = [rp.replace('/', '.').replace('.py', '') for rp in relative_paths]
-    return module_paths
+    def __init__(self):
+        self.plugins = []
+
+    def _full_class_name(self, ins):
+        return '{}.{}'.format(ins.__class__.__module__, ins.__class__.__name__)
+
+    def _get_plugin_module_paths(self, plugin_dir):
+        filepaths = [
+            fp for fp in glob.glob('{}/**/*.py'.format(plugin_dir), recursive=True)
+            if not fp.endswith('__init__.py')
+        ]
+        rel_paths = [re.sub(plugin_dir.rstrip('/') + '/', '', fp) for fp in filepaths]
+        module_paths = [rp.replace('/', '.').replace('.py', '') for rp in rel_paths]
+        return module_paths
+
+    def _load_plugin(self, klass):
+        ins = klass()
+        try:
+            if verifyObject(IPlugin, ins):
+                self.plugins.append(ins)
+        except BrokenImplementation:
+            logger.warning(
+                "Plugin '%(name)s' doesn't provide the plugin interface",
+                {'name': self._full_class_name(ins)}
+            )
+
+    def load_plugins(self, plugins_package):
+        # Resolve directory in the filesystem
+        plugin_dir = find_spec(plugins_package).submodule_search_locations[0]
+
+        for module_path in self._get_plugin_module_paths(plugin_dir):
+            # Load the module dynamically
+            spec = find_spec('{}.{}'.format(plugins_package, module_path))
+            m = module_from_spec(spec)
+            spec.loader.exec_module(m)
+
+            # Get classes from module and extract the plugin classes
+            classes = inspect.getmembers(m, predicate=inspect.isclass)
+            for _, klass in classes:
+                if klass == Plugin or 'Plugin' not in klass.__name__:
+                    continue
+                self._load_plugin(klass)
 
 
 def load_plugins():
     """ Return the list of plugin instances """
-    plugins = []
-    plugins_module = 'detectem.plugins'
-
-    # Resolve directory in the filesystem
-    plugin_dir = find_spec(plugins_module).submodule_search_locations[0]
-    plugin_dir = plugin_dir
-
-    for module_path in get_plugin_module_paths(plugin_dir):
-        # Load the module dynamically
-        spec = find_spec('{}.{}'.format(plugins_module, module_path))
-        m = module_from_spec(spec)
-        spec.loader.exec_module(m)
-
-        # Get classes from module and extract the plugin classes
-        classes = inspect.getmembers(m, predicate=inspect.isclass)
-
-        for name, klass in classes:
-            if klass == Plugin or 'Plugin' not in klass.__name__:
-                continue
-
-            ins = klass()
-
-            try:
-                if verifyObject(IPlugin, ins):
-                    plugins.append(ins)
-            except BrokenImplementation:
-                logger.warning(
-                    "Plugin %(name)s doesn't meet the plugin interface",
-                    {'name': name}
-                )
-
-    return plugins
+    loader = _PluginLoader()
+    loader.load_plugins('detectem.plugins')
+    return loader.plugins
 
 
 class IPlugin(Interface):
