@@ -60,7 +60,9 @@ class _PluginLoader(object):
             # Get classes from module and extract the plugin classes
             classes = inspect.getmembers(m, predicate=inspect.isclass)
             for _, klass in classes:
-                if klass == Plugin or 'Plugin' not in klass.__name__:
+                if klass.__module__ != spec.name:
+                    continue
+                if 'Plugin' not in klass.__name__:
                     continue
                 self._load_plugin(klass)
 
