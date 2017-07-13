@@ -40,7 +40,16 @@ class _PluginLoader(object):
         ins = klass()
         try:
             if verifyObject(IPlugin, ins):
-                self.plugins.append(ins)
+                reg = get_plugin_by_name(ins.name, self.plugins)
+                if not reg:
+                    self.plugins.append(ins)
+                else:
+                    logger.warning(
+                        "Plugin '%(name)s' by '%(ins)s' is already provided by '%(reg)s'",
+                        {'name': ins.name,
+                         'ins': self._full_class_name(ins),
+                         'reg': self._full_class_name(reg)}
+                    )
         except BrokenImplementation:
             logger.warning(
                 "Plugin '%(name)s' doesn't provide the plugin interface",
