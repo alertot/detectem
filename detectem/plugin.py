@@ -62,7 +62,7 @@ class _PluginLoader(object):
             for _, klass in classes:
                 if klass.__module__ != spec.name:
                     continue
-                if 'Plugin' not in klass.__name__:
+                if not klass.__name__.endswith('Plugin'):
                     continue
                 self._load_plugin(klass)
 
