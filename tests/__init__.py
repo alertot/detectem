@@ -5,8 +5,8 @@ from collections import defaultdict
 from yaml import load
 
 
-def load_from_yaml(current_file, relative_yaml_file):
-    final_path = os.path.join(os.path.dirname(current_file), relative_yaml_file)
+def load_from_yaml(test_dir, relative_yaml_file):
+    final_path = os.path.join(test_dir, relative_yaml_file)
     lines = []
 
     if os.path.isdir(final_path):

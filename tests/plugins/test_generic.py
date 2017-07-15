@@ -1,9 +1,14 @@
+import os
+
 import pytest
 import dukpy
+
+from importlib.util import find_spec, module_from_spec
 
 from detectem.core import Detector
 from detectem.plugin import load_plugins, get_plugin_by_name
 from detectem.utils import extract_version, extract_name, check_presence
+from detectem.settings import PLUGIN_PACKAGES
 from tests import load_from_yaml, tree
 
 
@@ -16,27 +21,35 @@ class TestGenericMatches(object):
 
     def pytest_generate_tests(self, metafunc):
         fname = metafunc.function.__name__
-
-        plugin = pytest.config.getoption('plugin', None)
-        if plugin:
-            plugin = plugin.replace('.', '')
-            data = load_from_yaml(__file__, 'fixtures/{}.yml'.format(plugin))
-        else:
-            data = load_from_yaml(__file__, 'fixtures/')
-
-        if fname == 'test_matches':
-            entry_name = 'matches'
-        elif fname == 'test_js_matches':
-            entry_name = 'js_matches'
-        elif fname == 'test_modular_matches':
-            entry_name = 'modular_matches'
-        elif fname == 'test_indicators':
-            entry_name = 'indicators'
-
         cases = []
-        for entry in data:
-            for match in entry.get(entry_name, []):
-                cases.append([entry['plugin'], match])
+
+        for plugin_package in PLUGIN_PACKAGES:
+            package = plugin_package.split('.')[0]
+            package_dir = find_spec(package).submodule_search_locations[0]
+            test_dir = os.path.join(package_dir, os.pardir, 'tests')
+
+            plugin = pytest.config.getoption('plugin', None)
+            if plugin:
+                plugin = plugin.replace('.', '')
+                try:
+                    data = load_from_yaml(test_dir, 'plugins/fixtures/{}.yml'.format(plugin))
+                except FileNotFoundError:
+                    continue
+            else:
+                data = load_from_yaml(test_dir, 'plugins/fixtures/')
+
+            if fname == 'test_matches':
+                entry_name = 'matches'
+            elif fname == 'test_js_matches':
+                entry_name = 'js_matches'
+            elif fname == 'test_modular_matches':
+                entry_name = 'modular_matches'
+            elif fname == 'test_indicators':
+                entry_name = 'indicators'
+
+            for entry in data:
+                for match in entry.get(entry_name, []):
+                    cases.append([entry['plugin'], match])
 
         metafunc.parametrize('plugin_name,match', cases)
 
