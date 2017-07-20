@@ -67,11 +67,11 @@ def extract_name(text, matchers):
     return extract_data(text, matchers, 'name')
 
 
-def extract_version_from_headers(headers, matchers):
+def extract_from_headers(headers, matchers, extraction_function):
     for matcher_name, matcher_value in matchers:
         for header in headers:
             if header['name'] == matcher_name:
-                v = extract_version(header['value'], [matcher_value])
+                v = extraction_function(header['value'], [matcher_value])
                 if v:
                     return v
 

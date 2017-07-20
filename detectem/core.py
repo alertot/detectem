@@ -1,7 +1,7 @@
 import logging
 
 from detectem.utils import (
-    extract_version, extract_name, extract_version_from_headers,
+    extract_version, extract_name, extract_from_headers,
     get_most_complete_version, check_presence
 )
 from detectem.plugin import get_plugin_by_name
@@ -219,12 +219,12 @@ class Detector():
             return version
 
     @staticmethod
-    def from_header(entry, matchers, _):
+    def from_header(entry, matchers, extraction_function):
         """ Return version from valid headers.
         It only applies on first request.
 
         """
         headers = entry['response']['headers']
-        version = extract_version_from_headers(headers, matchers)
+        version = extract_from_headers(headers, matchers, extraction_function)
         if version:
             return version

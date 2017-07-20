@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from detectem.utils import extract_version, extract_version_from_headers
+from detectem.utils import check_presence, extract_version, extract_from_headers
 from detectem.exceptions import NotNamedParameterFound
 
 
@@ -31,12 +31,27 @@ def test_extract_version_with_invalid_matcher():
     ([], []),
     ([{'name': 'Header', 'value': 'software v1.1.1'}], []),
 ])
-def test_extract_version_from_headers_not_matching(headers, matchers):
-    assert not extract_version_from_headers(headers, matchers)
+def test_extract_from_headers_version_not_matching(headers, matchers):
+    assert not extract_from_headers(headers, matchers, extract_version)
 
 
-def test_extract_version_from_headers_matching():
+def test_extract_from_headers_matching_version():
     headers = [{'name': 'Header', 'value': 'software v1.1.1'}]
     matchers = [('Header', 'software v(?P<version>.*)')]
 
-    assert extract_version_from_headers(headers, matchers) == '1.1.1'
+    assert extract_from_headers(headers, matchers, extract_version) == '1.1.1'
+
+
+@pytest.mark.parametrize("headers, matchers", [
+    ([], []),
+    ([{'name': 'Header', 'value': 'awesome software'}], []),
+])
+def test_extract_from_headers_value_not_present(headers, matchers):
+    assert not extract_from_headers(headers, matchers, check_presence)
+
+
+def test_extract_from_headers_value_is_present():
+    headers = [{'name': 'Header', 'value': 'awesome software'}]
+    matchers = [('Header', '.*awesome software.*')]
+
+    assert extract_from_headers(headers, matchers, check_presence)
