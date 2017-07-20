@@ -191,6 +191,8 @@ class Detector():
 
     def check_indicator_presence(self, plugin, entry):
         grouped_matchers = plugin.get_grouped_matchers('indicators')
+        if not self._is_first_request(entry) and 'header' in grouped_matchers:
+            del grouped_matchers['header']
 
         presence_list = self.get_values_from_matchers(
             entry, grouped_matchers, check_presence
