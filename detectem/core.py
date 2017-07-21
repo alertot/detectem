@@ -1,5 +1,7 @@
 import logging
 
+from collections import defaultdict
+
 from detectem.utils import (
     extract_version, extract_name, extract_from_headers,
     get_most_complete_version, check_presence
@@ -19,6 +21,29 @@ class Result():
         self.homepage = homepage
         self.from_url = from_url
 
+    def __hash__(self):
+        return hash((self.name, self.version, self.type))
+
+    def __eq__(self, o):
+        def to_tuple(rt):
+            return (rt.name, rt.version, rt.type)
+        return to_tuple(self) == to_tuple(o)
+
+    def __repr__(self):
+        return str({'name': self.name, 'version': self.version, 'type': self.type})
+
+
+class ResultCollection():
+
+    def __init__(self):
+        self._results = defaultdict(list)
+
+    def add_result(self, rt):
+        self._results[rt.name].append(rt)
+
+    def get_results(self):
+        return [rt for p_results in self._results.values() for rt in p_results]
+
 
 class Detector():
     def __init__(self, response, plugins, requested_url):
@@ -27,7 +52,7 @@ class Detector():
 
         self._softwares_from_splash = response['softwares']
         self._plugins = plugins
-        self._results = set()
+        self._results = ResultCollection()
 
     @staticmethod
     def get_url(entry):
@@ -68,7 +93,7 @@ class Detector():
     def process_from_splash(self):
         for software in self._softwares_from_splash:
             plugin = self._plugins.get(software['name'])
-            self._results.add(
+            self._results.add_result(
                 Result(
                     name=plugin.name,
                     version=software['version'],
@@ -96,7 +121,7 @@ class Detector():
                 if version:
                     # Name could be different than plugin name in modular plugins
                     name = self.get_plugin_name(plugin, entry)
-                    self._results.add(
+                    self._results.add_result(
                         Result(
                             name=name,
                             version=version,
@@ -109,7 +134,7 @@ class Detector():
             for plugin in indicator_plugins:
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
-                    self._results.add(
+                    self._results.add_result(
                         Result(
                             name=plugin.name,
                             homepage=plugin.homepage,
@@ -120,7 +145,7 @@ class Detector():
                     hints += self.get_hints(plugin, entry)
 
         for hint in hints:
-            self._results.add(hint)
+            self._results.add_result(hint)
 
     def get_results(self, metadata=False):
         """ Return results of the analysis. """
@@ -129,7 +154,7 @@ class Detector():
         self.process_har()
         self.process_from_splash()
 
-        for rt in self._results:
+        for rt in self._results.get_results():
             rdict = {'name': rt.name}
             if rt.version:
                 rdict['version'] = rt.version
