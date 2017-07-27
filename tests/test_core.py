@@ -92,6 +92,31 @@ class TestDetector():
 
         assert d.get_results() == result
 
+    @pytest.mark.parametrize('sources', MATCHER_SOURCES)
+    def test_match_from_headers_ignores_resource_entries(self, sources):
+        har = [
+            {
+                'request': {'url': self.URL},
+                'response': {
+                    'url': self.URL,
+                    'headers': [],
+                },
+            },
+            {
+                'request': {'url': 'http://foo.org/lib/foo.js'},
+                'response': {
+                    'url': 'http://foo.org/lib/foo.js',
+                    'headers': [
+                        {'name': 'FooHeader', 'value': 'Foo-min v1.1'}
+                    ]
+                },
+            },
+        ]
+        p = self._create_plugin(self.FOO_PLUGIN, sources, ['header'])
+        d = self._create_detector(har, [p])
+
+        assert not d.get_results()
+
     @pytest.mark.parametrize('sources,result', zip(MATCHER_SOURCES, FOO_RESULTS))
     def test_match_from_body(self, sources, result):
         har = [
@@ -114,6 +139,22 @@ class TestDetector():
         d = self._create_detector(har, [p])
 
         assert d.get_results() == result
+
+    @pytest.mark.parametrize('sources', MATCHER_SOURCES)
+    def test_match_from_body_excludes_main_entry(self, sources):
+        har = [
+            {
+                'request': {'url': self.URL},
+                'response': {
+                    'url': self.URL,
+                    'content': {'text': 'About Foo-min v1.1'},
+                },
+            },
+        ]
+        p = self._create_plugin(self.FOO_PLUGIN, sources, ['body'])
+        d = self._create_detector(har, [p])
+
+        assert not d.get_results()
 
     @pytest.mark.parametrize('sources,result', zip(MATCHER_SOURCES, FOO_RESULTS))
     def test_match_from_url(self, sources, result):

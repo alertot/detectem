@@ -198,6 +198,21 @@ class Detector():
 
         return results_data
 
+    def _get_matchers_for_entry(self, source, plugin, entry):
+        grouped_matchers = plugin.get_grouped_matchers(source)
+
+        def remove_group(group):
+            if group in grouped_matchers:
+                del grouped_matchers[group]
+
+        if self._is_first_request(entry):
+            remove_group('body')
+            remove_group('url')
+        else:
+            remove_group('header')
+
+        return grouped_matchers
+
     def _is_first_request(self, entry):
         return entry['request']['url'].rstrip('/') == self.requested_url.rstrip('/')
 
@@ -214,24 +229,21 @@ class Detector():
 
     def get_plugin_version(self, plugin, entry):
         """ Return version after applying every plugin matcher. """
-        versions = []
-        grouped_matchers = plugin.get_grouped_matchers()
-
-        # Check headers just for the first request
-        if not self._is_first_request(entry) and 'header' in grouped_matchers:
-            del grouped_matchers['header']
-
+        grouped_matchers = self._get_matchers_for_entry(
+            'matchers', plugin, entry
+        )
         versions = self.get_values_from_matchers(
             entry, grouped_matchers, extract_version
         )
-
         return get_most_complete_version(versions)
 
     def get_plugin_name(self, plugin, entry):
         if not plugin.is_modular:
             return plugin.name
 
-        grouped_matchers = plugin.get_grouped_matchers('modular_matchers')
+        grouped_matchers = self._get_matchers_for_entry(
+            'modular_matchers', plugin, entry
+        )
         module_name = self.get_values_from_matchers(
             entry, grouped_matchers, extract_name
         )
@@ -244,14 +256,12 @@ class Detector():
         return name
 
     def check_indicator_presence(self, plugin, entry):
-        grouped_matchers = plugin.get_grouped_matchers('indicators')
-        if not self._is_first_request(entry) and 'header' in grouped_matchers:
-            del grouped_matchers['header']
-
+        grouped_matchers = self._get_matchers_for_entry(
+            'indicators', plugin, entry
+        )
         presence_list = self.get_values_from_matchers(
             entry, grouped_matchers, check_presence
         )
-
         return any(presence_list)
 
     @staticmethod
