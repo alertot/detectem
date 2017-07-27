@@ -96,3 +96,35 @@ class TestResultCollection():
     ])
     def test_get_all_detected_plugins(self, detected, results):
         self._assert_results(detected, results)
+
+    @pytest.mark.parametrize('detected,results', [
+        ({
+            Result('pluginA', '1.1'),
+            Result('pluginA', '1.2'),
+            Result('pluginA', '1.1'),
+         },
+         {
+            Result('pluginA', '1.1'),
+            Result('pluginA', '1.2'),
+         }),
+
+        ({
+            Result('pluginA', '1.1'),
+            Result('pluginA', type=INDICATOR_TYPE),
+            Result('pluginA', type=HINT_TYPE),
+         },
+         {
+            Result('pluginA', '1.1'),
+         }),
+
+        ({Result('pluginB', type=HINT_TYPE), Result('pluginB', type=HINT_TYPE)},
+         {Result('pluginB', type=HINT_TYPE)}),
+
+        ({Result('pluginB', type=INDICATOR_TYPE), Result('pluginB', type=INDICATOR_TYPE)},
+         {Result('pluginB', type=INDICATOR_TYPE)}),
+
+        ({Result('pluginB', type=INDICATOR_TYPE), Result('pluginB', type=HINT_TYPE)},
+         {Result('pluginB', type=INDICATOR_TYPE)}),
+     ])
+    def test_remove_duplicated_results(self, detected, results):
+        self._assert_results(detected, results)
