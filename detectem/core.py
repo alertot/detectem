@@ -1,6 +1,7 @@
 import logging
 
 from collections import defaultdict
+from distutils.version import LooseVersion
 
 from detectem.utils import (
     extract_version, extract_name, extract_from_headers,
@@ -28,6 +29,11 @@ class Result():
         def to_tuple(rt):
             return (rt.name, rt.version, rt.type)
         return to_tuple(self) == to_tuple(o)
+
+    def __lt__(self, o):
+        def to_tuple(rt):
+            return (rt.name, LooseVersion(rt.version or '0'), rt.type)
+        return to_tuple(self) < to_tuple(o)
 
     def __repr__(self):
         return str({'name': self.name, 'version': self.version, 'type': self.type})
@@ -178,7 +184,7 @@ class Detector():
         self.process_har()
         self.process_from_splash()
 
-        for rt in self._results.get_results():
+        for rt in sorted(self._results.get_results()):
             rdict = {'name': rt.name}
             if rt.version:
                 rdict['version'] = rt.version
