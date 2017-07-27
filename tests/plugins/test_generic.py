@@ -6,7 +6,7 @@ import dukpy
 from importlib.util import find_spec
 
 from detectem.core import Detector
-from detectem.plugin import load_plugins, get_plugin_by_name
+from detectem.plugin import load_plugins
 from detectem.utils import extract_version, extract_name, check_presence
 from detectem.settings import PLUGIN_PACKAGES
 from tests import load_from_yaml, tree
@@ -16,7 +16,7 @@ class TestGenericMatches(object):
     FIELDS = ['body', 'url', 'header']
 
     @pytest.fixture()
-    def plugin_list(self):
+    def all_plugins(self):
         return load_plugins()
 
     def pytest_generate_tests(self, metafunc):
@@ -69,18 +69,18 @@ class TestGenericMatches(object):
 
         return (fake_har_entry, method)
 
-    def test_matches(self, plugin_name, match, plugin_list):
+    def test_matches(self, plugin_name, match, all_plugins):
         field = [k for k in match.keys() if k in self.FIELDS][0]
         fake_har_entry, method = self._get_har_entry_and_method(field, match)
 
-        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        plugin = all_plugins.get(plugin_name)
         matchers = plugin._get_matchers(field)
         results = method(fake_har_entry, matchers, extract_version)
 
         assert results
         assert match['version'] in results
 
-    def test_js_matches(self, plugin_name, match, plugin_list):
+    def test_js_matches(self, plugin_name, match, all_plugins):
         was_asserted = False
         js_code = match['js']
 
@@ -89,7 +89,7 @@ class TestGenericMatches(object):
         interpreter.evaljs('window = {};')
         interpreter.evaljs(js_code)
 
-        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        plugin = all_plugins.get(plugin_name)
         for matcher in plugin.js_matchers:
             is_present = interpreter.evaljs(matcher['check'])
             if is_present is not None:
@@ -99,8 +99,8 @@ class TestGenericMatches(object):
 
         assert was_asserted
 
-    def test_modular_matches(self, plugin_name, match, plugin_list):
-        plugin = get_plugin_by_name(plugin_name, plugin_list)
+    def test_modular_matches(self, plugin_name, match, all_plugins):
+        plugin = all_plugins.get(plugin_name)
         keys_to_search = [
             ('software', 'modular_matchers', extract_name),
             ('version', 'matchers', extract_version),
@@ -122,11 +122,11 @@ class TestGenericMatches(object):
 
             assert flag
 
-    def test_indicators(self, plugin_name, match, plugin_list):
+    def test_indicators(self, plugin_name, match, all_plugins):
         field = [k for k in match.keys() if k in self.FIELDS][0]
         fake_har_entry, method = self._get_har_entry_and_method(field, match)
 
-        plugin = get_plugin_by_name(plugin_name, plugin_list)
+        plugin = all_plugins.get(plugin_name)
         matchers = plugin._get_matchers(field, 'indicators')
         presence = method(fake_har_entry, matchers, check_presence)
 

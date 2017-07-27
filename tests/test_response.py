@@ -13,6 +13,7 @@ from detectem.response import (
     get_response,
 )
 from detectem.exceptions import SplashError
+from detectem.plugin import PluginCollection
 from detectem.response import requests
 
 
@@ -47,7 +48,10 @@ def test_create_lua_script():
         name = 'bla'
         js_matchers = [{'check': 'bla', 'version': 'bla.version'}]
 
-    script = create_lua_script(plugins=[BlaPlugin()])
+    plugins = PluginCollection()
+    plugins.add(BlaPlugin())
+
+    script = create_lua_script(plugins)
     assert script
 
     js_data = json.dumps(BlaPlugin.js_matchers)
@@ -65,7 +69,7 @@ def test_get_response(monkeypatch):
     monkeypatch.setattr(requests, 'post', lambda v: v)
     monkeypatch.setattr(detectem.utils, 'SETUP_SPLASH', False)
 
-    response = get_response('http://domain.tld', {})
+    response = get_response('http://domain.tld', PluginCollection())
     assert response
     assert 'har' in response
     assert 'softwares' in response
@@ -83,7 +87,7 @@ def test_get_response_with_error_status_codes(monkeypatch):
     monkeypatch.setattr(detectem.utils, 'SETUP_SPLASH', False)
 
     with pytest.raises(SplashError):
-        get_response('http://domain.tld', {})
+        get_response('http://domain.tld', PluginCollection())
 
 
 @pytest.mark.parametrize("har_data,result_len", [

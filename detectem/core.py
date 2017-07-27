@@ -4,7 +4,6 @@ from detectem.utils import (
     extract_version, extract_name, extract_from_headers,
     get_most_complete_version, check_presence
 )
-from detectem.plugin import get_plugin_by_name
 from detectem.settings import VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE
 
 logger = logging.getLogger('detectem')
@@ -27,11 +26,8 @@ class Detector():
         self.requested_url = requested_url
 
         self._softwares_from_splash = response['softwares']
+        self._plugins = plugins
         self._results = set()
-
-        # Separate plugins according to its type
-        self.version_plugins = [p for p in plugins if not p.is_indicator]
-        self.indicators = [p for p in plugins if p.is_indicator]
 
     @staticmethod
     def get_url(entry):
@@ -71,7 +67,7 @@ class Detector():
 
     def process_from_splash(self):
         for software in self._softwares_from_splash:
-            plugin = get_plugin_by_name(software['name'], self.version_plugins)
+            plugin = self._plugins.get(software['name'])
             self._results.add(
                 Result(
                     name=plugin.name,
@@ -91,8 +87,11 @@ class Detector():
         """
         hints = []
 
+        version_plugins = self._plugins.with_version_matchers()
+        indicator_plugins = self._plugins.with_indicator_matchers()
+
         for entry in self.har:
-            for plugin in self.version_plugins:
+            for plugin in version_plugins:
                 version = self.get_plugin_version(plugin, entry)
                 if version:
                     # Name could be different than plugin name in modular plugins
@@ -107,7 +106,7 @@ class Detector():
                     )
                     hints += self.get_hints(plugin, entry)
 
-            for plugin in self.indicators:
+            for plugin in indicator_plugins:
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
                     self._results.add(

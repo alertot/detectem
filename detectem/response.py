@@ -82,12 +82,8 @@ def create_lua_script(plugins):
     lua_template = pkg_resources.resource_string('detectem', 'script.lua')
     template = Template(lua_template.decode('utf-8'))
 
-    javascript_data = []
-    for p in plugins:
-        if hasattr(p, 'js_matchers'):
-            javascript_data.append(
-                {'name': p.name, 'matchers': p.js_matchers}
-            )
+    javascript_data = [{'name': p.name, 'matchers': p.js_matchers}
+                       for p in plugins.with_js_matchers()]
 
     return template.substitute(js_data=json.dumps(javascript_data))
 

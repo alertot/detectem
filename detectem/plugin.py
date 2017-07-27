@@ -14,17 +14,37 @@ from detectem.settings import PLUGIN_PACKAGES
 logger = logging.getLogger('detectem')
 
 
-def get_plugin_by_name(name, plugins):
-    try:
-        return [p for p in plugins if p.name == name][0]
-    except IndexError:
-        return None
+class PluginCollection(object):
+
+    def __init__(self):
+        self._plugins = {}
+
+    def __len__(self):
+        return len(self._plugins)
+
+    def add(self, ins):
+        self._plugins[ins.name] = ins
+
+    def get(self, name):
+        return self._plugins.get(name)
+
+    def get_all(self):
+        return self._plugins.values()
+
+    def with_version_matchers(self):
+        return [p for p in self._plugins.values() if not p.is_indicator]
+
+    def with_indicator_matchers(self):
+        return [p for p in self._plugins.values() if p.is_indicator]
+
+    def with_js_matchers(self):
+        return [p for p in self._plugins.values() if hasattr(p, 'js_matchers')]
 
 
 class _PluginLoader(object):
 
     def __init__(self):
-        self.plugins = []
+        self.plugins = PluginCollection()
 
     def _full_class_name(self, ins):
         return '{}.{}'.format(ins.__class__.__module__, ins.__class__.__name__)
@@ -42,9 +62,9 @@ class _PluginLoader(object):
         ins = klass()
         try:
             if verifyObject(IPlugin, ins):
-                reg = get_plugin_by_name(ins.name, self.plugins)
+                reg = self.plugins.get(ins.name)
                 if not reg:
-                    self.plugins.append(ins)
+                    self.plugins.add(ins)
                 else:
                     logger.warning(
                         "Plugin '%(name)s' by '%(ins)s' is already provided by '%(reg)s'",
