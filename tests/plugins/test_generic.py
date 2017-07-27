@@ -3,7 +3,7 @@ import os
 import pytest
 import dukpy
 
-from importlib.util import find_spec, module_from_spec
+from importlib.util import find_spec
 
 from detectem.core import Detector
 from detectem.plugin import load_plugins, get_plugin_by_name
@@ -32,7 +32,8 @@ class TestGenericMatches(object):
             if plugin:
                 plugin = plugin.replace('.', '')
                 try:
-                    data = load_from_yaml(test_dir, 'plugins/fixtures/{}.yml'.format(plugin))
+                    fixture_file = 'plugins/fixtures/{}.yml'.format(plugin)
+                    data = load_from_yaml(test_dir, fixture_file)
                 except FileNotFoundError:
                     continue
             else:
