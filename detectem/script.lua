@@ -1,4 +1,5 @@
 function main(splash)
+  splash.images_enabled = false
   splash.response_body_enabled = true
 
   local url = splash.args.url
