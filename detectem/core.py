@@ -1,4 +1,5 @@
 import logging
+import urllib.parse
 
 from collections import defaultdict
 from distutils.version import LooseVersion
@@ -7,7 +8,10 @@ from detectem.utils import (
     extract_version, extract_name, extract_from_headers,
     get_most_complete_version, check_presence
 )
-from detectem.settings import VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE
+from detectem.settings import (
+    VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
+    MAIN_ENTRY, RESOURCE_ENTRY,
+)
 
 logger = logging.getLogger('detectem')
 
@@ -77,12 +81,55 @@ class ResultCollection():
 
 class Detector():
     def __init__(self, response, plugins, requested_url):
-        self.har = response['har']
         self.requested_url = requested_url
+        self.har = self._prepare_har(response)
 
         self._softwares_from_splash = response['softwares']
         self._plugins = plugins
         self._results = ResultCollection()
+
+    def _prepare_har(self, response):
+        har = response.get('har', [])
+        if har:
+            self._mark_main_entry(har)
+        return har
+
+    def _mark_main_entry(self, entries):
+        for entry in entries:
+            self._set_entry_type(entry, RESOURCE_ENTRY)
+
+        def get_url(entry):
+            return entry['request']['url']
+
+        def get_location(entry):
+            headers = entry['response'].get('headers', [])
+            for header in headers:
+                if header['name'] == 'Location':
+                    return header['value']
+            return None
+
+        main_entry = entries[0]
+        main_location = get_location(main_entry)
+        if not main_location:
+            self._set_entry_type(main_entry, MAIN_ENTRY)
+            return
+        main_url = urllib.parse.urljoin(get_url(main_entry), main_location)
+
+        for entry in entries[1:]:
+            url = get_url(entry)
+            if url == main_url:
+                self._set_entry_type(entry, MAIN_ENTRY)
+                break
+        else:
+            self._set_entry_type(main_entry, MAIN_ENTRY)
+
+    @staticmethod
+    def _set_entry_type(entry, entry_type):
+        entry.setdefault('detectem', {})['type'] = entry_type
+
+    @staticmethod
+    def _get_entry_type(entry):
+        return entry['detectem']['type']
 
     @staticmethod
     def get_url(entry):
@@ -205,16 +252,13 @@ class Detector():
             if group in grouped_matchers:
                 del grouped_matchers[group]
 
-        if self._is_first_request(entry):
+        if self._get_entry_type(entry) == MAIN_ENTRY:
             remove_group('body')
             remove_group('url')
         else:
             remove_group('header')
 
         return grouped_matchers
-
-    def _is_first_request(self, entry):
-        return entry['request']['url'].rstrip('/') == self.requested_url.rstrip('/')
 
     def get_values_from_matchers(self, entry, matchers, extraction_function):
         values = []

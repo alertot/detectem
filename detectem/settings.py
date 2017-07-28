@@ -12,3 +12,6 @@ CMD_OUTPUT = 'cmd'
 VERSION_TYPE = 'version'
 INDICATOR_TYPE = 'indicator'
 HINT_TYPE = 'hint'
+
+RESOURCE_ENTRY = 'resource'
+MAIN_ENTRY = 'main'

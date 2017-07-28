@@ -2,7 +2,7 @@ import pytest
 
 from detectem.core import Detector, Result, ResultCollection
 from detectem.plugin import Plugin, PluginCollection
-from detectem.settings import INDICATOR_TYPE, HINT_TYPE
+from detectem.settings import INDICATOR_TYPE, HINT_TYPE, MAIN_ENTRY
 
 
 class TestDetector():
@@ -14,6 +14,41 @@ class TestDetector():
             'url': 'http://domain.tld/libA-1.4.2.js'
         },
     }
+
+    HAR_NO_URL_REDIRECT = [
+        {
+            'request': {'url': 'http://domain.tld/'},
+            'response': {},
+        },
+        {
+            'request': {'url': 'http://domain.tld/js/script.js'},
+            'response': {},
+        }
+    ]
+    HAR_URL_REDIRECT_PATH = [
+        {
+            'request': {'url': 'http://domain.tld/'},
+            'response': {'headers': [
+                {'name': 'Location', 'value': '/new/default.html'}
+            ]},
+        },
+        {
+            'request': {'url': 'http://domain.tld/new/default.html'},
+            'response': {},
+        }
+    ]
+    HAR_URL_REDIRECT_ABS = [
+        {
+            'request': {'url': 'http://domain.tld/'},
+            'response': {'headers': [
+                {'name': 'Location', 'value': 'http://other-domain.tld/'}
+            ]},
+        },
+        {
+            'request': {'url': 'http://other-domain.tld/'},
+            'response': {},
+        }
+    ]
 
     URL = 'http://domain.tld/'
 
@@ -56,6 +91,15 @@ class TestDetector():
     def test_detector_starts_with_empty_results(self):
         d = Detector({'har': None, 'softwares': None}, [], None)
         assert not d._results.get_results()
+
+    @pytest.mark.parametrize("har,index", [
+        (HAR_NO_URL_REDIRECT, 0),
+        (HAR_URL_REDIRECT_PATH, 1),
+        (HAR_URL_REDIRECT_ABS, 1),
+    ])
+    def test_mark_main_entry(self, har, index):
+        d = self._create_detector(har, [])
+        assert d.har[index]['detectem']['type'] == MAIN_ENTRY
 
     def _create_plugin(self, template, sources, matchers):
         class TestPlugin(Plugin):
