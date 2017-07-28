@@ -26,7 +26,9 @@ def is_url_allowed(url):
 
     """
     blacklist = [
-        '\.ttf', '\.woff', 'fonts\.googleapis\.com', '\.png', '\.jpe?g', '\.gif'
+        '\.ttf', '\.woff',
+        'fonts\.googleapis\.com',
+        '\.png', '\.jpe?g', '\.gif', '\.svg'
     ]
 
     for ft in blacklist:
