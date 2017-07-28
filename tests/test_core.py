@@ -101,6 +101,23 @@ class TestDetector():
         d = self._create_detector(har, [])
         assert d.har[index]['detectem']['type'] == MAIN_ENTRY
 
+    def test_convert_inline_script_to_har_entry(self):
+        script = 'Inline script'
+
+        d = Detector({'har': [], 'softwares': [], 'scripts': [script]}, None, self.URL)
+        e = d.har[0]
+
+        assert e['request']['url'] == self.URL
+        assert e['response']['content']['text'] == script
+
+    @pytest.mark.parametrize("scripts,n_entries", [
+        ([], 0),
+        (['script1', 'script2'], 2),
+    ])
+    def test_add_inline_scripts_to_har(self, scripts, n_entries):
+        d = Detector({'har': [], 'softwares': [], 'scripts': scripts}, None, self.URL)
+        assert len(d.har) == n_entries
+
     def _create_plugin(self, template, sources, matchers):
         class TestPlugin(Plugin):
             name = template['name']

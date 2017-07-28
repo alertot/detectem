@@ -10,7 +10,7 @@ from detectem.utils import (
 )
 from detectem.settings import (
     VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
-    MAIN_ENTRY, RESOURCE_ENTRY,
+    MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY
 )
 
 logger = logging.getLogger('detectem')
@@ -92,6 +92,8 @@ class Detector():
         har = response.get('har', [])
         if har:
             self._mark_main_entry(har)
+        for script in response.get('scripts', []):
+            har.append(self._script_to_har_entry(script))
         return har
 
     def _mark_main_entry(self, entries):
@@ -122,6 +124,21 @@ class Detector():
                 break
         else:
             self._set_entry_type(main_entry, MAIN_ENTRY)
+
+    def _script_to_har_entry(self, script):
+        entry = {
+            'request': {
+                'url': self.requested_url,
+            },
+            'response': {
+                'url': self.requested_url,
+                'content': {
+                    'text': script
+                }
+            }
+        }
+        self._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
+        return entry
 
     @staticmethod
     def _set_entry_type(entry, entry_type):

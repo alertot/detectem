@@ -63,7 +63,7 @@ def test_get_response(monkeypatch):
         status_code = 200
 
         def json(self):
-            return {'har': {}, 'softwares': []}
+            return {'har': {}, 'softwares': [], 'scripts': {}}
 
     monkeypatch.setattr(requests, 'get', lambda v: TestResponse())
     monkeypatch.setattr(requests, 'post', lambda v: v)

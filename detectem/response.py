@@ -120,12 +120,14 @@ def get_response(url, plugins):
         raise SplashError(json_data['description'])
 
     softwares = json_data['softwares']
+    scripts = json_data['scripts'].values()
     har = get_valid_har(json_data['har'])
 
     logger.debug('[+] Detected %(n)d softwares from the DOM', {'n': len(softwares)})
+    logger.debug('[+] Detected %(n)d scripts from the DOM', {'n': len(scripts)})
     logger.debug('[+] Final HAR has %(n)d valid entries', {'n': len(har)})
 
-    return {'har': har, 'softwares': softwares}
+    return {'har': har, 'scripts': scripts, 'softwares': softwares}
 
 
 def get_valid_har(har_data):

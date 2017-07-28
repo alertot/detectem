@@ -15,3 +15,4 @@ HINT_TYPE = 'hint'
 
 RESOURCE_ENTRY = 'resource'
 MAIN_ENTRY = 'main'
+INLINE_SCRIPT_ENTRY = 'inline-script'

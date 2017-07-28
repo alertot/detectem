@@ -31,9 +31,16 @@ function main(splash)
   splash:runjs(detectFunction)
   local softwares = splash:evaljs('detect()')
 
+  local scripts = splash:select_all('script')
+  local sources = {}
+  for _, s in ipairs(scripts) do
+    sources[#sources+1] = s.node.innerHTML
+  end
+
   return {
     har = splash:har(),
     softwares=softwares,
+    scripts=sources,
   }
 end
 
