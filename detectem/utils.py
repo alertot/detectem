@@ -3,6 +3,7 @@ import time
 import sys
 import logging
 import json
+import pprint
 
 from contextlib import contextmanager
 
@@ -10,7 +11,10 @@ import docker
 import requests
 
 from detectem.exceptions import NotNamedParameterFound
-from detectem.settings import SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE
+from detectem.settings import (
+    SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE,
+    JSON_OUTPUT, CMD_OUTPUT
+)
 
 
 logger = logging.getLogger('detectem')
@@ -120,8 +124,10 @@ def docker_container():
     yield
 
 
-def print_error_message(error_dict, format):
-    if format == 'json':
-        print(json.dumps(error_dict))
-    else:
-        print(error_dict)
+def create_printer(format):
+    if format == CMD_OUTPUT:
+        return pprint.pprint
+    elif format == JSON_OUTPUT:
+        def json_printer(data):
+            print(json.dumps(data))
+        return json_printer

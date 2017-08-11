@@ -1,4 +1,7 @@
 import sys
+import json
+
+from detectem.exceptions import SplashError, NoPluginsError
 
 try:
     from bottle import run, post, request
@@ -16,7 +19,13 @@ def do_detection():
     metadata = request.forms.get('metadata')
 
     metadata = bool(metadata == '1')
-    return get_detection_results(url, format='json', metadata=metadata)
+
+    try:
+        result = get_detection_results(url, metadata=metadata)
+    except (SplashError, NoPluginsError) as e:
+        result = {'error': e}
+
+    return json.dumps(result)
 
 
 run(host='0.0.0.0', port=5723)

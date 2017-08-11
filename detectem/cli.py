@@ -1,14 +1,12 @@
 import logging
 import sys
-import json
 import click
-import pprint
 
 from detectem.response import get_response
 from detectem.plugin import load_plugins
 from detectem.core import Detector
-from detectem.exceptions import SplashError
-from detectem.utils import print_error_message
+from detectem.exceptions import SplashError, NoPluginsError
+from detectem.utils import create_printer
 from detectem.settings import CMD_OUTPUT, JSON_OUTPUT
 
 # Set up logging
@@ -46,35 +44,40 @@ def main(debug, format, metadata, url):
     else:
         ch.setLevel(logging.ERROR)
 
-    results = get_detection_results(url, format, metadata)
-    if format == CMD_OUTPUT:
-        pprint.pprint(results)
-    elif format == JSON_OUTPUT:
-        print(results)
+    printer = create_printer(format)
+    try:
+        results = get_detection_results(url, metadata)
+    except (NoPluginsError, SplashError) as e:
+        printer(str(e))
+        sys.exit(0)
+
+    printer(results)
 
 
-def get_detection_results(url, format, metadata):
+def get_detection_results(url, metadata):
+    """ Return results from detector.
+
+    This function prepares the environment loading the plugins,
+    getting the response and passing it to the detector.
+
+    In case of errors, it raises exceptions to be handled externally.
+
+    """
     plugins = load_plugins()
     if not plugins:
-        error_dict = {'error': 'No plugins found in $DET_PLUGIN_PACKAGES'}
-        print_error_message(error_dict, format=format)
-        sys.exit(0)
+        raise NoPluginsError('No plugins found')
+
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
     try:
         response = get_response(url, plugins)
     except SplashError as e:
-        error_dict = {'error': 'Splash error: {}'.format(e)}
-        print_error_message(error_dict, format=format)
-        sys.exit(0)
+        raise e
 
     det = Detector(response, plugins, url)
     results = det.get_results(metadata=metadata)
 
-    if format == JSON_OUTPUT:
-        return json.dumps(results)
-    else:
-        return results
+    return results
 
 
 if __name__ == "__main__":
