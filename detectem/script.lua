@@ -29,18 +29,34 @@ function main(splash)
   ]]
   splash:runjs('softwareData = $js_data;')
   splash:runjs(detectFunction)
-  local softwares = splash:evaljs('detect()')
 
-  local scripts = splash:select_all('script')
-  local sources = {}
-  for _, s in ipairs(scripts) do
-    sources[#sources+1] = s.node.innerHTML
+  local softwares = {}
+  local scripts = {}
+  local errors = {}
+
+  local ok, res = pcall(splash.evaljs, self, 'detect()')
+  if ok then
+    softwares = res
+  else
+    errors['evaljs'] = res
+  end
+
+  local ok, res = pcall(splash.select_all, self, 'script')
+  if ok then
+    if res then
+      for _, s in ipairs(res) do
+        scripts[#scripts+1] = s.node.innerHTML
+      end
+    end
+  else
+    errors['select_all'] = res
   end
 
   return {
     har = splash:har(),
     softwares=softwares,
-    scripts=sources,
+    scripts=scripts,
+    errors=errors,
   }
 end
 
