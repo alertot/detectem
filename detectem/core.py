@@ -164,23 +164,25 @@ class Detector():
         """
         hints = []
 
-        for hint_function in getattr(plugin, 'hints', []):
-            hint = hint_function(entry)
-            if hint:
-                if isinstance(hint, Result):
-                    logger.debug(
-                        '%(pname)s & hint %(hname)s detected',
-                        {'pname': plugin.name, 'hname': hint.name}
-                    )
-
-                    hint.type = HINT_TYPE
-                    hints.append(hint)
-                else:
-                    logger.error(
-                        '%(pname)s has invalid plugin',
-                        {'pname': plugin.name}
-                    )
-                    continue
+        for hint_name in getattr(plugin, 'hints', []):
+            hint_plugin = self._plugins.get(hint_name)
+            if hint_plugin:
+                hint_result = Result(
+                    name=hint_plugin.name,
+                    homepage=hint_plugin.homepage,
+                    from_url=self.requested_url,
+                    type=HINT_TYPE
+                )
+                hints.append(hint_result)
+                logger.debug(
+                    '%(pname)s & hint %(hname)s detected',
+                    {'pname': plugin.name, 'hname': hint_result.name}
+                )
+            else:
+                logger.error(
+                    '%(pname)s hints an invalid plugin: %(hname)s',
+                    {'pname': plugin.name, 'hname': hint_name}
+                )
 
         return hints
 

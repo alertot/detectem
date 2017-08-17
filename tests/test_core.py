@@ -84,10 +84,6 @@ class TestDetector():
         ['matchers', 'modular_matchers'],
     ]
 
-    @pytest.fixture
-    def min_detector(self):
-        return Detector({'har': None, 'softwares': None}, [], None)
-
     def test_detector_starts_with_empty_results(self):
         d = Detector({'har': None, 'softwares': None}, [], None)
         assert not d._results.get_results()
@@ -247,20 +243,27 @@ class TestDetector():
     def test_get_url(self, entry, result):
         assert Detector.get_url(entry) == result
 
-    def test_get_hints_with_valid_hint(self, min_detector):
+    def test_get_hints_with_valid_hint(self):
         class TestPlugin(Plugin):
-            name = 'bla'
-            hints = [lambda v: Result('test')]
+            name = 'test'
+            homepage = 'test'
 
-        hints = min_detector.get_hints(TestPlugin, {})
+        class BlaPlugin(Plugin):
+            name = 'bla'
+            hints = ['test']
+
+        detector = self._create_detector(None, [TestPlugin()])
+
+        hints = detector.get_hints(BlaPlugin(), {})
         assert hints
 
-    def test_get_hints_with_invalid_hint(self, min_detector):
-        class TestPlugin(Plugin):
+    def test_get_hints_with_invalid_hint(self):
+        class BlaPlugin(Plugin):
             name = 'bla'
-            hints = [lambda v: 'test']
+            hints = ['test']
 
-        hints = min_detector.get_hints(TestPlugin, {})
+        detector = self._create_detector(None, [])
+        hints = detector.get_hints(BlaPlugin(), {})
         assert not hints
 
 

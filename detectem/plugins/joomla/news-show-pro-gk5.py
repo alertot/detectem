@@ -1,6 +1,4 @@
 from detectem.plugin import Plugin
-from detectem.core import Result
-from detectem.plugins.joomla.joomla import JoomlaPlugin
 
 
 class NewsShowProGk5Plugin(Plugin):
@@ -9,6 +7,4 @@ class NewsShowProGk5Plugin(Plugin):
     indicators = [
         {'body': '\* @package News Show Pro GK5\n'},
     ]
-    hints = [
-        lambda entry: Result(JoomlaPlugin.name, homepage=JoomlaPlugin.homepage)
-    ]
+    hints = ["joomla"]
