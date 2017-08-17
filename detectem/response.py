@@ -117,7 +117,10 @@ def get_response(url, plugins):
     json_data = res.json()
 
     if res.status_code in ERROR_STATUS_CODES:
-        raise SplashError(json_data['description'])
+        error_msg = json_data['description']
+        if 'info' in json_data and 'error' in json_data['info']:
+            error_msg += ': {}'.format(json_data['info']['error'])
+        raise SplashError(error_msg)
 
     softwares = json_data['softwares']
     scripts = json_data['scripts'].values()
