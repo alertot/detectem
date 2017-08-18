@@ -111,6 +111,8 @@ def get_response(url, plugins):
             "please verify and stop any other splash instance to avoid port issues."
         )
         sys.exit(-1)
+    except requests.exceptions.ConnectionError:
+        raise SplashError("Could not connect to Splash server {}".format(SPLASH_URL))
 
     logger.debug('[+] Response received')
 

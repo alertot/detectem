@@ -118,8 +118,10 @@ def docker_container():
             container.start()
             time.sleep(1)
 
-    # Send request to delete cache
-    requests.post('{}/_gc'.format(SPLASH_URL))
+    try:
+        requests.post('{}/_gc'.format(SPLASH_URL))
+    except requests.exceptions.RequestException:
+        pass
 
     yield
 
