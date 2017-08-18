@@ -110,7 +110,7 @@ def get_response(url, plugins):
             "It's possible that previous splash container didn't finish well, "
             "please verify and stop any other splash instance to avoid port issues."
         )
-        sys.exit(0)
+        sys.exit(-1)
 
     logger.debug('[+] Response received')
 

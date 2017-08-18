@@ -49,7 +49,7 @@ def main(debug, format, metadata, url):
         results = get_detection_results(url, metadata)
     except (NoPluginsError, SplashError) as e:
         printer(str(e))
-        sys.exit(0)
+        sys.exit(1)
 
     printer(results)
 
