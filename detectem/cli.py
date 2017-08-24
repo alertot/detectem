@@ -69,11 +69,7 @@ def get_detection_results(url, metadata):
 
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
-    try:
-        response = get_response(url, plugins)
-    except SplashError as e:
-        raise e
-
+    response = get_response(url, plugins)
     det = Detector(response, plugins, url)
     results = det.get_results(metadata=metadata)
 
