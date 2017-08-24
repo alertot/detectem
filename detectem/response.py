@@ -117,10 +117,7 @@ def get_response(url, plugins):
     json_data = res.json()
 
     if res.status_code in ERROR_STATUS_CODES:
-        error_msg = json_data['description']
-        if 'info' in json_data and 'error' in json_data['info']:
-            error_msg += ': {}'.format(json_data['info']['error'])
-        raise SplashError(error_msg)
+        raise SplashError(get_splash_error(json_data))
 
     softwares = json_data['softwares']
     scripts = json_data['scripts'].values()
@@ -131,6 +128,29 @@ def get_response(url, plugins):
     logger.debug('[+] Final HAR has %(n)d valid entries', {'n': len(har)})
 
     return {'har': har, 'scripts': scripts, 'softwares': softwares}
+
+
+def get_splash_error(json_data):
+    msg = json_data['description']
+    if 'info' in json_data and 'error' in json_data['info']:
+        error = json_data['info']['error']
+        if error.startswith('http'):
+            msg = 'Request to site failed with error code {0}'.format(error)
+        elif error.startswith('network'):
+            # see http://doc.qt.io/qt-5/qnetworkreply.html
+            qt_errors = {
+                'network1': 'ConnectionRefusedError',
+                'network2': 'RemoteHostClosedError',
+                'network3': 'HostNotFoundError',
+                'network4': 'TimeoutError',
+                'network5': 'OperationCanceledError',
+                'network6': 'SslHandshakeFailedError',
+            }
+            error = qt_errors.get(error, "error code {0}".format(error))
+            msg = 'Request to site failed with {0}'.format(error)
+        else:
+            msg = '{0}: {1}'.format(msg, error)
+    return msg
 
 
 def get_valid_har(har_data):
