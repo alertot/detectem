@@ -12,6 +12,7 @@ import requests
 from detectem.exceptions import DockerStartError, NotNamedParameterFound
 from detectem.settings import (
     SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE,
+    SPLASH_MAX_TIMEOUT,
     JSON_OUTPUT, CMD_OUTPUT
 )
 
@@ -102,6 +103,9 @@ class DockerManager:
                 "Please ensure Docker is running."
             )
 
+    def _get_splash_args(self):
+        return '--max-timeout {}'.format(SPLASH_MAX_TIMEOUT)
+
     def _get_container(self):
         try:
             return self.docker_cli.containers.get(self.container_name)
@@ -115,6 +119,7 @@ class DockerManager:
                         '8050/tcp': 8050,
                         '8051/tcp': 8051,
                     },
+                    command=self._get_splash_args(),
                 )
             except docker.errors.ImageNotFound:
                 raise DockerStartError(
