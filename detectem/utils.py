@@ -134,12 +134,26 @@ class DockerManager:
         if container.status != 'running':
             try:
                 container.start()
-                time.sleep(1)
+                self._wait_container()
             except docker.errors.APIError as e:
                 raise DockerStartError(
                     "There was an error running Splash container: {}"
                     .format(e.explanation)
                 )
+
+    def _wait_container(self):
+        for t in [1, 2, 4, 6, 8, 10]:
+            try:
+                requests.get('{}/_ping'.format(SPLASH_URL))
+                break
+            except requests.exceptions.RequestException:
+                time.sleep(t)
+        else:
+            raise DockerStartError(
+                "Could not connect to started Splash container. "
+                "See 'docker logs splash-detectm' for more details, "
+                "or remove the container to try again."
+            )
 
 
 @contextmanager
