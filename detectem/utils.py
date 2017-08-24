@@ -1,6 +1,5 @@
 import re
 import time
-import sys
 import logging
 import json
 import pprint
@@ -10,7 +9,7 @@ from contextlib import contextmanager
 import docker
 import requests
 
-from detectem.exceptions import NotNamedParameterFound
+from detectem.exceptions import DockerStartError, NotNamedParameterFound
 from detectem.settings import (
     SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE,
     JSON_OUTPUT, CMD_OUTPUT
@@ -80,43 +79,73 @@ def extract_from_headers(headers, matchers, extraction_function):
                     return v
 
 
+def docker_error(method):
+    def run_method(self=None):
+        try:
+            method(self)
+        except docker.errors.DockerException as e:
+            raise DockerStartError("Docker error: {}".format(e))
+    return run_method
+
+
+class DockerManager:
+    """
+    Wraps requests to docker daemon to manage Splash container.
+    """
+    def __init__(self):
+        try:
+            self.docker_cli = docker.from_env(version='auto')
+            self.container_name = 'splash-detectem'
+        except docker.errors.DockerException:
+            raise DockerStartError(
+                "Could not connect to Docker daemon. "
+                "Please ensure Docker is running."
+            )
+
+    def _get_container(self):
+        try:
+            return self.docker_cli.containers.get(self.container_name)
+        except docker.errors.NotFound:
+            try:
+                return self.docker_cli.containers.create(
+                    name=self.container_name,
+                    image=DOCKER_SPLASH_IMAGE,
+                    ports={
+                        '5023/tcp': 5023,
+                        '8050/tcp': 8050,
+                        '8051/tcp': 8051,
+                    },
+                )
+            except docker.errors.ImageNotFound:
+                raise DockerStartError(
+                    "Docker image {} not found. Please install it or set an image "
+                    "using DOCKER_SPLASH_IMAGE environment variable."
+                    .format(DOCKER_SPLASH_IMAGE)
+                )
+
+    @docker_error
+    def start_container(self):
+        container = self._get_container()
+        if container.status != 'running':
+            try:
+                container.start()
+                time.sleep(1)
+            except docker.errors.APIError as e:
+                raise DockerStartError(
+                    "There was an error running Splash container: {}"
+                    .format(e.explanation)
+                )
+
+
 @contextmanager
 def docker_container():
-    """ Start a container for doing requests.
+    """ Start a Splash container to send requests.
     If it doesn't exist, it creates the container named 'splash-detectem'.
 
     """
     if SETUP_SPLASH:
-        docker_cli = docker.from_env(version='auto')
-        container_name = 'splash-detectem'
-
-        try:
-            container = docker_cli.containers.get(container_name)
-        except docker.errors.NotFound:
-            try:
-                docker_cli.images.get(DOCKER_SPLASH_IMAGE)
-            except docker.errors.ImageNotFound:
-                logger.error(
-                    "%(evar)s not found. Please install the docker image or "
-                    "set an image using DOCKER_SPLASH_IMAGE environment variable.",
-                    {'evar': DOCKER_SPLASH_IMAGE}
-                )
-                sys.exit(-1)
-
-            # Create docker container
-            container = docker_cli.containers.create(
-                name=container_name,
-                image=DOCKER_SPLASH_IMAGE,
-                ports={
-                    '5023/tcp': 5023,
-                    '8050/tcp': 8050,
-                    '8051/tcp': 8051,
-                },
-            )
-
-        if container.status != 'running':
-            container.start()
-            time.sleep(1)
+        dm = DockerManager()
+        dm.start_container()
 
     try:
         requests.post('{}/_gc'.format(SPLASH_URL))

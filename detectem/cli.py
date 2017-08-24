@@ -5,7 +5,7 @@ import click
 from detectem.response import get_response
 from detectem.plugin import load_plugins
 from detectem.core import Detector
-from detectem.exceptions import SplashError, NoPluginsError
+from detectem.exceptions import DockerStartError, SplashError, NoPluginsError
 from detectem.utils import create_printer
 from detectem.settings import CMD_OUTPUT, JSON_OUTPUT
 
@@ -47,7 +47,7 @@ def main(debug, format, metadata, url):
     printer = create_printer(format)
     try:
         results = get_detection_results(url, metadata)
-    except (NoPluginsError, SplashError) as e:
+    except (NoPluginsError, DockerStartError, SplashError) as e:
         printer(str(e))
         sys.exit(1)
 

@@ -1,6 +1,5 @@
 import requests
 import base64
-import sys
 import logging
 import re
 import pkg_resources
@@ -10,7 +9,7 @@ import urllib.parse
 from string import Template
 
 from detectem.settings import SPLASH_URL
-from detectem.exceptions import DockerStartError, SplashError
+from detectem.exceptions import SplashError
 from detectem.utils import docker_container
 
 DEFAULT_CHARSET = 'iso-8859-1'
@@ -104,13 +103,6 @@ def get_response(url, plugins):
         with docker_container():
             logger.debug('[+] Sending request to Splash instance')
             res = requests.get(page_url)
-    except DockerStartError:
-        logger.error(
-            "There was an error running splash container. "
-            "It's possible that previous splash container didn't finish well, "
-            "please verify and stop any other splash instance to avoid port issues."
-        )
-        sys.exit(-1)
     except requests.exceptions.ConnectionError:
         raise SplashError("Could not connect to Splash server {}".format(SPLASH_URL))
 
