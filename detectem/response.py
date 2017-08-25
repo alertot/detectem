@@ -8,7 +8,7 @@ import urllib.parse
 
 from string import Template
 
-from detectem.settings import SPLASH_URL
+from detectem.settings import SPLASH_TIMEOUT, SPLASH_URL
 from detectem.exceptions import SplashError
 from detectem.utils import docker_container
 
@@ -89,7 +89,7 @@ def create_lua_script(plugins):
     return template.substitute(js_data=json.dumps(javascript_data))
 
 
-def get_response(url, plugins):
+def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
     """ Return response with har and detected software. i
 
     :rtype: dict
@@ -97,7 +97,10 @@ def get_response(url, plugins):
     """
     lua_script = create_lua_script(plugins)
     lua = urllib.parse.quote_plus(lua_script)
-    page_url = '{}/execute?url={}&lua_source={}'.format(SPLASH_URL, url, lua)
+    page_url = (
+        '{0}/execute?url={1}&timeout={2}&lua_source={3}'
+        .format(SPLASH_URL, url, timeout, lua)
+    )
 
     try:
         with docker_container():

@@ -7,7 +7,7 @@ from detectem.plugin import load_plugins
 from detectem.core import Detector
 from detectem.exceptions import DockerStartError, SplashError, NoPluginsError
 from detectem.utils import create_printer
-from detectem.settings import CMD_OUTPUT, JSON_OUTPUT
+from detectem.settings import SPLASH_TIMEOUT, CMD_OUTPUT, JSON_OUTPUT
 
 # Set up logging
 logger = logging.getLogger('detectem')
@@ -24,6 +24,12 @@ logger.addHandler(ch)
     help='Include this flag to enable debug messages.'
 )
 @click.option(
+    '--timeout',
+    default=SPLASH_TIMEOUT,
+    type=click.INT,
+    help='Timeout for Splash (in seconds).'
+)
+@click.option(
     '--format',
     default=CMD_OUTPUT,
     type=click.Choice([CMD_OUTPUT, JSON_OUTPUT]),
@@ -36,7 +42,7 @@ logger.addHandler(ch)
     help='Include this flag to return plugin metadata.'
 )
 @click.argument('url')
-def main(debug, format, metadata, url):
+def main(debug, timeout, format, metadata, url):
     if debug:
         click.echo("[+] Enabling debug mode.")
         ch.setLevel(logging.DEBUG)
@@ -46,7 +52,7 @@ def main(debug, format, metadata, url):
 
     printer = create_printer(format)
     try:
-        results = get_detection_results(url, metadata)
+        results = get_detection_results(url, timeout, metadata)
     except (NoPluginsError, DockerStartError, SplashError) as e:
         printer(str(e))
         sys.exit(1)
@@ -54,7 +60,7 @@ def main(debug, format, metadata, url):
     printer(results)
 
 
-def get_detection_results(url, metadata):
+def get_detection_results(url, timeout, metadata):
     """ Return results from detector.
 
     This function prepares the environment loading the plugins,
@@ -69,7 +75,7 @@ def get_detection_results(url, metadata):
 
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
-    response = get_response(url, plugins)
+    response = get_response(url, plugins, timeout)
     det = Detector(response, plugins, url)
     results = det.get_results(metadata=metadata)
 

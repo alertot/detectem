@@ -7,6 +7,7 @@ SETUP_SPLASH = os.environ.get('SETUP_SPLASH', 'True') == 'True'
 DOCKER_SPLASH_IMAGE = os.environ.get('DOCKER_SPLASH_IMAGE', 'scrapinghub/splash:latest')
 
 SPLASH_MAX_TIMEOUT = int(os.environ.get('SPLASH_MAX_TIMEOUT', '120'))
+SPLASH_TIMEOUT = 30
 
 JSON_OUTPUT = 'json'
 CMD_OUTPUT = 'cmd'

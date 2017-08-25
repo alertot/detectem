@@ -8,7 +8,7 @@ def test_get_detection_results_with_no_plugins(mocker):
     mocker.patch('detectem.cli.load_plugins', return_value=[])
 
     with pytest.raises(NoPluginsError):
-        get_detection_results('http://domain.tld', metadata=True)
+        get_detection_results('http://domain.tld', timeout=30, metadata=True)
 
 
 def test_get_detection_results_with_splash_error(mocker):
@@ -18,7 +18,7 @@ def test_get_detection_results_with_splash_error(mocker):
     )
 
     with pytest.raises(SplashError):
-        get_detection_results('http://domain.tld', metadata=True)
+        get_detection_results('http://domain.tld', timeout=30, metadata=True)
 
 
 def test_get_detection_ok(mocker):
@@ -32,5 +32,5 @@ def test_get_detection_ok(mocker):
     mocker.patch('detectem.cli.get_response', return_value=1)
     mocker.patch('detectem.cli.Detector', return_value=FakeDetector)
 
-    rs = get_detection_results('http://domain.tld', metadata=True)
+    rs = get_detection_results('http://domain.tld', timeout=30, metadata=True)
     assert rs == [1, 2, 3]
