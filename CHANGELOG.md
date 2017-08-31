@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Unreleased
 ----------
+
+0.6.0 - 2017-08-31
+------------------
 ### Added
 - Options to set Splash timeout
 - Detect software on inline scripts
