@@ -38,7 +38,7 @@ def is_url_allowed(url):
 
 
 def is_valid_mimetype(response):
-    """ Return ``True`` if the mimetype no contains words from the blacklist.
+    """ Return ``True`` if the mimetype is not blacklisted.
 
     :rtype: bool
 
@@ -90,7 +90,8 @@ def create_lua_script(plugins):
 
 
 def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
-    """ Return response with har and detected software. i
+    """
+    Return response with HAR, inline scritps and software detected by JS matchers.
 
     :rtype: dict
 
@@ -151,7 +152,7 @@ def get_splash_error(json_data):
 
 
 def get_valid_har(har_data):
-    """ Return list of valid har entries.
+    """ Return list of valid HAR entries.
 
     :rtype: list
 

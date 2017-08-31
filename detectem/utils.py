@@ -91,7 +91,7 @@ def docker_error(method):
 
 class DockerManager:
     """
-    Wraps requests to docker daemon to manage Splash container.
+    Wraps requests to Docker daemon to manage Splash container.
     """
     def __init__(self):
         try:
@@ -151,15 +151,15 @@ class DockerManager:
         else:
             raise DockerStartError(
                 "Could not connect to started Splash container. "
-                "See 'docker logs splash-detectm' for more details, "
+                "See 'docker logs splash-detectem' for more details, "
                 "or remove the container to try again."
             )
 
 
 @contextmanager
 def docker_container():
-    """ Start a Splash container to send requests.
-    If it doesn't exist, it creates the container named 'splash-detectem'.
+    """ Start the Splash server on a Docker container.
+    If the container doesn't exist, it is created and named 'splash-detectem'.
 
     """
     if SETUP_SPLASH:
