@@ -6,8 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+- Options to set Splash timeout
+- Detect software on inline scripts
+- Support for custom plugins
+- A from_url field to the output metadata
 
 ### Changed
+- Better error handling
+- Do not run JS matchers when site uses Content Security Policy
+- Disable loading images on Splash
+- Use names when listing hints
+- Sort detected plugins by name and version
+- Remove duplicated plugins from detection results
 
 ## 0.5.2 - 2017-03-24
 ### Changed
