@@ -1,16 +1,16 @@
 import sys
 import json
 
-from detectem.exceptions import SplashError, NoPluginsError
-
 try:
+    import bottle
     from bottle import run, post, request
 except ImportError:
-    print("Install bottle to use the web service ..")
+    print('[+] Install bottle to use the web service')
     sys.exit(0)
 
-
+from detectem.exceptions import SplashError, NoPluginsError
 from detectem.cli import get_detection_results
+from detectem.settings import DEBUG
 
 
 @post('/detect')
@@ -28,4 +28,10 @@ def do_detection():
     return json.dumps(result)
 
 
-run(host='0.0.0.0', port=5723)
+def main():
+    bottle.debug(DEBUG)
+    run(host='0.0.0.0', port=5723)
+
+
+if __name__ == '__main__':
+    main()
