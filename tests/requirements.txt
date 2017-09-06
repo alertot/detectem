@@ -2,3 +2,4 @@ pytest==3.0.3
 pyyaml==3.12
 dukpy==0.0.6
 pytest-mock==1.6.2
+boddle==0.2.6

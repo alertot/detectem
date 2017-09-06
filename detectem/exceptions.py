@@ -8,9 +8,11 @@ class NotNamedParameterFound(Exception):
 
 class SplashError(Exception):
     def __init__(self, msg):
-        msg = 'Splash error: {}'.format(msg)
+        self.msg = 'Splash error: {}'.format(msg)
         super().__init__(msg)
 
 
 class NoPluginsError(Exception):
-    pass
+    def __init__(self, msg):
+        self.msg = msg
+        super().__init__(msg)
