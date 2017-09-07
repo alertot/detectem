@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Unreleased
 ----------
+
+0.6.1 - 2017-09-07
+------------------
 ## Fixed
 - Regression in the web service
 
