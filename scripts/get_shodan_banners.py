@@ -11,8 +11,11 @@ except ImportError:
     print('Install shodan: pip install shodan')
     sys.exit(0)
 
-
-SHODAN_API_KEY = os.environ['SHODAN_API_KEY']
+try:
+    SHODAN_API_KEY = os.environ['SHODAN_API_KEY']
+except KeyError:
+    print('Set SHODAN_API_KEY environment variable with your key')
+    sys.exit(0)
 
 
 def get_headers(text):
@@ -46,10 +49,16 @@ def get_headers(text):
     is_flag=True,
     help='Include stats'
 )
+@click.option(
+    '--show-names',
+    default=False,
+    is_flag=True,
+    help='Show header names'
+)
 @click.argument('query')
-def main(filter, stats, query):
+def main(filter, stats, show_names, query):
     counter = 0
-    filtered_header = []
+    filtered_header = set()
     api = shodan.Shodan(SHODAN_API_KEY)
 
     try:
@@ -59,14 +68,17 @@ def main(filter, stats, query):
         sys.exit(0)
 
     for match in result['matches']:
+        server = '{}:{}'.format(match['ip_str'], match['port'])
         hd = get_headers(match['data'])
         if not hd:
             continue
 
-        if filter:
+        if show_names:
+            filtered_header.update(set(hd.keys()))
+        elif filter:
             value = hd.get(filter)
             if value:
-                filtered_header.append(value)
+                filtered_header.add((server, value))
         else:
             pprint.pprint(hd, width=160)
             counter += 1
@@ -75,7 +87,7 @@ def main(filter, stats, query):
         pprint.pprint(filtered_header, width=160)
 
     if stats:
-        print()
+        print('\n--- Stats ---')
         print('[+] n_matches: {}'.format(len(result['matches'])))
         print('[+] n_printed: {}'.format(counter or len(filtered_header)))
 
