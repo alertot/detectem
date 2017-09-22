@@ -1,0 +1,13 @@
+- plugin: jqueryui
+  matches:
+    - body: |
+        /*!
+        * jQuery UI Core 1.11.4
+        * http://jqueryui.com
+      version: 1.11.4
+    - body: /*! jQuery UI - v1.11.1 - 2014-08-13
+      version: 1.11.1
+    - url: https://code.jquery.com/ui/1.11.1/jquery-ui.min.js
+      version: 1.11.1
+    - url: https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js
+      version: 1.12.1

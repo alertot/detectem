@@ -1,0 +1,21 @@
+- plugin: react
+  matches:
+    - body: |
+        /**
+         * React v15.6.1
+         *
+         * Copyright 2013-present, Facebook, Inc.
+      version: 15.6.1
+    - url: https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-with-addons.js
+      version: 15.6.1
+    - url: https://cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js
+      version: 15.6.1
+    - url: https://fb.me/react-0.14.3.js
+      version: 0.14.3
+    - url: https://fb.me/react-with-addons-0.14.3.min.js
+      version: 0.14.3
+  js_matches:
+    - js: "window.React = {version: '15.1.0'}"
+      version: 15.1.0
+  indicators:
+    - body: <div class="Welcome__welcomeMain___1BuTh" data-reactid=".1nj3fc0syyo.0">

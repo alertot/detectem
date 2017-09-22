@@ -1,0 +1,31 @@
+- plugin: lightbox
+  matches:
+    - body: |
+        /*!
+         * Lightbox v2.9.0
+         * by Lokesh Dhakar
+         *
+         * More info:
+         * http://lokeshdhakar.com/projects/lightbox2/
+      version: 2.9.0
+    - url: https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox.js
+      version: 2.9.0
+    - url: https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox.min.js
+      version: 2.9.0
+  indicators:
+    - url: https://www.freecodecamp.org/bower_components/lightbox2/dist/css/lightbox.css
+
+- plugin: prettyphoto
+  matches:
+    - body: (function($){$.prettyPhoto={version:'3.0.1'};
+      version: 3.0.1
+    - body: |
+        (function($) {
+            $.prettyPhoto = {version: '3.1.6'};}
+      version: 3.1.6
+    - body: e.prettyPhoto={version:"3.1.6"}
+      version: 3.1.6
+    - url: https://cdnjs.cloudflare.com/ajax/libs/prettyPhoto/3.1.6/js/jquery.prettyPhoto.min.js
+      version: 3.1.6
+    - url: https://cdnjs.cloudflare.com/ajax/libs/prettyPhoto/3.1.6/css/prettyPhoto.min.css
+      version: 3.1.6

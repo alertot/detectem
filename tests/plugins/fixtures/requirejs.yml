@@ -1,0 +1,9 @@
+- plugin: require.js
+  matches:
+    - body: |
+         * @license RequireJS 2.3.5 Copyright jQuery Foundation and other contributors.
+      version: 2.3.5
+    - url: https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.22/require.js
+      version: 2.1.22
+    - url: https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js
+      version: 2.3.5
