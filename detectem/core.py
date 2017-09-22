@@ -197,6 +197,8 @@ class Detector():
                     from_url=self.requested_url,
                 )
             )
+            for hint in self.get_hints(plugin):
+                self._results.add_result(hint)
 
     def process_har(self):
         """ Detect plugins present in the page.
