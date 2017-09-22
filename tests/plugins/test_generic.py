@@ -60,6 +60,7 @@ class TestGenericMatches(object):
         if field == 'url':
             method = Detector.from_url
             fake_har_entry['request']['url'] = match['url']
+            fake_har_entry['response']['url'] = match['url']
         elif field == 'body':
             method = Detector.from_body
             fake_har_entry['response']['content']['text'] = match['body']
