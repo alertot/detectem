@@ -1,5 +1,3 @@
-import os
-
 from unittest.mock import patch
 
 from detectem.settings import get_boolean_value
