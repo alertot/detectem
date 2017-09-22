@@ -2,6 +2,10 @@
   matches:
     - url: http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js
       version: 1.8.3
+    - url: https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js
+      version: 3.2.1
+    - url: https://code.jquery.com/jquery-3.2.1.slim.min.js
+      version: 3.2.1
     - url: https://code.jquery.com/jquery-1.11.3.min.js
       version: 1.11.3
     - url: https://code.jquery.com/jquery-1.11.4.js
@@ -14,6 +18,12 @@
       version: 1.4.4
     - body: /*! jQuery v1.7.2 jquery.com | jquery.org/license */
       version: 1.7.2
+    - body: "/*! jQuery v3.2.1 \
+             -ajax,-ajax/jsonp,-ajax/load,-ajax/parseXML,-ajax/script,-ajax/var/location,\
+             -ajax/var/nonce,-ajax/var/rquery,-ajax/xhr,-manipulation/_evalUrl,-event/ajax,\
+             -effects,-effects/Tween,-effects/animatedSelector \
+             | (c) JS Foundation and other contributors"
+      version: 3.2.1
 
 - plugin: jquery-colorbox
   matches:
