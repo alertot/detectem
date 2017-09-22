@@ -254,7 +254,7 @@ class TestDetector():
 
         detector = self._create_detector(None, [TestPlugin()])
 
-        hints = detector.get_hints(BlaPlugin(), {})
+        hints = detector.get_hints(BlaPlugin())
         assert hints
 
     def test_get_hints_with_invalid_hint(self):
@@ -263,7 +263,7 @@ class TestDetector():
             hints = ['test']
 
         detector = self._create_detector(None, [])
-        hints = detector.get_hints(BlaPlugin(), {})
+        hints = detector.get_hints(BlaPlugin())
         assert not hints
 
 

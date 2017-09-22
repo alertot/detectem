@@ -156,7 +156,7 @@ class Detector():
 
         return entry['request']['url']
 
-    def get_hints(self, plugin, entry):
+    def get_hints(self, plugin):
         """ Get plugins hints from `plugin` on `entry`.
 
         Plugins hints return `Result` or `None`.
@@ -225,7 +225,7 @@ class Detector():
                             from_url=self.get_url(entry)
                         )
                     )
-                    hints += self.get_hints(plugin, entry)
+                    hints += self.get_hints(plugin)
 
             for plugin in indicator_plugins:
                 is_present = self.check_indicator_presence(plugin, entry)
@@ -238,7 +238,7 @@ class Detector():
                             type=INDICATOR_TYPE
                         )
                     )
-                    hints += self.get_hints(plugin, entry)
+                    hints += self.get_hints(plugin)
 
         for hint in hints:
             self._results.add_result(hint)
