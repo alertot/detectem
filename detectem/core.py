@@ -4,16 +4,22 @@ import urllib.parse
 from collections import defaultdict
 from distutils.version import LooseVersion
 
-from detectem.utils import (
-    extract_version, extract_name, extract_from_headers,
-    get_most_complete_version, check_presence
-)
+from detectem.utils import get_most_complete_version
 from detectem.settings import (
     VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
     MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY
 )
+from detectem.matchers import (
+    UrlMatcher, BodyMatcher, HeaderMatcher, XPathMatcher
+)
 
 logger = logging.getLogger('detectem')
+MATCHERS = {
+    'url': UrlMatcher(),
+    'body': BodyMatcher(),
+    'header': HeaderMatcher(),
+    'xpath': XPathMatcher(),
+}
 
 
 class Result():
@@ -278,84 +284,70 @@ class Detector():
             remove_group('url')
         else:
             remove_group('header')
+            remove_group('xpath')
 
         return grouped_matchers
 
-    def get_values_from_matchers(self, entry, matchers, extraction_function):
-        values = []
-
-        for key, matchers in matchers.items():
-            method = getattr(self, 'from_{}'.format(key))
-            value = method(entry, matchers, extraction_function)
-            if value:
-                values.append(value)
-
-        return values
-
     def get_plugin_version(self, plugin, entry):
-        """ Return version after applying every plugin matcher. """
+        """ Return version after applying proper ``plugin`` matchers to ``entry``.
+
+        The matchers could return many versions, but at the end one is returned.
+
+        """
+        versions = []
         grouped_matchers = self._get_matchers_for_entry(
             'matchers', plugin, entry
         )
-        versions = self.get_values_from_matchers(
-            entry, grouped_matchers, extract_version
-        )
+
+        for key, matchers in grouped_matchers.items():
+            klass = MATCHERS[key]
+            version = klass.get_version(entry, *matchers)
+            if version:
+                versions.append(version)
+
         return get_most_complete_version(versions)
 
     def get_plugin_name(self, plugin, entry):
+        """ Return plugin name with module name if it's found.
+        Otherwise return the normal plugin name.
+
+        """
         if not plugin.is_modular:
             return plugin.name
 
         grouped_matchers = self._get_matchers_for_entry(
             'modular_matchers', plugin, entry
         )
-        module_name = self.get_values_from_matchers(
-            entry, grouped_matchers, extract_name
-        )
+        module_name = None
+
+        for key, matchers in grouped_matchers.items():
+            klass = MATCHERS[key]
+            module_name = klass.get_module_name(entry, *matchers)
+            if module_name:
+                break
 
         if module_name:
-            name = '{}-{}'.format(plugin.name, module_name[0])
+            name = '{}-{}'.format(plugin.name, module_name)
         else:
             name = plugin.name
 
         return name
 
     def check_indicator_presence(self, plugin, entry):
+        """ Return presence after applying proper ``plugin`` matchers to ``entry``.
+
+        The matchers return boolean values and at least one is enough
+        to assert the presence of the plugin.
+
+        """
         grouped_matchers = self._get_matchers_for_entry(
             'indicators', plugin, entry
         )
-        presence_list = self.get_values_from_matchers(
-            entry, grouped_matchers, check_presence
-        )
-        return any(presence_list)
+        presences = []
 
-    @staticmethod
-    def from_url(entry, matchers, extraction_function):
-        """ Return version from request or response url.
-        Both could be different because of redirects.
+        for key, matchers in grouped_matchers.items():
+            klass = MATCHERS[key]
+            presence = klass.check_presence(entry, *matchers)
+            presences.append(presence)
 
-        """
-        for rtype in ['request', 'response']:
-            url = entry[rtype]['url']
-            version = extraction_function(url, matchers)
-            if version:
-                return version
-
-    @staticmethod
-    def from_body(entry, matchers, extraction_function):
-        body = entry['response']['content']['text']
-
-        version = extraction_function(body, matchers)
-        if version:
-            return version
-
-    @staticmethod
-    def from_header(entry, matchers, extraction_function):
-        """ Return version from valid headers.
-        It only applies on first request.
-
-        """
-        headers = entry['response']['headers']
-        version = extract_from_headers(headers, matchers, extraction_function)
-        if version:
-            return version
+        return any(presences)

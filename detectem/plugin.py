@@ -86,7 +86,7 @@ class _PluginLoader(object):
             logger.debug(
                 "[+] Could not load plugins package '%(pkg)s'",
                 {'pkg': plugins_package}
-                )
+            )
             return
 
         for module_path in self._get_plugin_module_paths(plugin_dir):
@@ -127,7 +127,7 @@ class Plugin():
     def get_grouped_matchers(self, source='matchers'):
         """ Return dictionary of matchers (not empty ones) """
         data = {}
-        for k in ['url', 'body', 'header']:
+        for k in ['url', 'body', 'header', 'xpath']:
             m = self._get_matchers(k, source)
             if m:
                 data[k] = m

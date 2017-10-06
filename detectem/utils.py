@@ -1,4 +1,3 @@
-import re
 import time
 import logging
 import json
@@ -9,7 +8,7 @@ from contextlib import contextmanager
 import docker
 import requests
 
-from detectem.exceptions import DockerStartError, NotNamedParameterFound
+from detectem.exceptions import DockerStartError
 from detectem.settings import (
     SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE,
     SPLASH_MAX_TIMEOUT,
@@ -29,55 +28,6 @@ def get_most_complete_version(versions):
         return
 
     return max(versions)
-
-
-def check_presence(text, matchers):
-    for matcher in matchers:
-        if isinstance(matcher, str):
-            v = re.search(matcher, text, flags=re.DOTALL)
-            if v:
-                return True
-        elif callable(matcher):
-            v = matcher(text)
-            if v:
-                return True
-
-    return False
-
-
-def extract_data(text, matchers, parameter):
-    for matcher in matchers:
-        if isinstance(matcher, str):
-            v = re.search(matcher, text, flags=re.DOTALL)
-            if v:
-                try:
-                    return v.group(parameter)
-                except IndexError:
-                    raise NotNamedParameterFound(
-                        'Parameter %s not found in regexp' %
-                        parameter
-                    )
-        elif callable(matcher):
-            v = matcher(text)
-            if v:
-                return v
-
-
-def extract_version(text, matchers):
-    return extract_data(text, matchers, 'version')
-
-
-def extract_name(text, matchers):
-    return extract_data(text, matchers, 'name')
-
-
-def extract_from_headers(headers, matchers, extraction_function):
-    for matcher_name, matcher_value in matchers:
-        for header in headers:
-            if header['name'] == matcher_name:
-                v = extraction_function(header['value'], [matcher_value])
-                if v:
-                    return v
 
 
 def docker_error(method):

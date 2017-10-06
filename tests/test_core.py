@@ -3,6 +3,7 @@ import pytest
 from detectem.core import Detector, Result, ResultCollection
 from detectem.plugin import Plugin, PluginCollection
 from detectem.settings import INDICATOR_TYPE, HINT_TYPE, MAIN_ENTRY
+from detectem.plugins.helpers import meta_generator
 
 
 class TestDetector():
@@ -59,16 +60,19 @@ class TestDetector():
             'url': 'foo.*-(?P<version>[0-9\.]+)\.js',
             'header': ('FooHeader', 'Foo.* v(?P<version>[0-9\.]+)'),
             'body': 'Foo.* v(?P<version>[0-9\.]+)',
+            'xpath': (meta_generator('foo-min'), '(?P<version>[0-9\.]+)'),
         },
         'indicators': {
             'url': 'foo.*\.js',
             'header': ('FooHeader', 'Foo'),
             'body': 'Foo',
+            'xpath': "//meta[@name='generator']",
         },
         'modular_matchers': {
             'url': 'foo-(?P<name>\w+)-.*\.js',
             'header': ('FooHeader', 'Foo-(?P<name>\w+)'),
             'body': 'Foo-(?P<name>\w+)',
+            'xpath': (meta_generator('foo-min'), 'foo-(?P<name>\w+)'),
         },
     }
 
@@ -228,6 +232,24 @@ class TestDetector():
             },
         ]
         p = self._create_plugin(self.FOO_PLUGIN, sources, ['url'])
+        d = self._create_detector(har, [p])
+
+        assert d.get_results() == result
+
+    @pytest.mark.parametrize('sources,result', zip(MATCHER_SOURCES, FOO_RESULTS))
+    def test_match_from_xpath(self, sources, result):
+        har = [
+            {
+                'request': {'url': self.URL},
+                'response': {
+                    'url': self.URL,
+                    'content': {
+                        'text': '<meta name="generator" content="foo-min 1.1">'
+                    },
+                },
+            },
+        ]
+        p = self._create_plugin(self.FOO_PLUGIN, sources, ['xpath'])
         d = self._create_detector(har, [p])
 
         assert d.get_results() == result
