@@ -2,7 +2,7 @@ image: python:3.6.2-alpine
 
 test:
   script:
-    - apk add --update build-base
+    - apk add --update build-base libxml2-dev libxslt-dev
     - pip install -r requirements.txt
     - pip install -r tests/requirements.txt
     - py.test tests
