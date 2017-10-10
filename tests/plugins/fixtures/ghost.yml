@@ -1,0 +1,4 @@
+- plugin: ghost
+  matches:
+    - xpath: '<meta name="generator" content="Ghost 0.11">'
+      version: '0.11'

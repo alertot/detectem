@@ -61,6 +61,8 @@ class TestGenericMatches(object):
             fake_har_entry['response']['content']['text'] = yaml_dict['body']
         elif field == 'header':
             fake_har_entry['response']['headers'] = [yaml_dict['header']]
+        elif field == 'xpath':
+            fake_har_entry['response']['content']['text'] = yaml_dict['xpath']
 
         return fake_har_entry
 

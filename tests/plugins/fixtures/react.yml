@@ -18,4 +18,4 @@
     - js: "window.React = {version: '15.1.0'}"
       version: 15.1.0
   indicators:
-    - body: <div class="Welcome__welcomeMain___1BuTh" data-reactid=".1nj3fc0syyo.0">
+    - xpath: <div class="Welcome__welcomeMain___1BuTh" data-reactid=".1nj3fc0syyo.0">

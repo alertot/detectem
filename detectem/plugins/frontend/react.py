@@ -16,5 +16,5 @@ class ReactPlugin(Plugin):
         },
     ]
     indicators = [
-        {'body': '<\w+\s[^>]+data-react'},
+        {'xpath': '//div[@data-reactid]'},
     ]
