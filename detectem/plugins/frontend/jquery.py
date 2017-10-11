@@ -12,6 +12,9 @@ class JqueryPlugin(Plugin):
         {'url': '/jquery/(?P<version>[0-9\.]+)/jquery(\.slim)?(\.min)?\.js'},
         {'url': '/jquery-(?P<version>[0-9\.]+)(\.slim)?(\.min)?\.js'},
     ]
+    js_matchers = [
+        {'check': '"jQuery" in window', 'version': 'window.jQuery().jquery'},
+    ]
 
 
 class ColorBoxPlugin(Plugin):

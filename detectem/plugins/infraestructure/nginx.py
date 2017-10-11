@@ -7,3 +7,6 @@ class NginxPlugin(Plugin):
     matchers = [
         {'header': ('Server', 'nginx/(?P<version>[0-9\.]+)')},
     ]
+    indicators = [
+        {'header': ('Server', 'nginx\s*')},
+    ]

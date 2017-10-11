@@ -24,6 +24,10 @@
              -effects,-effects/Tween,-effects/animatedSelector \
              | (c) JS Foundation and other contributors"
       version: 3.2.1
+  js_matches:
+    - js: 'window.jQuery = function() { return {jquery: "1.0.0"} }'
+      version: 1.0.0
+
 
 - plugin: jquery-colorbox
   matches:

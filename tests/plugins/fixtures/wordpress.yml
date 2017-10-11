@@ -6,3 +6,7 @@
   matches:
     - url: http://www.domain.tld/wp-content/plugins/contact-form-7/includes/js/scripts.js?ver=3.3.3
       version: 3.3.3
+- plugin: wordpress
+  matches:
+    - url: http://domain.tld/wp-includes/js/wp-embed.min.js?ver=1.2.3
+      version: 1.2.3
