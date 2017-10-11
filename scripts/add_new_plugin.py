@@ -7,14 +7,15 @@ ROOT_DIRECTORY = os.path.abspath(
 )
 PLUGIN_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'detectem/plugins')
 PLUGIN_DIRECTORIES = [
-    d for d in os.listdir(PLUGIN_DIRECTORY) if not d.startswith('_')
+    d for d in os.listdir(PLUGIN_DIRECTORY)
+    if os.path.isdir(os.path.join(PLUGIN_DIRECTORY, d)) and d != '__pycache__'
 ]
 
 
 @click.command()
 @click.option(
     '--matcher',
-    type=click.Choice(['url', 'body', 'header']),
+    type=click.Choice(['url', 'body', 'header', 'xpath']),
     required=True,
     help='Set the matcher type.',
 )
