@@ -1,0 +1,15 @@
+version: '3.1'
+
+services:
+  splash:
+    image: scrapinghub/splash:3.0
+
+  detectem:
+    build: 
+      context: ./
+      dockerfile: Dockerfile-alternate
+    environment:
+      - SETUP_SPLASH=False
+      - SPLASH_URL=http://splash:8050
+    depends_on:
+      - splash
