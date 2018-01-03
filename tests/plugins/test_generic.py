@@ -25,15 +25,7 @@ class TestGenericMatches(object):
             test_dir = os.path.join(package_dir, os.pardir, 'tests')
 
             plugin = pytest.config.getoption('plugin', None)
-            if plugin:
-                plugin = plugin.replace('.', '')
-                try:
-                    fixture_file = 'plugins/fixtures/{}.yml'.format(plugin)
-                    data = load_from_yaml(test_dir, fixture_file)
-                except FileNotFoundError:
-                    continue
-            else:
-                data = load_from_yaml(test_dir, 'plugins/fixtures/')
+            data = load_from_yaml(test_dir, 'plugins/fixtures/')
 
             if fname == 'test_version_matches':
                 entry_name = 'matches'
@@ -46,8 +38,13 @@ class TestGenericMatches(object):
 
             for entry in data:
                 for yaml_dict in entry.get(entry_name, []):
-                    plugin = all_plugins.get(entry['plugin'])
-                    cases.append([plugin, yaml_dict])
+                    if plugin:
+                        if plugin == entry['plugin']:
+                            p = all_plugins.get(entry['plugin'])
+                            cases.append([p, yaml_dict])
+                    else:
+                        p = all_plugins.get(entry['plugin'])
+                        cases.append([p, yaml_dict])
 
         metafunc.parametrize('plugin,yaml_dict', cases)
 
