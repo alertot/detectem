@@ -238,9 +238,10 @@ class Detector():
             for plugin in indicator_plugins:
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
+                    name = self.get_plugin_name(plugin, entry)
                     self._results.add_result(
                         Result(
-                            name=plugin.name,
+                            name=name,
                             homepage=plugin.homepage,
                             from_url=self.get_url(entry),
                             type=INDICATOR_TYPE
