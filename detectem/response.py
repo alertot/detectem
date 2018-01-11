@@ -83,10 +83,26 @@ def create_lua_script(plugins):
     lua_template = pkg_resources.resource_string('detectem', 'script.lua')
     template = Template(lua_template.decode('utf-8'))
 
-    javascript_data = [{'name': p.name, 'matchers': p.js_matchers}
-                       for p in plugins.with_js_matchers()]
+    javascript_data = to_javascript_data(plugins)
 
     return template.substitute(js_data=json.dumps(javascript_data))
+
+
+def to_javascript_data(plugins):
+    """
+    Return a dictionary with all JavaScript matchers. Quotes are escaped.
+
+    :rtype: dict
+
+    """
+    def escape(v):
+        return re.sub('"', '\\"', v)
+
+    def js_matchers(p):
+        return [{k: escape(v) for k, v in m.items()} for m in p.js_matchers]
+
+    return [{'name': p.name, 'matchers': js_matchers(p)}
+            for p in plugins.with_js_matchers()]
 
 
 def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
