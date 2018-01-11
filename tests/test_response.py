@@ -9,6 +9,7 @@ from detectem.response import (
     is_valid_mimetype,
     get_charset,
     create_lua_script,
+    get_evaljs_error,
     get_valid_har,
     get_response,
 )
@@ -162,3 +163,22 @@ def test_get_response_with_error_status_codes(monkeypatch):
 ])
 def test_get_valid_har(har_data, result_len):
     assert len(get_valid_har(har_data)) == result_len
+
+
+def test_get_evaljs_error():
+    json_data = {
+        'errors': {
+            'evaljs':
+                "ScriptError("
+                "{"
+                "'js_error_type': 'ReferenceError', "
+                "'message': 'JS error: \"ReferenceError: Can\\'t find variable: softwareData\"', "  # noqa: E501
+                "'js_error': \"ReferenceError: Can't find variable: softwareData \", "
+                "'js_error_message': \"Can't find variable: softwareData\", "
+                "'splash_method': 'evaljs', "
+                "'type': 'JS_ERROR'"
+                "},)"
+        }
+    }
+    message = get_evaljs_error(json_data)
+    assert message == "JS error: \"ReferenceError: Can't find variable: softwareData\""

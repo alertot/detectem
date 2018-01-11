@@ -121,7 +121,11 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
     scripts = json_data['scripts'].values()
     har = get_valid_har(json_data['har'])
 
-    logger.debug('[+] Detected %(n)d softwares from the DOM', {'n': len(softwares)})
+    js_error = get_evaljs_error(json_data)
+    if js_error:
+        logger.debug('[+] WARNING: failed to eval JS matchers: %(n)s', {'n': js_error})
+    else:
+        logger.debug('[+] Detected %(n)d softwares from the DOM', {'n': len(softwares)})
     logger.debug('[+] Detected %(n)d scripts from the DOM', {'n': len(scripts)})
     logger.debug('[+] Final HAR has %(n)d valid entries', {'n': len(har)})
 
@@ -149,6 +153,17 @@ def get_splash_error(json_data):
         else:
             msg = '{0}: {1}'.format(msg, error)
     return msg
+
+
+def get_evaljs_error(json_data):
+    error = None
+    if 'errors' in json_data and 'evaljs' in json_data['errors']:
+        res = json_data['errors']['evaljs']
+        if isinstance(res, str):
+            m = re.search("'message': '(.*?)'[,}]", res)
+            if m:
+                error = bytes(m.group(1), 'utf-8').decode('unicode_escape')
+    return error
 
 
 def get_valid_har(har_data):
