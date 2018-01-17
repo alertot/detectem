@@ -5,8 +5,8 @@ detectem
 .. image:: https://img.shields.io/pypi/v/detectem.svg
         :target: https://pypi.python.org/pypi/detectem
 
-.. image:: https://img.shields.io/travis/spectresearch/detectem.svg
-        :target: https://travis-ci.org/spectresearch/detectem
+.. image:: https://img.shields.io/travis/alertot/detectem.svg
+        :target: https://travis-ci.org/alertot/detectem
 
 .. image:: https://pyup.io/repos/github/alertot/detectem/shield.svg
      :target: https://pyup.io/repos/github/alertot/detectem/

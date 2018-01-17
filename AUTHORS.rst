@@ -6,8 +6,10 @@ Development Lead
 ----------------
 
 * Claudio Salazar <csalazar@spect.cl>
+* Sebastian Mancilla
 
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Rodrigo Tobar
+* Tomas Hernandez

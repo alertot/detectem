@@ -12,7 +12,7 @@ setup(
     description="Detect software in websites.",
     author="Claudio Salazar",
     author_email='csalazar@spect.cl',
-    url='https://github.com/spectresearch/detectem',
+    url='https://github.com/alertot/detectem',
     packages=find_packages(exclude=('tests', 'docs')),
     package_dir={'detectem': 'detectem'},
     entry_points={
@@ -22,6 +22,7 @@ setup(
     },
     include_package_data=True,
     install_requires=requirements,
+    python_requires='>=3.5',
     license="MIT",
     zip_safe=False,
     keywords='detector detection',
