@@ -8,6 +8,10 @@ detectem
 .. image:: https://img.shields.io/travis/spectresearch/detectem.svg
         :target: https://travis-ci.org/spectresearch/detectem
 
+.. image:: https://pyup.io/repos/github/alertot/detectem/shield.svg
+     :target: https://pyup.io/repos/github/alertot/detectem/
+     :alt: Updates
+
 
 detectem is a specialized software detector.
 Let's see it in action.
