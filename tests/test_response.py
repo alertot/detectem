@@ -1,5 +1,4 @@
 import pytest
-import json
 
 import detectem.utils
 
@@ -55,8 +54,9 @@ def test_create_lua_script():
     script = create_lua_script(plugins)
     assert script
 
-    js_data = json.dumps(BlaPlugin.js_matchers)
-    assert js_data in script
+    assert '"name": "bla"' in script
+    assert '"check": "bla"' in script
+    assert '"version": "bla.version"' in script
 
 
 def test_get_response(monkeypatch):
