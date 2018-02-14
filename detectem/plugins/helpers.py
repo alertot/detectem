@@ -1,3 +1,3 @@
 def meta_generator(name):
-    return '//meta[@name="generator" and contains(@content, "{}")]' \
+    return '//meta[re:test(@name,"generator","i") and contains(@content, "{}")]' \
             '/@content'.format(name)
