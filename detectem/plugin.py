@@ -13,6 +13,24 @@ from detectem.settings import PLUGIN_PACKAGES
 
 logger = logging.getLogger('detectem')
 
+LANGUAGE_TAGS = [
+    'php', 'python', 'ruby', 'perl', 'node.js', 'javascript',
+]
+FRAMEWORK_TAGS = [
+    'django', 'angular', 'backbone', 'react',
+]
+PRODUCT_TAGS = [
+    'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
+    'joomla',
+]
+CATEGORY_TAGS = [
+    'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
+    'document management system', 'miscellaneous',
+    'message board', 'angular', 'js framework', 'web framework',
+    'visualization', 'graphics', 'web server',
+]
+PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
+
 
 class PluginCollection(object):
     def __init__(self):
@@ -59,8 +77,10 @@ class _PluginLoader(object):
         return module_paths
 
     def _is_plugin_ok(self, instance):
-        ''' Return `True` if plugin meets plugin interface and
-        is not already registered in the plugin collection.
+        ''' Return `True` if:
+        1. Plugin meets plugin interface.
+        2. Is not already registered in the plugin collection.
+        3. Have accepted tags.
 
         Otherwise, return `False` and log warnings.
 
@@ -76,16 +96,24 @@ class _PluginLoader(object):
 
         # Check if the plugin is already registered
         reg = self.plugins.get(instance.name)
-        if not reg:
-            return True
+        if reg:
+            logger.warning(
+                "Plugin '%(name)s' by '%(instance)s' is already provided by '%(reg)s'",
+                {'name': instance.name,
+                 'instance': self._full_class_name(instance),
+                 'reg': self._full_class_name(reg)}
+            )
+            return False
 
-        logger.warning(
-            "Plugin '%(name)s' by '%(instance)s' is already provided by '%(reg)s'",
-            {'name': instance.name,
-             'instance': self._full_class_name(instance),
-             'reg': self._full_class_name(reg)}
-        )
-        return False
+        for tag in instance.tags:
+            if tag not in PLUGIN_TAGS:
+                logger.warning(
+                    "Invalid tag '%(tag)s' in '%(instance)s'",
+                    {'tag': tag, 'instance': self._full_class_name(instance)}
+                )
+                return False
+
+        return True
 
     def load_plugins(self, plugins_package):
         ''' Load plugins from `plugins_package` module. '''
@@ -134,6 +162,7 @@ def load_plugins():
 class IPlugin(Interface):
     name = Attribute(""" Name to identify the plugin. """)
     homepage = Attribute(""" Plugin homepage. """)
+    tags = Attribute(""" Tags to categorize plugins """)
 
 
 @implementer(IPlugin)

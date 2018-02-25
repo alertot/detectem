@@ -4,9 +4,11 @@ from detectem.plugin import Plugin
 class NginxPlugin(Plugin):
     name = 'nginx'
     homepage = 'https://www.nginx.com/'
+    tags = ['web server', 'nginx']
+
     matchers = [
-        {'header': ('Server', 'nginx/(?P<version>[0-9\.]+)')},
+        {'header': ('Server', r'nginx/(?P<version>[0-9\.]+)')},
     ]
     indicators = [
-        {'header': ('Server', 'nginx\s*')},
+        {'header': ('Server', r'nginx\s*')},
     ]

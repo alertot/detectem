@@ -3,9 +3,8 @@
     - js: "window.CrayonSyntaxSettings = {version: '1.0.0'}"
       version: 1.0.0
 - plugin: contact-form-7
-  matches:
+  indicators:
     - url: http://www.domain.tld/wp-content/plugins/contact-form-7/includes/js/scripts.js?ver=3.3.3
-      version: 3.3.3
 - plugin: wordpress
   matches:
     - url: http://domain.tld/wp-includes/js/wp-embed.min.js?ver=1.2.3
