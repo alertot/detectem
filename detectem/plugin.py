@@ -15,7 +15,6 @@ logger = logging.getLogger('detectem')
 
 
 class PluginCollection(object):
-
     def __init__(self):
         self._plugins = {}
 
@@ -32,7 +31,7 @@ class PluginCollection(object):
         return self._plugins.values()
 
     def with_version_matchers(self):
-        return [p for p in self._plugins.values() if not p.is_indicator]
+        return [p for p in self._plugins.values() if p.is_version]
 
     def with_indicator_matchers(self):
         return [p for p in self._plugins.values() if p.is_indicator]
@@ -42,7 +41,6 @@ class PluginCollection(object):
 
 
 class _PluginLoader(object):
-
     def __init__(self):
         self.plugins = PluginCollection()
 
@@ -50,41 +48,53 @@ class _PluginLoader(object):
         return '{}.{}'.format(ins.__class__.__module__, ins.__class__.__name__)
 
     def _get_plugin_module_paths(self, plugin_dir):
+        ''' Return a list of every module in `plugin_dir`. '''
         filepaths = [
             fp for fp in glob.glob('{}/**/*.py'.format(plugin_dir), recursive=True)
             if not fp.endswith('__init__.py')
         ]
         rel_paths = [re.sub(plugin_dir.rstrip('/') + '/', '', fp) for fp in filepaths]
         module_paths = [rp.replace('/', '.').replace('.py', '') for rp in rel_paths]
+
         return module_paths
 
-    def _load_plugin(self, klass):
-        ins = klass()
+    def _is_plugin_ok(self, instance):
+        ''' Return `True` if plugin meets plugin interface and
+        is not already registered in the plugin collection.
+
+        Otherwise, return `False` and log warnings.
+
+        '''
         try:
-            if verifyObject(IPlugin, ins):
-                reg = self.plugins.get(ins.name)
-                if not reg:
-                    self.plugins.add(ins)
-                else:
-                    logger.warning(
-                        "Plugin '%(name)s' by '%(ins)s' is already provided by '%(reg)s'",
-                        {'name': ins.name,
-                         'ins': self._full_class_name(ins),
-                         'reg': self._full_class_name(reg)}
-                    )
+            verifyObject(IPlugin, instance)
         except BrokenImplementation:
             logger.warning(
                 "Plugin '%(name)s' doesn't provide the plugin interface",
-                {'name': self._full_class_name(ins)}
+                {'name': self._full_class_name(instance)}
             )
+            return False
+
+        # Check if the plugin is already registered
+        reg = self.plugins.get(instance.name)
+        if not reg:
+            return True
+
+        logger.warning(
+            "Plugin '%(name)s' by '%(instance)s' is already provided by '%(reg)s'",
+            {'name': instance.name,
+             'instance': self._full_class_name(instance),
+             'reg': self._full_class_name(reg)}
+        )
+        return False
 
     def load_plugins(self, plugins_package):
+        ''' Load plugins from `plugins_package` module. '''
         try:
             # Resolve directory in the filesystem
             plugin_dir = find_spec(plugins_package).submodule_search_locations[0]
         except ImportError:
-            logger.debug(
-                "[+] Could not load plugins package '%(pkg)s'",
+            logger.error(
+                "Could not load plugins package '%(pkg)s'",
                 {'pkg': plugins_package}
             )
             return
@@ -98,18 +108,26 @@ class _PluginLoader(object):
             # Get classes from module and extract the plugin classes
             classes = inspect.getmembers(m, predicate=inspect.isclass)
             for _, klass in classes:
+                # Avoid imports processing
                 if klass.__module__ != spec.name:
                     continue
+
+                # Avoid classes not ending in Plugin
                 if not klass.__name__.endswith('Plugin'):
                     continue
-                self._load_plugin(klass)
+
+                instance = klass()
+                if self._is_plugin_ok(instance):
+                    self.plugins.add(instance)
 
 
 def load_plugins():
-    """ Return the list of plugin instances """
+    """ Return the list of plugin instances. """
     loader = _PluginLoader()
+
     for pkg in PLUGIN_PACKAGES:
         loader.load_plugins(pkg)
+
     return loader.plugins
 
 
@@ -120,12 +138,24 @@ class IPlugin(Interface):
 
 @implementer(IPlugin)
 class Plugin():
-    def _get_matchers(self, value, source='matchers'):
+    def _get_matchers(self, mtype, source='matchers'):
+        ''' Return `mtype` matchers present in `source`.
+        For instance, `mtype=url` and `source=matchers` would return
+        URL matchers present in the plugin.
+
+        `source` is a variable because we could extract
+        matchers from indicators or other attribute too.
+
+        '''
         matchers_dict = getattr(self, source, [])
-        return [m[value] for m in matchers_dict if value in m]
+
+        return [m[mtype] for m in matchers_dict if mtype in m]
 
     def get_grouped_matchers(self, source='matchers'):
-        """ Return dictionary of matchers (not empty ones) """
+        """ Return plugin dictionary of matchers (not empty ones)
+        with matcher type as key and matcher list as value.
+
+        """
         data = {}
         for k in ['url', 'body', 'header', 'xpath']:
             m = self._get_matchers(k, source)
@@ -133,6 +163,10 @@ class Plugin():
                 data[k] = m
 
         return data
+
+    @property
+    def is_version(self):
+        return bool(hasattr(self, 'matchers'))
 
     @property
     def is_modular(self):
