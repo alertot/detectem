@@ -254,17 +254,6 @@ class TestDetector():
 
         assert d.get_results() == result
 
-    @pytest.mark.parametrize('entry,result', [
-        ({'request': {'url': 'http://a'}}, 'http://a'),
-        ({
-            'request': {'url': 'http://a'},
-            'response': {'url': 'http://b'},
-        }, 'http://b'),
-
-    ])
-    def test_get_url(self, entry, result):
-        assert Detector.get_url(entry) == result
-
     def test_get_hints_with_valid_hint(self):
         class TestPlugin(Plugin):
             name = 'test'

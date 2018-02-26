@@ -4,7 +4,10 @@ import urllib.parse
 from collections import defaultdict
 from distutils.version import LooseVersion
 
-from detectem.utils import get_most_complete_version
+from detectem.utils import (
+    get_most_complete_version,
+    get_url,
+)
 from detectem.settings import (
     VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
     MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY
@@ -154,13 +157,6 @@ class Detector():
     def _get_entry_type(entry):
         return entry['detectem']['type']
 
-    @staticmethod
-    def get_url(entry):
-        """ Return URL from response if it was received otherwise requested URL """
-        if 'response' in entry:
-            return entry['response']['url']
-
-        return entry['request']['url']
 
     def get_hints(self, plugin):
         """ Get plugins hints from `plugin` on `entry`.
@@ -230,7 +226,7 @@ class Detector():
                             name=name,
                             version=version,
                             homepage=plugin.homepage,
-                            from_url=self.get_url(entry)
+                            from_url=get_url(entry)
                         )
                     )
                     hints += self.get_hints(plugin)
@@ -243,7 +239,7 @@ class Detector():
                         Result(
                             name=name,
                             homepage=plugin.homepage,
-                            from_url=self.get_url(entry),
+                            from_url=get_url(entry),
                             type=INDICATOR_TYPE
                         )
                     )

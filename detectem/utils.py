@@ -131,3 +131,11 @@ def create_printer(format):
         def json_printer(data):
             print(json.dumps(data))
         return json_printer
+
+
+def get_url(entry):
+    """ Return URL from response if it was received otherwise requested URL. """
+    if 'response' in entry:
+        return entry['response']['url']
+
+    return entry['request']['url']
