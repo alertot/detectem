@@ -226,3 +226,6 @@ class Plugin():
 class GenericPlugin(Plugin):
     """ Class used by generic plugins. """
     ptype = 'generic'
+
+    def get_information(self, entry):
+        raise NotImplementedError()
