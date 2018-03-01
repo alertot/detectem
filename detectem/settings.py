@@ -17,6 +17,7 @@ def get_boolean_value(key, default):
 
 
 PLUGIN_PACKAGES = os.environ.get('DET_PLUGIN_PACKAGES', 'detectem.plugins').split(',')
+DATA_DIR = os.path.join(os.path.dirname(__file__), os.pardir, 'data')
 
 SPLASH_URL = os.environ.get('SPLASH_URL', 'http://localhost:8050')
 SETUP_SPLASH = get_boolean_value('SETUP_SPLASH', True)
@@ -34,6 +35,7 @@ CMD_OUTPUT = 'cmd'
 VERSION_TYPE = 'version'
 INDICATOR_TYPE = 'indicator'
 HINT_TYPE = 'hint'
+GENERIC_TYPE = 'generic'
 
 RESOURCE_ENTRY = 'resource'
 MAIN_ENTRY = 'main'

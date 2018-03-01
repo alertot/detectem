@@ -10,7 +10,8 @@ from detectem.utils import (
 )
 from detectem.settings import (
     VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
-    MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY
+    MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY,
+    GENERIC_TYPE,
 )
 from detectem.matchers import (
     UrlMatcher, BodyMatcher, HeaderMatcher, XPathMatcher
@@ -77,6 +78,9 @@ class ResultCollection():
                 assert len(p_list) == 1
             elif HINT_TYPE in rdict:
                 p_list = list(rdict[HINT_TYPE])
+                assert len(p_list) == 1
+            elif GENERIC_TYPE in rdict:
+                p_list = list(rdict[GENERIC_TYPE])
                 assert len(p_list) == 1
 
             norm_results[p_name] = p_list
@@ -214,6 +218,7 @@ class Detector():
 
         version_plugins = self._plugins.with_version_matchers()
         indicator_plugins = self._plugins.with_indicator_matchers()
+        generic_plugins = self._plugins.with_generic_matchers()
 
         for entry in self.har:
             for plugin in version_plugins:
@@ -244,6 +249,19 @@ class Detector():
                         )
                     )
                     hints += self.get_hints(plugin)
+
+            for plugin in generic_plugins:
+                is_present = self.check_indicator_presence(plugin, entry)
+                if is_present:
+                    plugin_data = plugin.get_information(entry)
+                    self._results.add_result(
+                        Result(
+                            name=plugin_data['name'],
+                            homepage=plugin_data['homepage'],
+                            from_url=get_url(entry),
+                            type=GENERIC_TYPE,
+                        )
+                    )
 
         for hint in hints:
             self._results.add_result(hint)

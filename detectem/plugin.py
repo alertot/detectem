@@ -55,7 +55,10 @@ class PluginCollection(object):
         return [p for p in self._plugins.values() if p.is_indicator]
 
     def with_js_matchers(self):
-        return [p for p in self._plugins.values() if hasattr(p, 'js_matchers')]
+        return [p for p in self._plugins.values() if p.is_js]
+
+    def with_generic_matchers(self):
+        return [p for p in self._plugins.values() if p.is_generic]
 
 
 class _PluginLoader(object):
@@ -167,6 +170,12 @@ class IPlugin(Interface):
 
 @implementer(IPlugin)
 class Plugin():
+    """ Class used by normal plugins.
+    It implements :class:`~IPlugin`.
+
+    """
+    ptype = 'normal'
+
     def _get_matchers(self, mtype, source='matchers'):
         ''' Return `mtype` matchers present in `source`.
         For instance, `mtype=url` and `source=matchers` would return
@@ -203,4 +212,17 @@ class Plugin():
 
     @property
     def is_indicator(self):
-        return bool(hasattr(self, 'indicators'))
+        return bool(hasattr(self, 'indicators')) and self.ptype == 'normal'
+
+    @property
+    def is_js(self):
+        return bool(hasattr(self, 'js_matchers'))
+
+    @property
+    def is_generic(self):
+        return self.ptype == 'generic'
+
+
+class GenericPlugin(Plugin):
+    """ Class used by generic plugins. """
+    ptype = 'generic'
