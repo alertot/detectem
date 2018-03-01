@@ -13,7 +13,7 @@ from detectem.response import (
     get_response,
 )
 from detectem.exceptions import SplashError
-from detectem.plugin import PluginCollection
+from detectem.plugin import PluginCollection, Plugin
 from detectem.response import requests
 
 
@@ -44,7 +44,7 @@ def test_get_charset(response, result):
 
 
 def test_create_lua_script():
-    class BlaPlugin():
+    class BlaPlugin(Plugin):
         name = 'bla'
         js_matchers = [{'check': 'bla', 'version': 'bla.version'}]
 
