@@ -14,20 +14,22 @@ from detectem.settings import PLUGIN_PACKAGES
 logger = logging.getLogger('detectem')
 
 LANGUAGE_TAGS = [
-    'php', 'python', 'ruby', 'perl', 'node.js', 'javascript',
+    'php', 'python', 'ruby', 'perl', 'node.js', 'javascript', 'asp.net', 'java',
+    'go',
 ]
 FRAMEWORK_TAGS = [
-    'django', 'angular', 'backbone', 'react',
+    'django', 'angular', 'backbone', 'react', 'symfony',
 ]
 PRODUCT_TAGS = [
     'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
-    'joomla',
+    'joomla', 'drupal',
 ]
 CATEGORY_TAGS = [
     'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
     'document management system', 'miscellaneous',
     'message board', 'angular', 'js framework', 'web framework',
-    'visualization', 'graphics', 'web server',
+    'visualization', 'graphics', 'web server', 'wiki', 'editor',
+    'ecommerce', 'accounting', 'database manager', 'photo gallery',
 ]
 PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
 
