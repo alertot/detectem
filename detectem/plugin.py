@@ -15,14 +15,18 @@ logger = logging.getLogger('detectem')
 
 LANGUAGE_TAGS = [
     'php', 'python', 'ruby', 'perl', 'node.js', 'javascript', 'asp.net', 'java',
-    'go',
+    'go', 'ruby on rails', 'cfml',
 ]
 FRAMEWORK_TAGS = [
-    'django', 'angular', 'backbone', 'react', 'symfony',
+    'django', 'angular', 'backbone', 'react', 'symfony',  'bootstrap', 'vue',
+    'laravel', 'woltlab',
 ]
 PRODUCT_TAGS = [
     'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
-    'joomla', 'drupal',
+    'joomla', 'drupal', 'underscore.js', 'marionette.js', 'moment timezone',
+    'moment.js', 'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql',
+    'octopress', 'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion',
+    'jekill', 'less', 'windows server', 'mysql',
 ]
 CATEGORY_TAGS = [
     'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
@@ -30,6 +34,9 @@ CATEGORY_TAGS = [
     'message board', 'angular', 'js framework', 'web framework',
     'visualization', 'graphics', 'web server', 'wiki', 'editor',
     'ecommerce', 'accounting', 'database manager', 'photo gallery',
+    'issue tracker', 'mobile framework', 'slider', 'accounting', 'programming language',
+    'hosting panel', 'lms', 'js graphic', 'exhibit', 'marketing automation',
+    'search engine', 'documentation tool', 'database', 'template engine',
 ]
 PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
 
