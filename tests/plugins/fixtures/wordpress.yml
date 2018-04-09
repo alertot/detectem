@@ -6,3 +6,7 @@
   matches:
     - url: http://domain.tld/wp-includes/js/wp-embed.min.js?ver=1.2.3
       version: 1.2.3
+    - xpath: '<meta name="generator" content="Wordpress 4.9.1">'
+      version: 4.9.1
+  indicators:
+    - url: http://www.domain.tld/wp-content/plugins/bla

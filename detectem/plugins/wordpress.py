@@ -1,4 +1,5 @@
 from detectem.plugin import Plugin
+from .helpers import meta_generator
 
 
 class WordpressPlugin(Plugin):
@@ -7,5 +8,8 @@ class WordpressPlugin(Plugin):
     tags = ['wordpress']
 
     matchers = [
-        {'url': '/wp-includes/js/wp-embed.min.js\?ver=(?P<version>[0-9\.]+)'},
+        {'url': r'/wp-includes/js/wp-embed.min.js\?ver=(?P<version>[0-9\.]+)'},
+        {'xpath': (meta_generator('Wordpress'), r'(?P<version>[0-9\.]+)')},
     ]
+
+    indicators = [{'url': '/wp-content/plugins/'}]
