@@ -11,7 +11,6 @@ from detectem.exceptions import DockerStartError, SplashError, NoPluginsError
 from detectem.utils import create_printer
 from detectem.settings import SPLASH_TIMEOUT, CMD_OUTPUT, JSON_OUTPUT
 
-
 DUMMY_URL = "http://domain.tld"
 
 # Set up logging
@@ -26,31 +25,32 @@ logger.addHandler(ch)
     '--debug',
     default=False,
     is_flag=True,
-    help='Include this flag to enable debug messages.'
+    help='Include this flag to enable debug messages.',
 )
 @click.option(
     '--timeout',
     default=SPLASH_TIMEOUT,
     type=click.INT,
-    help='Timeout for Splash (in seconds).'
+    help='Timeout for Splash (in seconds).',
 )
 @click.option(
     '--format',
     default=CMD_OUTPUT,
     type=click.Choice([CMD_OUTPUT, JSON_OUTPUT]),
-    help='Set the format of the results.'
+    help='Set the format of the results.',
 )
 @click.option(
     '--metadata',
     default=False,
     is_flag=True,
-    help='Include this flag to return plugin metadata.'
+    help='Include this flag to return plugin metadata.',
 )
 @click.option(
-    '--plugins', 'list_plugins',
+    '--plugins',
+    'list_plugins',
     default=False,
     is_flag=True,
-    help='List registered plugins'
+    help='List registered plugins',
 )
 @click.argument('url', default=DUMMY_URL, required=True)
 def main(debug, timeout, format, metadata, list_plugins, url):

@@ -12,10 +12,7 @@ class ReactPlugin(Plugin):
         {'url': r'/react(-with-addons)?-(?P<version>[0-9\.]+)(\.min)?\.js'},
     ]
     js_matchers = [
-        {
-            'check': 'window.React',
-            'version': 'window.React.version'
-        },
+        {'check': 'window.React', 'version': 'window.React.version'},
     ]
     indicators = [
         {'xpath': '//div[@data-reactid]'},

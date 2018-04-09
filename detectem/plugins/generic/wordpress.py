@@ -21,9 +21,7 @@ class WordpressGenericPlugin(GenericPlugin):
                 data = json.loads(line)
                 self.plugins[data['name']] = data['vendor']
 
-    indicators = [
-        {'url': '/wp-content/plugins/'}
-    ]
+    indicators = [{'url': '/wp-content/plugins/'}]
 
     def get_information(self, entry):
         name = re.findall('/wp-content/plugins/([^/]+)/', get_url(entry))[0]

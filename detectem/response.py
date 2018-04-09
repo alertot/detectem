@@ -25,9 +25,7 @@ def is_url_allowed(url):
 
     """
     blacklist = [
-        '\.ttf', '\.woff',
-        'fonts\.googleapis\.com',
-        '\.png', '\.jpe?g', '\.gif', '\.svg'
+        '\.ttf', '\.woff', 'fonts\.googleapis\.com', '\.png', '\.jpe?g', '\.gif', '\.svg'
     ]
 
     for ft in blacklist:
@@ -95,6 +93,7 @@ def to_javascript_data(plugins):
     :rtype: dict
 
     """
+
     def escape(v):
         return re.sub('"', '\\"', v)
 

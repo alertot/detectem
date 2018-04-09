@@ -14,29 +14,28 @@ from detectem.settings import PLUGIN_PACKAGES
 logger = logging.getLogger('detectem')
 
 LANGUAGE_TAGS = [
-    'php', 'python', 'ruby', 'perl', 'node.js', 'javascript', 'asp.net', 'java',
-    'go', 'ruby on rails', 'cfml',
+    'php', 'python', 'ruby', 'perl', 'node.js', 'javascript', 'asp.net', 'java', 'go',
+    'ruby on rails', 'cfml'
 ]
 FRAMEWORK_TAGS = [
-    'django', 'angular', 'backbone', 'react', 'symfony',  'bootstrap', 'vue',
-    'laravel', 'woltlab',
+    'django', 'angular', 'backbone', 'react', 'symfony', 'bootstrap', 'vue', 'laravel',
+    'woltlab'
 ]
 PRODUCT_TAGS = [
-    'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
-    'joomla', 'drupal', 'underscore.js', 'marionette.js', 'moment timezone',
-    'moment.js', 'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql',
-    'octopress', 'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion',
-    'jekill', 'less', 'windows server', 'mysql',
+    'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl', 'joomla',
+    'drupal', 'underscore.js', 'marionette.js', 'moment timezone', 'moment.js',
+    'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql', 'octopress',
+    'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion', 'jekill', 'less',
+    'windows server', 'mysql'
 ]
 CATEGORY_TAGS = [
     'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
-    'document management system', 'miscellaneous',
-    'message board', 'angular', 'js framework', 'web framework',
-    'visualization', 'graphics', 'web server', 'wiki', 'editor',
-    'ecommerce', 'accounting', 'database manager', 'photo gallery',
+    'document management system', 'miscellaneous', 'message board', 'angular',
+    'js framework', 'web framework', 'visualization', 'graphics', 'web server', 'wiki',
+    'editor', 'ecommerce', 'accounting', 'database manager', 'photo gallery',
     'issue tracker', 'mobile framework', 'slider', 'accounting', 'programming language',
     'hosting panel', 'lms', 'js graphic', 'exhibit', 'marketing automation',
-    'search engine', 'documentation tool', 'database', 'template engine',
+    'search engine', 'documentation tool', 'database', 'template engine'
 ]
 PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
 
@@ -110,10 +109,10 @@ class _PluginLoader(object):
         reg = self.plugins.get(instance.name)
         if reg:
             logger.warning(
-                "Plugin '%(name)s' by '%(instance)s' is already provided by '%(reg)s'",
-                {'name': instance.name,
-                 'instance': self._full_class_name(instance),
-                 'reg': self._full_class_name(reg)}
+                "Plugin '%(name)s' by '%(instance)s' is already provided by '%(reg)s'", {
+                    'name': instance.name, 'instance': self._full_class_name(instance),
+                    'reg': self._full_class_name(reg)
+                }
             )
             return False
 
@@ -134,8 +133,7 @@ class _PluginLoader(object):
             plugin_dir = find_spec(plugins_package).submodule_search_locations[0]
         except ImportError:
             logger.error(
-                "Could not load plugins package '%(pkg)s'",
-                {'pkg': plugins_package}
+                "Could not load plugins package '%(pkg)s'", {'pkg': plugins_package}
             )
             return
 

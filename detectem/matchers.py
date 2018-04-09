@@ -2,7 +2,6 @@ import re
 
 from parsel import Selector
 
-
 from detectem.exceptions import NotNamedParameterFound
 
 
@@ -29,8 +28,7 @@ def extract_data(text, parameter, *matchers):
                     return v.group(parameter)
                 except IndexError:
                     raise NotNamedParameterFound(
-                        'Parameter %s not found in regexp' %
-                        parameter
+                        'Parameter %s not found in regexp' % parameter
                     )
         elif callable(matcher):
             v = matcher(text)

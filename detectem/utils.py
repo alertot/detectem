@@ -10,11 +10,9 @@ import requests
 
 from detectem.exceptions import DockerStartError
 from detectem.settings import (
-    SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE,
-    SPLASH_MAX_TIMEOUT,
-    JSON_OUTPUT, CMD_OUTPUT
+    SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE, SPLASH_MAX_TIMEOUT, JSON_OUTPUT,
+    CMD_OUTPUT
 )
-
 
 logger = logging.getLogger('detectem')
 
@@ -36,6 +34,7 @@ def docker_error(method):
             method(self)
         except docker.errors.DockerException as e:
             raise DockerStartError("Docker error: {}".format(e))
+
     return run_method
 
 
@@ -43,6 +42,7 @@ class DockerManager:
     """
     Wraps requests to Docker daemon to manage Splash container.
     """
+
     def __init__(self):
         try:
             self.docker_cli = docker.from_env(version='auto')
@@ -128,8 +128,10 @@ def create_printer(format):
     if format == CMD_OUTPUT:
         return pprint.pprint
     elif format == JSON_OUTPUT:
+
         def json_printer(data):
             print(json.dumps(data))
+
         return json_printer
 
 

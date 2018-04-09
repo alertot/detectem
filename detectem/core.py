@@ -9,13 +9,15 @@ from detectem.utils import (
     get_url,
 )
 from detectem.settings import (
-    VERSION_TYPE, INDICATOR_TYPE, HINT_TYPE,
-    MAIN_ENTRY, RESOURCE_ENTRY, INLINE_SCRIPT_ENTRY,
+    VERSION_TYPE,
+    INDICATOR_TYPE,
+    HINT_TYPE,
+    MAIN_ENTRY,
+    RESOURCE_ENTRY,
+    INLINE_SCRIPT_ENTRY,
     GENERIC_TYPE,
 )
-from detectem.matchers import (
-    UrlMatcher, BodyMatcher, HeaderMatcher, XPathMatcher
-)
+from detectem.matchers import (UrlMatcher, BodyMatcher, HeaderMatcher, XPathMatcher)
 
 logger = logging.getLogger('detectem')
 MATCHERS = {
@@ -28,7 +30,12 @@ MATCHERS = {
 
 class Result():
     def __init__(
-        self, name, version=None, homepage=None, from_url=None, type=VERSION_TYPE
+        self,
+        name,
+        version=None,
+        homepage=None,
+        from_url=None,
+        type=VERSION_TYPE,
     ):
         self.name = name
         self.type = type
@@ -42,11 +49,13 @@ class Result():
     def __eq__(self, o):
         def to_tuple(rt):
             return (rt.name, rt.version, rt.type)
+
         return to_tuple(self) == to_tuple(o)
 
     def __lt__(self, o):
         def to_tuple(rt):
             return (rt.name, LooseVersion(rt.version or '0'), rt.type)
+
         return to_tuple(self) < to_tuple(o)
 
     def __repr__(self):
@@ -54,7 +63,6 @@ class Result():
 
 
 class ResultCollection():
-
     def __init__(self):
         self._results = defaultdict(list)
 
@@ -140,15 +148,8 @@ class Detector():
 
     def _script_to_har_entry(self, script):
         entry = {
-            'request': {
-                'url': self.requested_url,
-            },
-            'response': {
-                'url': self.requested_url,
-                'content': {
-                    'text': script
-                }
-            }
+            'request': {'url': self.requested_url, },
+            'response': {'url': self.requested_url, 'content': {'text': script}}
         }
         self._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
         return entry
@@ -160,7 +161,6 @@ class Detector():
     @staticmethod
     def _get_entry_type(entry):
         return entry['detectem']['type']
-
 
     def get_hints(self, plugin):
         """ Get plugins hints from `plugin` on `entry`.
@@ -177,7 +177,7 @@ class Detector():
                     name=hint_plugin.name,
                     homepage=hint_plugin.homepage,
                     from_url=self.requested_url,
-                    type=HINT_TYPE
+                    type=HINT_TYPE,
                 )
                 hints.append(hint_result)
                 logger.debug(
@@ -231,7 +231,7 @@ class Detector():
                             name=name,
                             version=version,
                             homepage=plugin.homepage,
-                            from_url=get_url(entry)
+                            from_url=get_url(entry),
                         )
                     )
                     hints += self.get_hints(plugin)
@@ -245,7 +245,7 @@ class Detector():
                             name=name,
                             homepage=plugin.homepage,
                             from_url=get_url(entry),
-                            type=INDICATOR_TYPE
+                            type=INDICATOR_TYPE,
                         )
                     )
                     hints += self.get_hints(plugin)
@@ -310,9 +310,7 @@ class Detector():
 
         """
         versions = []
-        grouped_matchers = self._get_matchers_for_entry(
-            'matchers', plugin, entry
-        )
+        grouped_matchers = self._get_matchers_for_entry('matchers', plugin, entry)
 
         for key, matchers in grouped_matchers.items():
             klass = MATCHERS[key]
@@ -330,9 +328,7 @@ class Detector():
         if not plugin.is_modular:
             return plugin.name
 
-        grouped_matchers = self._get_matchers_for_entry(
-            'modular_matchers', plugin, entry
-        )
+        grouped_matchers = self._get_matchers_for_entry('modular_matchers', plugin, entry)
         module_name = None
 
         for key, matchers in grouped_matchers.items():
@@ -355,9 +351,7 @@ class Detector():
         to assert the presence of the plugin.
 
         """
-        grouped_matchers = self._get_matchers_for_entry(
-            'indicators', plugin, entry
-        )
+        grouped_matchers = self._get_matchers_for_entry('indicators', plugin, entry)
         presences = []
 
         for key, matchers in grouped_matchers.items():

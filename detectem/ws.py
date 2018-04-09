@@ -21,9 +21,7 @@ def do_detection():
     metadata = bool(metadata == '1')
 
     try:
-        result = get_detection_results(
-            url, timeout=SPLASH_TIMEOUT, metadata=metadata
-        )
+        result = get_detection_results(url, timeout=SPLASH_TIMEOUT, metadata=metadata)
     except (SplashError, NoPluginsError) as e:
         result = {'error': e.msg}
 

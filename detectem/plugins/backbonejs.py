@@ -12,9 +12,6 @@ class BackboneJsPlugin(Plugin):
         {'url': r'/backbone-(?P<version>[0-9\.]+)(\.min)?\.js'},
     ]
     js_matchers = [
-        {
-            'check': 'window.Backbone',
-            'version': 'window.Backbone.VERSION'
-        },
+        {'check': 'window.Backbone', 'version': 'window.Backbone.VERSION'},
     ]
     hints = ['underscore.js']

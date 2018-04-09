@@ -7,6 +7,8 @@ class JoomlaPlugin(Plugin):
     tags = ['joomla']
 
     indicators = [
-        {'body':
-         '<meta name="generator" content="Joomla! - Open Source Content Management"'},
+        {
+            'body':
+                '<meta name="generator" content="Joomla! - Open Source Content Management"'
+        },
     ]

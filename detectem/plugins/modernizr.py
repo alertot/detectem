@@ -12,8 +12,5 @@ class ModernizrPlugin(Plugin):
         {'url': r'/modernizr-(?P<version>[0-9\.]+)(\.min)?\.js'},
     ]
     js_matchers = [
-        {
-            'check': 'window.Modernizr',
-            'version': 'window.Modernizr._version'
-        },
+        {'check': 'window.Modernizr', 'version': 'window.Modernizr._version'},
     ]
