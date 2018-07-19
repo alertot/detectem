@@ -15,13 +15,22 @@ from detectem.settings import DEBUG, SPLASH_TIMEOUT
 
 @post('/detect')
 def do_detection():
+    # Url is mandatory
     url = request.forms.get('url')
-    metadata = request.forms.get('metadata')
+    if not url:
+        return json.dumps({'error': 'You must provide `url` parameter.'})
 
+    # metadata is optional
+    metadata = request.forms.get('metadata', '0')
     metadata = bool(metadata == '1')
 
+    # timeout is optional
+    timeout = request.forms.get('timeout', type=int)
+    if not timeout:
+        timeout = SPLASH_TIMEOUT
+
     try:
-        result = get_detection_results(url, timeout=SPLASH_TIMEOUT, metadata=metadata)
+        result = get_detection_results(url, timeout=timeout, metadata=metadata)
     except (SplashError, NoPluginsError) as e:
         result = {'error': e.msg}
 
