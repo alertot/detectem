@@ -1,5 +1,5 @@
 pytest==3.3.2
-pyyaml==3.12
+pyyaml==3.13
 dukpy==0.1.0
 pytest-mock==1.6.3
 boddle==0.2.7
