@@ -3,6 +3,7 @@ import re
 from parsel import Selector
 
 from detectem.exceptions import NotNamedParameterFound
+from detectem.utils import get_response_body
 
 
 def check_presence(text, *matchers):
@@ -77,7 +78,7 @@ class UrlMatcher:
 class BodyMatcher:
     @classmethod
     def get_version(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
 
         version = extract_version(body, *matchers)
         if version:
@@ -85,13 +86,13 @@ class BodyMatcher:
 
     @classmethod
     def check_presence(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
 
         return check_presence(body, *matchers)
 
     @classmethod
     def get_module_name(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
 
         name = extract_name(body, *matchers)
         if name:
@@ -138,7 +139,7 @@ class HeaderMatcher:
 class XPathMatcher:
     @classmethod
     def get_version(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
         selector = Selector(text=body)
 
         for xpath, regexp in matchers:
@@ -152,7 +153,7 @@ class XPathMatcher:
 
     @classmethod
     def check_presence(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
         selector = Selector(text=body)
 
         for xpath in matchers:
@@ -164,7 +165,7 @@ class XPathMatcher:
 
     @classmethod
     def get_module_name(cls, entry, *matchers):
-        body = entry['response']['content']['text']
+        body = get_response_body(entry)
         selector = Selector(text=body)
 
         for xpath, regexp in matchers:

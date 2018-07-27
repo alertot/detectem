@@ -141,3 +141,7 @@ def get_url(entry):
         return entry['response']['url']
 
     return entry['request']['url']
+
+
+def get_response_body(entry):
+    return entry['response']['content']['text']
