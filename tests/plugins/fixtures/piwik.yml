@@ -1,0 +1,5 @@
+- plugin: piwik
+  indicators:
+    - body: |
+        /*!!
+         * Piwik - free/libre analytics platform

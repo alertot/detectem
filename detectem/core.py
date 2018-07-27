@@ -1,5 +1,6 @@
 import logging
 import urllib.parse
+import hashlib
 
 from collections import defaultdict
 from distutils.version import LooseVersion
@@ -7,6 +8,7 @@ from distutils.version import LooseVersion
 from detectem.utils import (
     get_most_complete_version,
     get_url,
+    get_response_body,
 )
 from detectem.settings import (
     VERSION_TYPE,
@@ -148,7 +150,7 @@ class Detector():
 
     def _script_to_har_entry(self, script):
         entry = {
-            'request': {'url': self.requested_url, },
+            'request': {'url': self.requested_url},
             'response': {'url': self.requested_url, 'content': {'text': script}}
         }
         self._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
@@ -250,6 +252,27 @@ class Detector():
                     )
                     hints += self.get_hints(plugin)
 
+                    # Try to get version through file hashes
+                    version = self.get_version_via_file_hashes(plugin, entry)
+                    if version:
+                        self._results.add_result(
+                            Result(
+                                name=name,
+                                version=version,
+                                homepage=plugin.homepage,
+                                from_url=get_url(entry),
+                            )
+                        )
+                    else:
+                        self._results.add_result(
+                            Result(
+                                name=name,
+                                homepage=plugin.homepage,
+                                from_url=get_url(entry),
+                                type=INDICATOR_TYPE,
+                            )
+                        )
+
             for plugin in generic_plugins:
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
@@ -319,6 +342,25 @@ class Detector():
                 versions.append(version)
 
         return get_most_complete_version(versions)
+
+    def get_version_via_file_hashes(self, plugin, entry):
+        file_hashes = getattr(plugin, 'file_hashes', {})
+        if not file_hashes:
+            return
+
+        url = get_url(entry)
+        body = get_response_body(entry).encode('utf-8')
+        for file, hash_dict in file_hashes.items():
+            if file not in url:
+                continue
+
+            m = hashlib.sha256()
+            m.update(body)
+            h = m.hexdigest()
+
+            for version, version_hash in hash_dict.items():
+                if h == version_hash:
+                    return version
 
     def get_plugin_name(self, plugin, entry):
         """ Return plugin name with module name if it's found.
