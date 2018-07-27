@@ -4,3 +4,7 @@ column_limit = 90
 dedent_closing_brackets = True
 coalesce_brackets = True
 each_dict_entry_on_separate_line = False
+allow_split_before_dict_value = False
+allow_multiline_dictionary_keys = False
+space_between_ending_comma_and_closing_bracket = False
+split_arguments_when_comma_terminated = True
