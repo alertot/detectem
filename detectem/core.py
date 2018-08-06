@@ -277,14 +277,17 @@ class Detector():
                 is_present = self.check_indicator_presence(plugin, entry)
                 if is_present:
                     plugin_data = plugin.get_information(entry)
-                    self._results.add_result(
-                        Result(
-                            name=plugin_data['name'],
-                            homepage=plugin_data['homepage'],
-                            from_url=get_url(entry),
-                            type=GENERIC_TYPE,
+
+                    # Only add to results if it's a valid result
+                    if 'name' in plugin_data:
+                        self._results.add_result(
+                            Result(
+                                name=plugin_data['name'],
+                                homepage=plugin_data['homepage'],
+                                from_url=get_url(entry),
+                                type=GENERIC_TYPE,
+                            )
                         )
-                    )
 
         for hint in hints:
             self._results.add_result(hint)

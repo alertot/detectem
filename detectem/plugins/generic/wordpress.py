@@ -24,7 +24,12 @@ class WordpressGenericPlugin(GenericPlugin):
     indicators = [{'url': '/wp-content/plugins/'}]
 
     def get_information(self, entry):
-        name = re.findall('/wp-content/plugins/([^/]+)/', get_url(entry))[0]
+        name_match = re.findall('/wp-content/plugins/([^/]+)/', get_url(entry))
+        # There are weird cases with malformed plugins urls
+        if not name_match:
+            return {}
+
+        name = name_match[0].lower()
         known = None
 
         try:
