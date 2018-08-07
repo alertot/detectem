@@ -4,7 +4,8 @@ from detectem.plugin import Plugin
 class JoomlaPlugin(Plugin):
     name = 'joomla!'
     homepage = 'https://www.joomla.org/'
-    tags = ['joomla']
+    vendor = 'Open Source Matters, Inc.'
+    tags = ['joomla!', 'cms', 'php']
 
     indicators = [
         {

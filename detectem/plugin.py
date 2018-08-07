@@ -22,8 +22,8 @@ FRAMEWORK_TAGS = [
     'woltlab'
 ]
 PRODUCT_TAGS = [
-    'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl', 'joomla',
-    'drupal', 'underscore.js', 'marionette.js', 'moment timezone', 'moment.js',
+    'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
+    'joomla!', 'drupal', 'underscore.js', 'marionette.js', 'moment timezone', 'moment.js',
     'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql', 'octopress',
     'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion', 'jekill', 'less',
     'windows server', 'mysql'
