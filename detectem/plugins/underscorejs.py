@@ -4,6 +4,7 @@ from detectem.plugin import Plugin
 class UnderscoreJSPlugin(Plugin):
     name = 'underscore.js'
     homepage = 'http://underscorejs.org/'
+    vendor = 'Jeremy Ashkenas'
     tags = ['javascript']
 
     matchers = [
