@@ -2,9 +2,7 @@ import os
 
 import click
 
-ROOT_DIRECTORY = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), os.pardir)
-)
+ROOT_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 PLUGIN_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'detectem/plugins')
 PLUGIN_DIRECTORIES = [
     d for d in os.listdir(PLUGIN_DIRECTORY)
@@ -19,19 +17,13 @@ PLUGIN_DIRECTORIES = [
     required=True,
     help='Set the matcher type.',
 )
-@click.option(
-    '--category',
-    type=click.Choice(PLUGIN_DIRECTORIES),
-    required=True,
-    help='Set plugin category.',
-)
 @click.argument('name')
-def main(name, category, matcher):
-    create_plugin_file(name, category, matcher)
+def main(name, matcher):
+    create_plugin_file(name, matcher)
     create_test_file(name, matcher)
 
 
-def create_plugin_file(name, category, matcher):
+def create_plugin_file(name, matcher):
     plugin_template = '''
 from detectem.plugin import Plugin
 
@@ -47,12 +39,12 @@ class {title}Plugin(Plugin):
         {{'check': '', 'version': ''}},
     ]
     """
-'''.format(name=name, title=name.title(), matcher=matcher).lstrip()
+'''.format(
+        name=name, title=name.title(), matcher=matcher
+    ).lstrip()
 
     plugin_filename = name + '.py'
-    plugin_filepath = os.path.join(
-        PLUGIN_DIRECTORY, category, plugin_filename
-    )
+    plugin_filepath = os.path.join(PLUGIN_DIRECTORY, plugin_filename)
 
     if os.path.exists(plugin_filepath):
         raise FileExistsError('Plugin file already exists.')
@@ -68,7 +60,9 @@ def create_test_file(name, matcher):
   matches:
     - {matcher}:
       version:
-'''.format(name=name, matcher=matcher).lstrip()
+'''.format(
+        name=name, matcher=matcher
+    ).lstrip()
 
     test_filename = name + '.yml'
     test_filepath = os.path.join(
