@@ -51,9 +51,11 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+_build/
 
 # PyBuilder
 target/
 
 # pyenv python configuration file
 .python-version
+.mypy_cache
