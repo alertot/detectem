@@ -59,9 +59,6 @@ class PluginCollection(object):
     def with_version_matchers(self):
         return [p for p in self._plugins.values() if p.is_version]
 
-    def with_indicator_matchers(self):
-        return [p for p in self._plugins.values() if p.is_indicator]
-
     def with_js_matchers(self):
         return [p for p in self._plugins.values() if p.is_js]
 
@@ -69,7 +66,7 @@ class PluginCollection(object):
         return [p for p in self._plugins.values() if p.is_generic]
 
 
-class _PluginLoader(object):
+class _PluginLoader:
     def __init__(self):
         self.plugins = PluginCollection()
 
@@ -176,7 +173,7 @@ class IPlugin(Interface):
 
 
 @implementer(IPlugin)
-class Plugin():
+class Plugin:
     """ Class used by normal plugins.
     It implements :class:`~IPlugin`.
 
@@ -199,14 +196,6 @@ class Plugin():
     @property
     def is_version(self):
         return bool(hasattr(self, 'matchers'))
-
-    @property
-    def is_modular(self):
-        return bool(hasattr(self, 'modular_matchers'))
-
-    @property
-    def is_indicator(self):
-        return bool(hasattr(self, 'indicators')) and self.ptype == 'normal'
 
     @property
     def is_js(self):
