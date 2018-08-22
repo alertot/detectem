@@ -93,7 +93,7 @@ class TestMatchers:
             (XPathMatcher, res_text('<a>foo-1.1</a>'), ('//a/text()', version_re), '1.1'),
             (XPathMatcher, res_text('<a>bar-1.1</a>'), ('//a/text()', version_re), None),
         ]
-    )
+    )  # yapf: disable
     def test_get_version(self, matcher_class, entry, matcher, version):
         assert matcher_class.get_info(entry, matcher) == create_pm(version=version)
 
@@ -108,7 +108,7 @@ class TestMatchers:
             (XPathMatcher, res_text('<a>foo</a>'), ('//a/text()', presence_re), True),
             (XPathMatcher, res_text('<a>bar</a>'), ('//a/text()', presence_re), False),
         ]
-    )
+    ) # yapf: disable
     def test_get_presence(self, matcher_class, entry, matcher, presence):
         assert matcher_class.get_info(entry, matcher) == create_pm(presence=presence)
 
@@ -123,9 +123,10 @@ class TestMatchers:
             (XPathMatcher, res_text('<a>foo-core</a>'), ('//a/text()', name_re), 'core'),
             (XPathMatcher, res_text('<a>bar-core</a>'), ('//a/text()', name_re), None),
         ]
-    )
+    )  # yapf: disable
     def test_get_name(self, matcher_class, entry, matcher, name):
         assert matcher_class.get_info(entry, matcher) == create_pm(name=name)
+
 
 class TestUrlMatcher:
     @pytest.mark.parametrize(
