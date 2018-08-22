@@ -12,14 +12,27 @@ function main(splash)
 
       softwareData.forEach(function(s) {
         var matchers = s.matchers;
+        var presenceFlag = false;
 
         for (var i in matchers) {
-          if (eval(matchers[i].check)){
-            var version = eval(matchers[i].version);
+          var check_statement = matchers[i].check_statement
+          var version_statement = matchers[i].version_statement
+
+          if (eval(check_statement)){
+            if (!version_statement){
+              presenceFlag = true;
+              continue;
+            }
+
+            var version = eval(version_statement);
             if (version) {
               rs.push({'name': s.name, 'version': version});
             }
           }
+        }
+
+        if (presenceFlag) {
+          rs.push({'name': s.name})
         }
 
       });
@@ -59,4 +72,3 @@ function main(splash)
     errors=errors,
   }
 end
-

@@ -59,8 +59,8 @@ class PluginCollection(object):
     def with_version_matchers(self):
         return [p for p in self._plugins.values() if p.is_version]
 
-    def with_js_matchers(self):
-        return [p for p in self._plugins.values() if p.is_js]
+    def with_dom_matchers(self):
+        return [p for p in self._plugins.values() if p.is_dom]
 
     def with_generic_matchers(self):
         return [p for p in self._plugins.values() if p.is_generic]
@@ -170,6 +170,7 @@ class IPlugin(Interface):
     name = Attribute(""" Name to identify the plugin. """)
     homepage = Attribute(""" Plugin homepage. """)
     tags = Attribute(""" Tags to categorize plugins """)
+    matchers = Attribute(""" List of matchers """)
 
 
 @implementer(IPlugin)
@@ -195,11 +196,11 @@ class Plugin:
 
     @property
     def is_version(self):
-        return bool(hasattr(self, 'matchers'))
+        return self.ptype == 'normal'
 
     @property
-    def is_js(self):
-        return bool(hasattr(self, 'js_matchers'))
+    def is_dom(self):
+        return any([m for m in self.matchers if 'dom' in m])
 
     @property
     def is_generic(self):

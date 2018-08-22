@@ -134,14 +134,22 @@ class Detector():
         ''' Add softwares found in the DOM '''
         for software in self._softwares_from_splash:
             plugin = self._plugins.get(software['name'])
+
+            # Determine if it's a version or presence result
+            try:
+                additional_data = {'version': software['version']}
+            except KeyError:
+                additional_data = {'type': INDICATOR_TYPE}
+
             self._results.add_result(
                 Result(
                     name=plugin.name,
-                    version=software['version'],
                     homepage=plugin.homepage,
                     from_url=self.requested_url,
+                    **additional_data,
                 )
             )
+
             for hint in self.get_hints(plugin):
                 self._results.add_result(hint)
 

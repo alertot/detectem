@@ -97,11 +97,30 @@ def to_javascript_data(plugins):
     def escape(v):
         return re.sub('"', '\\"', v)
 
-    def js_matchers(p):
-        return [{k: escape(v) for k, v in m.items()} for m in p.js_matchers]
+    def dom_matchers(p):
+        dom_matchers = [m for m in p.matchers if 'dom' in m]
+        escaped_dom_matchers = []
 
-    return [{'name': p.name, 'matchers': js_matchers(p)}
-            for p in plugins.with_js_matchers()]
+        for dm in dom_matchers:
+            dm_tuple = dm['dom']
+
+            try:
+                # Version case
+                check, version = dm_tuple
+            except ValueError:
+                # Presence case
+                check = dm_tuple[0]
+                version = ''
+
+            escaped_dom_matchers.append({
+                'check_statement': escape(check),
+                'version_statement': escape(version),
+            })
+
+        return escaped_dom_matchers
+
+    return [{'name': p.name, 'matchers': dom_matchers(p)}
+            for p in plugins.with_dom_matchers()]
 
 
 def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
