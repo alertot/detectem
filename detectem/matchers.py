@@ -1,102 +1,104 @@
 import re
 
+from collections import namedtuple
+
 from parsel import Selector
 
-from detectem.exceptions import NotNamedParameterFound
 from detectem.utils import get_response_body
 
+PluginMatch = namedtuple('PluginMatch', 'name,version,presence')
 
-def check_presence(text, *matchers):
+
+def extract_named_group(text, named_group, matchers, return_presence=False):
+    ''' Return ``named_group`` match from ``text`` reached
+        by using a matcher from ``matchers``.
+
+        It also supports matching without a ``named_group`` in a matcher,
+        which sets ``presence=True``.
+
+        ``presence`` is only returned if ``return_presence=True``.
+
+    '''
+    presence = False
+
     for matcher in matchers:
         if isinstance(matcher, str):
             v = re.search(matcher, text, flags=re.DOTALL)
             if v:
-                return True
-        elif callable(matcher):
-            v = matcher(text)
-            if v:
-                return True
-
-    return False
-
-
-def extract_data(text, parameter, *matchers):
-    for matcher in matchers:
-        if isinstance(matcher, str):
-            v = re.search(matcher, text, flags=re.DOTALL)
-            if v:
+                dict_result = v.groupdict()
                 try:
-                    return v.group(parameter)
-                except IndexError:
-                    raise NotNamedParameterFound(
-                        'Parameter %s not found in regexp' % parameter
-                    )
+                    return dict_result[named_group]
+                except KeyError:
+                    if dict_result:
+                        # It's other named group matching, discard
+                        continue
+                    else:
+                        # It's a matcher without named_group
+                        # but we can't return it until every matcher pass
+                        # because a following matcher could have a named group
+                        presence = True
         elif callable(matcher):
             v = matcher(text)
             if v:
                 return v
 
+    if return_presence and presence:
+        return 'presence'
+
+    return None
+
 
 def extract_version(text, *matchers):
-    return extract_data(text, 'version', *matchers)
+    return extract_named_group(text, 'version', matchers, return_presence=True)
 
 
 def extract_name(text, *matchers):
-    return extract_data(text, 'name', *matchers)
+    return extract_named_group(text, 'name', matchers)
 
 
 class UrlMatcher:
     @classmethod
-    def get_version(cls, entry, *matchers):
+    def get_info(cls, entry, *matchers):
+        name = None
+        version = None
+        presence = False
+
         for rtype in ['request', 'response']:
-            url = entry[rtype]['url']
+            try:
+                url = entry[rtype]['url']
+            except KeyError:
+                # It could not contain response
+                continue
+
+            if not name:
+                name = extract_name(url, *matchers)
 
             version = extract_version(url, *matchers)
             if version:
-                return version
+                if version == 'presence':
+                    presence = True
+                    version = None
+                    break
 
-    @classmethod
-    def check_presence(cls, entry, *matchers):
-        for rtype in ['request', 'response']:
-            url = entry[rtype]['url']
-
-            if check_presence(url, *matchers):
-                return True
-
-        return False
-
-    @classmethod
-    def get_module_name(cls, entry, *matchers):
-        for rtype in ['request', 'response']:
-            url = entry[rtype]['url']
-
-            name = extract_name(url, *matchers)
-            if name:
-                return name
+        return PluginMatch(name=name, version=version, presence=presence)
 
 
 class BodyMatcher:
     @classmethod
-    def get_version(cls, entry, *matchers):
-        body = get_response_body(entry)
-
-        version = extract_version(body, *matchers)
-        if version:
-            return version
-
-    @classmethod
-    def check_presence(cls, entry, *matchers):
-        body = get_response_body(entry)
-
-        return check_presence(body, *matchers)
-
-    @classmethod
-    def get_module_name(cls, entry, *matchers):
+    def get_info(cls, entry, *matchers):
+        name = None
+        version = None
+        presence = False
         body = get_response_body(entry)
 
         name = extract_name(body, *matchers)
-        if name:
-            return name
+        version = extract_version(body, *matchers)
+        if version:
+            if version == 'presence':
+                presence = True
+                version = None
+
+        return PluginMatch(name=name, version=version, presence=presence)
 
 
 class HeaderMatcher:
@@ -108,71 +110,57 @@ class HeaderMatcher:
                     yield header['value'], matcher_value
 
     @classmethod
-    def get_version(cls, entry, *matchers):
+    def get_info(cls, entry, *matchers):
+        name = None
+        version = None
+        presence = False
         headers = entry['response']['headers']
 
         for hstring, hmatcher in cls._get_matches(headers, *matchers):
+            # Avoid overriding
+            if not name:
+                name = extract_name(hstring, hmatcher)
+
             version = extract_version(hstring, hmatcher)
-            if version:
-                return version
+            if version == 'presence':
+                presence = True
+                version = None
+                break
 
-    @classmethod
-    def check_presence(cls, entry, *matchers):
-        headers = entry['response']['headers']
-
-        for hstring, hmatcher in cls._get_matches(headers, *matchers):
-            if check_presence(hstring, hmatcher):
-                return True
-
-        return False
-
-    @classmethod
-    def get_module_name(cls, entry, *matchers):
-        headers = entry['response']['headers']
-
-        for hstring, hmatcher in cls._get_matches(headers, *matchers):
-            name = extract_name(hstring, hmatcher)
-            if name:
-                return name
+        return PluginMatch(name=name, version=version, presence=presence)
 
 
 class XPathMatcher:
     @classmethod
-    def get_version(cls, entry, *matchers):
+    def get_info(cls, entry, *matchers):
+        name = None
+        version = None
+        presence = False
         body = get_response_body(entry)
         selector = Selector(text=body)
 
-        for xpath, regexp in matchers:
+        for matcher in matchers:
+            if len(matcher) == 2:
+                xpath, regexp = matcher
+            else:
+                xpath = matcher[0]
+                regexp = None
+
             value = selector.xpath(xpath).extract_first()
             if not value:
                 continue
 
-            version = extract_version(value, regexp)
-            if version:
-                return version
+            if regexp:
+                # Avoid overriding
+                if not name:
+                    name = extract_name(value, regexp)
 
-    @classmethod
-    def check_presence(cls, entry, *matchers):
-        body = get_response_body(entry)
-        selector = Selector(text=body)
+                version = extract_version(value, regexp)
+                if version == 'presence':
+                    presence = True
+                    version = None
+                    break
+            else:
+                presence = True
 
-        for xpath in matchers:
-            sel = selector.xpath(xpath)
-            if sel:
-                return True
-
-        return False
-
-    @classmethod
-    def get_module_name(cls, entry, *matchers):
-        body = get_response_body(entry)
-        selector = Selector(text=body)
-
-        for xpath, regexp in matchers:
-            value = selector.xpath(xpath).extract_first()
-            if not value:
-                continue
-
-            name = extract_name(value, regexp)
-            if name:
-                return name
+        return PluginMatch(name=name, version=version, presence=presence)
