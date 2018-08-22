@@ -183,29 +183,16 @@ class Plugin():
     """
     ptype = 'normal'
 
-    def _get_matchers(self, mtype, source='matchers'):
-        ''' Return `mtype` matchers present in `source`.
-        For instance, `mtype=url` and `source=matchers` would return
-        URL matchers present in the plugin.
-
-        `source` is a variable because we could extract
-        matchers from indicators or other attribute too.
-
-        '''
-        matchers_dict = getattr(self, source, [])
-
-        return [m[mtype] for m in matchers_dict if mtype in m]
-
-    def get_grouped_matchers(self, source='matchers'):
-        """ Return plugin dictionary of matchers (not empty ones)
+    def get_grouped_matchers(self):
+        """ Return dictionary of matchers (not empty ones)
         with matcher type as key and matcher list as value.
 
         """
         data = {}
-        for k in ['url', 'body', 'header', 'xpath']:
-            m = self._get_matchers(k, source)
-            if m:
-                data[k] = m
+        for matcher_type in ['url', 'body', 'header', 'xpath', 'dom']:
+            matcher_list = [m[matcher_type] for m in self.matchers if matcher_type in m]
+            if matcher_list:
+                data[matcher_type] = matcher_list
 
         return data
 

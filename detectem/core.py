@@ -1,11 +1,10 @@
 import logging
 import urllib.parse
-import hashlib
 
 from detectem.utils import (
-    get_most_complete_version,
     get_url,
-    get_response_body,
+    get_most_complete_pm,
+    get_version_via_file_hashes,
 )
 from detectem.settings import (
     INDICATOR_TYPE,
@@ -27,74 +26,91 @@ MATCHERS = {
 }
 
 
-class Detector():
-    def __init__(self, response, plugins, requested_url):
-        self.requested_url = requested_url
-        self.har = self._prepare_har(response)
+class HarProcessor:
+    ''' This class process the HAR list returned by Splash
+        adding some markers useful for matcher application
+    '''
 
-        self._softwares_from_splash = response['softwares']
-        self._plugins = plugins
-        self._results = ResultCollection()
+    @staticmethod
+    def _set_entry_type(entry, entry_type):
+        entry.setdefault('detectem', {})['type'] = entry_type
 
-    def _prepare_har(self, response):
-        har = response.get('har', [])
-        if har:
-            self._mark_main_entry(har)
-        for script in response.get('scripts', []):
-            har.append(self._script_to_har_entry(script))
-        return har
+    def _get_location(self, entry):
+        ''' Return `Location` header value if it's present in ``entry`` '''
+        headers = entry['response'].get('headers', [])
 
-    def _mark_main_entry(self, entries):
+        for header in headers:
+            if header['name'] == 'Location':
+                return header['value']
+
+        return None
+
+    def mark_entries(self, entries):
+        ''' Mark one entry as main entry and the rest as resource entry.
+
+            Main entry is the entry that contain response's body
+            of the requested URL.
+        '''
+
         for entry in entries:
             self._set_entry_type(entry, RESOURCE_ENTRY)
 
-        def get_url(entry):
-            return entry['request']['url']
-
-        def get_location(entry):
-            headers = entry['response'].get('headers', [])
-            for header in headers:
-                if header['name'] == 'Location':
-                    return header['value']
-            return None
-
+        # If first entry doesn't have a redirect, set is as main entry
         main_entry = entries[0]
-        main_location = get_location(main_entry)
+        main_location = self._get_location(main_entry)
         if not main_location:
             self._set_entry_type(main_entry, MAIN_ENTRY)
             return
-        main_url = urllib.parse.urljoin(get_url(main_entry), main_location)
 
+        # Resolve redirected URL and see if it's in the rest of entries
+        main_url = urllib.parse.urljoin(get_url(main_entry), main_location)
         for entry in entries[1:]:
             url = get_url(entry)
             if url == main_url:
                 self._set_entry_type(entry, MAIN_ENTRY)
                 break
         else:
+            # In fail case, set the first entry
             self._set_entry_type(main_entry, MAIN_ENTRY)
 
-    def _script_to_har_entry(self, script):
+    def _script_to_har_entry(self, script, url):
+        ''' Return entry for embed script '''
         entry = {
-            'request': {'url': self.requested_url},
-            'response': {'url': self.requested_url, 'content': {'text': script}}
+            'request': {'url': url},
+            'response': {'url': url, 'content': {'text': script}}
         }
+
         self._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
         return entry
 
-    @staticmethod
-    def _set_entry_type(entry, entry_type):
-        entry.setdefault('detectem', {})['type'] = entry_type
+    def prepare(self, response, url):
+        har = response.get('har', [])
+        if har:
+            self.mark_entries(har)
+
+        # Detect embed scripts and add them to HAR list
+        for script in response.get('scripts', []):
+            har.append(self._script_to_har_entry(script, url))
+
+        return har
+
+
+class Detector():
+    def __init__(self, response, plugins, requested_url):
+        self.requested_url = requested_url
+        self.har = HarProcessor().prepare(response, requested_url)
+
+        self._softwares_from_splash = response['softwares']
+        self._plugins = plugins
+        self._results = ResultCollection()
 
     @staticmethod
     def _get_entry_type(entry):
+        ''' Return entry type. '''
         return entry['detectem']['type']
 
     def get_hints(self, plugin):
-        """ Get plugins hints from `plugin` on `entry`.
-
-        Plugins hints return `Result` or `None`.
-
-        """
+        ''' Return plugin hints from ``plugin``. '''
         hints = []
 
         for hint_name in getattr(plugin, 'hints', []):
@@ -107,19 +123,15 @@ class Detector():
                     type=HINT_TYPE,
                 )
                 hints.append(hint_result)
-                logger.debug(
-                    '%(pname)s & hint %(hname)s detected',
-                    {'pname': plugin.name, 'hname': hint_result.name}
-                )
+
+                logger.debug(f'{plugin.name} & hint {hint_result.name} detected')
             else:
-                logger.error(
-                    '%(pname)s hints an invalid plugin: %(hname)s',
-                    {'pname': plugin.name, 'hname': hint_name}
-                )
+                logger.error(f'{plugin.name} hints an invalid plugin: {hint_name}')
 
         return hints
 
     def process_from_splash(self):
+        ''' Add softwares found in the DOM '''
         for software in self._softwares_from_splash:
             plugin = self._plugins.get(software['name'])
             self._results.add_result(
@@ -133,52 +145,67 @@ class Detector():
             for hint in self.get_hints(plugin):
                 self._results.add_result(hint)
 
+    def _get_matchers_for_entry(self, plugin, entry):
+        grouped_matchers = plugin.get_grouped_matchers()
+
+        def remove_group(group):
+            if group in grouped_matchers:
+                del grouped_matchers[group]
+
+        if self._get_entry_type(entry) == 1:
+            remove_group('body')
+            remove_group('url')
+        else:
+            remove_group('header')
+            remove_group('xpath')
+
+        remove_group('dom')
+
+        return grouped_matchers
+
+    def apply_plugin_matchers(self, plugin, entry):
+        data_list = []
+        grouped_matchers = self._get_matchers_for_entry(plugin, entry)
+
+        for matcher_type, matchers in grouped_matchers.items():
+            klass = MATCHERS[matcher_type]
+            plugin_match = klass.get_info(entry, *matchers)
+            if plugin_match.name or plugin_match.version or plugin_match.presence:
+                data_list.append(plugin_match)
+
+        return get_most_complete_pm(data_list)
+
     def process_har(self):
-        """ Detect plugins present in the page.
-
-        First, start with version plugins, then software from Splash
-        and finish with indicators.
-        In each phase try to detect plugin hints in already detected plugins.
-
-        """
+        """ Detect plugins present in the page. """
         hints = []
 
         version_plugins = self._plugins.with_version_matchers()
-        indicator_plugins = self._plugins.with_indicator_matchers()
         generic_plugins = self._plugins.with_generic_matchers()
 
         for entry in self.har:
             for plugin in version_plugins:
-                version = self.get_plugin_version(plugin, entry)
-                if version:
-                    # Name could be different than plugin name in modular plugins
-                    name = self.get_plugin_name(plugin, entry)
+                pm = self.apply_plugin_matchers(plugin, entry)
+                if not pm:
+                    continue
+
+                # Set name if matchers could detect modular name
+                if pm.name:
+                    name = '{}-{}'.format(plugin.name, pm.name)
+                else:
+                    name = plugin.name
+
+                if pm.version:
                     self._results.add_result(
                         Result(
                             name=name,
-                            version=version,
+                            version=pm.version,
                             homepage=plugin.homepage,
                             from_url=get_url(entry),
                         )
                     )
-                    hints += self.get_hints(plugin)
-
-            for plugin in indicator_plugins:
-                is_present = self.check_indicator_presence(plugin, entry)
-                if is_present:
-                    name = self.get_plugin_name(plugin, entry)
-                    self._results.add_result(
-                        Result(
-                            name=name,
-                            homepage=plugin.homepage,
-                            from_url=get_url(entry),
-                            type=INDICATOR_TYPE,
-                        )
-                    )
-                    hints += self.get_hints(plugin)
-
+                elif pm.presence:
                     # Try to get version through file hashes
-                    version = self.get_version_via_file_hashes(plugin, entry)
+                    version = get_version_via_file_hashes(plugin, entry)
                     if version:
                         self._results.add_result(
                             Result(
@@ -197,10 +224,11 @@ class Detector():
                                 type=INDICATOR_TYPE,
                             )
                         )
+                hints += self.get_hints(plugin)
 
             for plugin in generic_plugins:
-                is_present = self.check_indicator_presence(plugin, entry)
-                if is_present:
+                pm = self.apply_plugin_matchers(plugin, entry)
+                if pm:
                     plugin_data = plugin.get_information(entry)
 
                     # Only add to results if it's a valid result
@@ -237,96 +265,3 @@ class Detector():
             results_data.append(rdict)
 
         return results_data
-
-    def _get_matchers_for_entry(self, source, plugin, entry):
-        grouped_matchers = plugin.get_grouped_matchers(source)
-
-        def remove_group(group):
-            if group in grouped_matchers:
-                del grouped_matchers[group]
-
-        if self._get_entry_type(entry) == MAIN_ENTRY:
-            remove_group('body')
-            remove_group('url')
-        else:
-            remove_group('header')
-            remove_group('xpath')
-
-        return grouped_matchers
-
-    def get_plugin_version(self, plugin, entry):
-        """ Return version after applying proper ``plugin`` matchers to ``entry``.
-
-        The matchers could return many versions, but at the end one is returned.
-
-        """
-        versions = []
-        grouped_matchers = self._get_matchers_for_entry('matchers', plugin, entry)
-
-        for key, matchers in grouped_matchers.items():
-            klass = MATCHERS[key]
-            version = klass.get_version(entry, *matchers)
-            if version:
-                versions.append(version)
-
-        return get_most_complete_version(versions)
-
-    def get_version_via_file_hashes(self, plugin, entry):
-        file_hashes = getattr(plugin, 'file_hashes', {})
-        if not file_hashes:
-            return
-
-        url = get_url(entry)
-        body = get_response_body(entry).encode('utf-8')
-        for file, hash_dict in file_hashes.items():
-            if file not in url:
-                continue
-
-            m = hashlib.sha256()
-            m.update(body)
-            h = m.hexdigest()
-
-            for version, version_hash in hash_dict.items():
-                if h == version_hash:
-                    return version
-
-    def get_plugin_name(self, plugin, entry):
-        """ Return plugin name with module name if it's found.
-        Otherwise return the normal plugin name.
-
-        """
-        if not plugin.is_modular:
-            return plugin.name
-
-        grouped_matchers = self._get_matchers_for_entry('modular_matchers', plugin, entry)
-        module_name = None
-
-        for key, matchers in grouped_matchers.items():
-            klass = MATCHERS[key]
-            module_name = klass.get_module_name(entry, *matchers)
-            if module_name:
-                break
-
-        if module_name:
-            name = '{}-{}'.format(plugin.name, module_name)
-        else:
-            name = plugin.name
-
-        return name
-
-    def check_indicator_presence(self, plugin, entry):
-        """ Return presence after applying proper ``plugin`` matchers to ``entry``.
-
-        The matchers return boolean values and at least one is enough
-        to assert the presence of the plugin.
-
-        """
-        grouped_matchers = self._get_matchers_for_entry('indicators', plugin, entry)
-        presences = []
-
-        for key, matchers in grouped_matchers.items():
-            klass = MATCHERS[key]
-            presence = klass.check_presence(entry, *matchers)
-            presences.append(presence)
-
-        return any(presences)
