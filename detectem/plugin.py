@@ -181,6 +181,9 @@ class Plugin:
     """
     ptype = 'normal'
 
+    def get_matchers(self, matcher_type):
+        return [m[matcher_type] for m in self.matchers if matcher_type in m]
+
     def get_grouped_matchers(self):
         """ Return dictionary of matchers (not empty ones)
         with matcher type as key and matcher list as value.
@@ -188,7 +191,7 @@ class Plugin:
         """
         data = {}
         for matcher_type in ['url', 'body', 'header', 'xpath', 'dom']:
-            matcher_list = [m[matcher_type] for m in self.matchers if matcher_type in m]
+            matcher_list = self.get_matchers(matcher_type)
             if matcher_list:
                 data[matcher_type] = matcher_list
 
