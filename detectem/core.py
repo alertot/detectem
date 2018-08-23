@@ -160,7 +160,7 @@ class Detector():
             if group in grouped_matchers:
                 del grouped_matchers[group]
 
-        if self._get_entry_type(entry) == 1:
+        if self._get_entry_type(entry) == MAIN_ENTRY:
             remove_group('body')
             remove_group('url')
         else:
