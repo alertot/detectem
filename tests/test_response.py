@@ -42,11 +42,10 @@ def test_is_valid_mimetype(response, result):
 def test_get_charset(response, result):
     assert get_charset(response) == result
 
-
 def test_create_lua_script():
     class BlaPlugin(Plugin):
         name = 'bla'
-        js_matchers = [{'check': 'bla', 'version': 'bla.version'}]
+        matchers = [{'dom': ('bla', 'bla.version')}]
 
     plugins = PluginCollection()
     plugins.add(BlaPlugin())
@@ -55,8 +54,8 @@ def test_create_lua_script():
     assert script
 
     assert '"name": "bla"' in script
-    assert '"check": "bla"' in script
-    assert '"version": "bla.version"' in script
+    assert '"check_statement": "bla"' in script
+    assert '"version_statement": "bla.version"' in script
 
 
 def test_get_response(monkeypatch):
