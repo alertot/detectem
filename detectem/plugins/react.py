@@ -5,6 +5,7 @@ class ReactPlugin(Plugin):
     name = 'react'
     homepage = 'https://facebook.github.io/react/'
     tags = ['javascript', 'react']
+    vendor = 'Facebook'
 
     matchers = [
         {'body': r' \* React v(?P<version>[0-9\.]+)'},
