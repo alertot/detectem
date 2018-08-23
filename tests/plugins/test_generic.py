@@ -37,9 +37,9 @@ class TestGenericPlugin:
 
         # Verify presence using matcher class
         matchers = plugin.get_matchers(matcher_type)
-        matcher_instance = MATCHERS[matcher_type]
+        matcher_class = MATCHERS[matcher_type]
 
-        assert matcher_instance.get_info(
+        assert matcher_class.get_info(
             har_entry,
             *matchers,
         ) == create_pm(presence=True)
