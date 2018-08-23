@@ -1,6 +1,6 @@
 - plugin: crayon-syntax-highlighter
-  js_matches:
-    - js: "window.CrayonSyntaxSettings = {version: '1.0.0'}"
+  matches:
+    - dom: "window.CrayonSyntaxSettings = {version: '1.0.0'}"
       version: 1.0.0
 - plugin: wordpress
   matches:
@@ -8,5 +8,5 @@
       version: 1.2.3
     - xpath: '<meta name="generator" content="Wordpress 4.9.1">'
       version: 4.9.1
-  indicators:
     - url: http://www.domain.tld/wp-content/plugins/bla
+      presence: true

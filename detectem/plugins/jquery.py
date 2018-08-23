@@ -16,9 +16,7 @@ class JqueryPlugin(Plugin):
         {'body': r'\* jQuery JavaScript Library v(?P<version>[0-9\.]+)'},
         {'url': r'/jquery/(?P<version>[0-9\.]+)/jquery(\.slim)?(\.min)?\.js'},
         {'url': r'/jquery-(?P<version>[0-9\.]+)(\.slim)?(\.min)?\.js'},
-    ]
-    js_matchers = [
-        {'check': '"jQuery" in window', 'version': 'window.jQuery().jquery'},
+        {'dom': ('"jQuery" in window', 'window.jQuery().jquery')},
     ]
 
 

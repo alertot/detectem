@@ -21,7 +21,7 @@ class WordpressGenericPlugin(GenericPlugin):
                 data = json.loads(line)
                 self.plugins[data['name']] = data['vendor']
 
-    indicators = [{'url': '/wp-content/plugins/'}]
+    matchers = [{'url': '/wp-content/plugins/'}]
 
     def get_information(self, entry):
         name_match = re.findall('/wp-content/plugins/([^/]+)/', get_url(entry))
@@ -30,20 +30,15 @@ class WordpressGenericPlugin(GenericPlugin):
             return {}
 
         name = name_match[0].lower()
-        known = None
+        homepage = self.homepage % name
 
         try:
             vendor = self.plugins[name]
-            known = True
         except KeyError:
             vendor = None
-            known = False
-
-        homepage = self.homepage % name
 
         return {
             'name': name,
             'homepage': homepage,
             'vendor': vendor,
-            'known': known,
         }

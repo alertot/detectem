@@ -9,7 +9,5 @@ class MomentJSPlugin(Plugin):
     matchers = [
         {'body': r'//! moment\.js\s+//! version : (?P<version>[0-9\.]+)'},
         {'url': r'/moment\.js/(?P<version>[0-9\.]+)/moment(\.min)?\.js'},
-    ]
-    js_matchers = [
-        {'check': 'window.moment', 'version': 'window.moment.version'},
+        {'dom': ('window.moment', 'window.moment.version')},
     ]

@@ -6,7 +6,8 @@ class PiwikPlugin(Plugin):
     homepage = 'https://matomo.org/'
     vendor = 'Matomo'
     tags = ['analytics']
-    indicators = [
+
+    matchers = [
         {'body': r'/\*!!\s+ \* Piwik - free/libre analytics platform'},
     ]
     file_hashes = {

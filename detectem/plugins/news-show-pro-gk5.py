@@ -6,7 +6,7 @@ class NewsShowProGk5Plugin(Plugin):
     homepage = 'https://www.gavick.com/news-show-pro'
     tags = ['joomla!']
 
-    indicators = [
+    matchers = [
         {'body': r'\* @package News Show Pro GK5\n'},
     ]
     hints = ["joomla!"]

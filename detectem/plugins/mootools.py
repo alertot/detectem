@@ -6,8 +6,8 @@ class MooToolsCorePlugin(Plugin):
     homepage = 'https://mootools.net/core'
     tags = ['javascript', 'mootools']
 
-    js_matchers = [
-        {'check': 'window.MooTools', 'version': 'window.MooTools.version'},
+    matchers = [
+        {'dom': ('window.MooTools', 'window.MooTools.version')},
     ]
 
 
@@ -16,9 +16,10 @@ class MooToolsMorePlugin(Plugin):
     homepage = 'https://mootools.net/more'
     tags = ['javascript', 'mootools']
 
-    js_matchers = [
+    matchers = [
         {
-            'check': 'window.MooTools && window.MooTools.More',
-            'version': 'window.MooTools.More.version'
+            'dom': (
+                'window.MooTools && window.MooTools.More', 'window.MooTools.More.version'
+            ),
         },
     ]

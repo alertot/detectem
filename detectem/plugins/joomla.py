@@ -7,7 +7,7 @@ class JoomlaPlugin(Plugin):
     vendor = 'Open Source Matters, Inc.'
     tags = ['joomla!', 'cms', 'php']
 
-    indicators = [
+    matchers = [
         {
             'body':
                 '<meta name="generator" content="Joomla! - Open Source Content Management"'

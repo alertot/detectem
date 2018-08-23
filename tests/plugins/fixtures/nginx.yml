@@ -4,7 +4,7 @@
         name: Server
         value: nginx/1.1.19
       version: 1.1.19
-  indicators:
     - header:
         name: Server
         value: nginx
+      presence: true

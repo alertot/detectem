@@ -6,6 +6,5 @@
       version: 2.18.1
     - url: //cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js
       version: 2.8.2
-  js_matches:
-    - js: "window.moment = {version: '2.5.1'}"
+    - dom: "window.moment = {version: '2.5.1'}"
       version: 2.5.1

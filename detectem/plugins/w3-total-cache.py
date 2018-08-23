@@ -9,7 +9,9 @@ class W3TotalCachePlugin(Plugin):
 
     matchers = [
         {'header': ('X-Powered-By', r'W3 Total Cache/(?P<version>[0-9\.]+)')},
-    ]
-    indicators = [
-        {'xpath': "//comment()[contains(.,'Performance optimized by W3 Total Cache')]"},
+        {
+            'xpath': (
+                "//comment()[contains(.,'Performance optimized by W3 Total Cache')]", None
+            )
+        },
     ]

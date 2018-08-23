@@ -9,8 +9,6 @@ class LightBoxPlugin(Plugin):
     matchers = [
         {'body': r'\* Lightbox v(?P<version>[0-9\.]+).*Lokesh Dhakar'},
         {'url': r'/lightbox2/(?P<version>[0-9\.]+)/js/lightbox(\.min)?\.(js|css)'},
-    ]
-    indicators = [
         {'url': r'/lightbox2/([^/]+/)*lightbox(\.min)?\.(js|css)'},
     ]
 

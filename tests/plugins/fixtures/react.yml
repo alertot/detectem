@@ -14,8 +14,7 @@
       version: 0.14.3
     - url: https://fb.me/react-with-addons-0.14.3.min.js
       version: 0.14.3
-  js_matches:
-    - js: "window.React = {version: '15.1.0'}"
+    - dom: "window.React = {version: '15.1.0'}"
       version: 15.1.0
-  indicators:
     - xpath: <div class="Welcome__welcomeMain___1BuTh" data-reactid=".1nj3fc0syyo.0">
+      presence: true

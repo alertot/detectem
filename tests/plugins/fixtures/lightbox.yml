@@ -12,8 +12,8 @@
       version: 2.9.0
     - url: https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.9.0/js/lightbox.min.js
       version: 2.9.0
-  indicators:
     - url: https://www.freecodecamp.org/bower_components/lightbox2/dist/css/lightbox.css
+      presence: true
 
 - plugin: prettyphoto
   matches:

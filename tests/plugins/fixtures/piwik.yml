@@ -1,5 +1,6 @@
 - plugin: piwik
-  indicators:
+  matches:
     - body: |
         /*!!
          * Piwik - free/libre analytics platform
+      presence: true

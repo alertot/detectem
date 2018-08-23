@@ -9,13 +9,10 @@ class AngularjsPlugin(Plugin):
     matchers = [
         {'body': r'^/\*\s+AngularJS v(?P<version>[0-9a-z\.-]+)\s'},
         {'url': r'angular\.?js/(?P<version>[0-9\.]+)/angular(\.min)?\.js'},
-    ]
-    modular_matchers = [
         {'url': r'/(?:angular-)(?P<name>\w+)(\.min)?\.js'},
-    ]
-    js_matchers = [
         {
-            'check': 'window.angular && window.angular.version',
-            'version': 'window.angular.version.full'
+            'dom': (
+                'window.angular && window.angular.version', 'window.angular.version.full'
+            )
         },
     ]

@@ -19,15 +19,13 @@
     - body: /*! jQuery v1.7.2 jquery.com | jquery.org/license */
       version: 1.7.2
     - body: "/*! jQuery v3.2.1 \
-             -ajax,-ajax/jsonp,-ajax/load,-ajax/parseXML,-ajax/script,-ajax/var/location,\
-             -ajax/var/nonce,-ajax/var/rquery,-ajax/xhr,-manipulation/_evalUrl,-event/ajax,\
-             -effects,-effects/Tween,-effects/animatedSelector \
-             | (c) JS Foundation and other contributors"
+        -ajax,-ajax/jsonp,-ajax/load,-ajax/parseXML,-ajax/script,-ajax/var/location,\
+        -ajax/var/nonce,-ajax/var/rquery,-ajax/xhr,-manipulation/_evalUrl,-event/ajax,\
+        -effects,-effects/Tween,-effects/animatedSelector \
+        | (c) JS Foundation and other contributors"
       version: 3.2.1
-  js_matches:
-    - js: 'window.jQuery = function() { return {jquery: "1.0.0"} }'
+    - dom: 'window.jQuery = function() { return {jquery: "1.0.0"} }'
       version: 1.0.0
-
 
 - plugin: jquery-colorbox
   matches:
