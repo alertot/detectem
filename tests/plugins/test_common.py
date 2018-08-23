@@ -1,19 +1,19 @@
 import os
 
+from importlib.util import find_spec
+
 import pytest
 import dukpy
-
-from importlib.util import find_spec
 
 from detectem.core import MATCHERS
 from detectem.plugin import load_plugins
 from detectem.settings import PLUGIN_PACKAGES
-from tests import load_from_yaml, tree
+from tests import load_from_yaml, create_pm
 from .utils import create_har_entry
 
 
-class TestCommonMatches(object):
-    FIELDS = ['body', 'url', 'header', 'xpath']
+class TestCommonMatches:
+    FIELDS = [k for k in MATCHERS]
 
     def pytest_generate_tests(self, metafunc):
         fname = metafunc.function.__name__
@@ -28,18 +28,19 @@ class TestCommonMatches(object):
             plugin = pytest.config.getoption('plugin', None)
             data = load_from_yaml(test_dir, 'plugins/fixtures/')
 
-            if fname == 'test_version_matches':
-                entry_name = 'matches'
-            elif fname == 'test_js_matches':
-                entry_name = 'js_matches'
-            elif fname == 'test_modular_matches':
-                entry_name = 'modular_matches'
-            elif fname == 'test_indicators':
-                entry_name = 'indicators'
+            only_dom_matches = fname == 'test_dom_matches'
 
+            # Entry is the full plugin test file evaluated as a dictionary
             for entry in data:
-                for yaml_dict in entry.get(entry_name, []):
+                # Each yaml_dict is an entry in matches
+                for yaml_dict in entry['matches']:
+                    # Filter valid matchers if dom matchers are expected
+                    if  (only_dom_matches and 'dom' not in yaml_dict) or \
+                        (not only_dom_matches and 'dom' in yaml_dict):
+                        continue
+
                     if plugin:
+                        # Case if plugin was provided by developer
                         if plugin == entry['plugin']:
                             p = all_plugins.get(entry['plugin'])
                             cases.append([p, yaml_dict])
@@ -49,48 +50,49 @@ class TestCommonMatches(object):
 
         metafunc.parametrize('plugin,yaml_dict', cases)
 
-    def _get_value_from_method(self, plugin, yaml_dict, method_name):
-        sources = {
-            'get_version': 'matchers',
-            'get_module_name': 'modular_matchers',
-            'check_presence': 'indicators',
-        }
+    def _get_plugin_match(self, plugin, yaml_dict):
         field = [k for k in yaml_dict.keys() if k in self.FIELDS][0]
-        method = getattr(MATCHERS[field], method_name)
         har_entry = create_har_entry(field, yaml_dict)
 
-        matchers = plugin._get_matchers(field, source=sources[method_name])
-        return method(har_entry, *matchers)
+        matchers = plugin.get_matchers(field)
+        matcher_class = MATCHERS[field]
 
-    def test_version_matches(self, plugin, yaml_dict):
-        result = self._get_value_from_method(plugin, yaml_dict, 'get_version')
+        return matcher_class.get_info(har_entry, *matchers)
 
-        assert yaml_dict['version'] == result
+    def test_matches(self, plugin, yaml_dict):
+        pm = self._get_plugin_match(plugin, yaml_dict)
+        was_asserted = False  # At least one assert was done
 
-    def test_js_matches(self, plugin, yaml_dict):
-        was_asserted = False
-        js_code = yaml_dict['js']
+        # yaml_dict contains one of the asserters
+        for asserter in ['version', 'name', 'presence']:
+            value = yaml_dict.get(asserter)
+            if value:
+                assert pm == create_pm(**{asserter: value})
+                was_asserted = True
+
+        assert was_asserted
+
+    def test_dom_matches(self, plugin, yaml_dict):
+        was_asserted = False  # At least one assert was done
+        js_code = yaml_dict['dom']
 
         interpreter = dukpy.JSInterpreter()
         # Create window browser object
         interpreter.evaljs('window = {};')
         interpreter.evaljs(js_code)
 
-        for matcher in plugin.js_matchers:
-            is_present = interpreter.evaljs(matcher['check'])
+        for matcher in plugin.get_matchers('dom'):
+            check_statement, version_statement = matcher
+
+            is_present = interpreter.evaljs(check_statement)
             if is_present is not None:
-                version = interpreter.evaljs(matcher['version'])
-                assert yaml_dict['version'] == version
-                was_asserted = True
+                if version_statement:
+                    version = interpreter.evaljs(version_statement)
+                    assert yaml_dict['version'] == version
+                    was_asserted = True
+                    break
+                else:
+                    assert yaml_dict['presence']
+                    was_asserted = True
 
         assert was_asserted
-
-    def test_modular_matches(self, plugin, yaml_dict):
-        result = self._get_value_from_method(plugin, yaml_dict, 'get_module_name')
-
-        assert yaml_dict['module_name'] == result
-
-    def test_indicators(self, plugin, yaml_dict):
-        result = self._get_value_from_method(plugin, yaml_dict, 'check_presence')
-
-        assert result
