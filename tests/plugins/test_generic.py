@@ -2,10 +2,11 @@ import pytest
 
 from detectem.core import MATCHERS
 from detectem.plugin import load_plugins, GenericPlugin
+from tests import create_pm
 from .utils import create_har_entry
 
 
-class TestGenericPlugin(object):
+class TestGenericPlugin:
     @pytest.fixture
     def plugins(self):
         return load_plugins()
@@ -20,22 +21,27 @@ class TestGenericPlugin(object):
 
         assert x.ptype == 'generic'
 
-    @pytest.mark.parametrize('plugin_name,indicator,name', [
-        (
+    @pytest.mark.parametrize(
+        'plugin_name,matcher_type,har_content,name', [(
             'wordpress_generic',
-            {'url': 'http://domain.tld/wp-content/plugins/example/'},
+            'url',
+            'http://domain.tld/wp-content/plugins/example/',
             'example',
-        )
-    ])
-    def test_real_generic_plugin(self, plugin_name, indicator, name, plugins):
+        )]
+    )
+    def test_real_generic_plugin(
+        self, plugin_name, matcher_type, har_content, name, plugins
+    ):
         plugin = plugins.get(plugin_name)
-        matcher_type = [k for k in indicator.keys()][0]
+        har_entry = create_har_entry(matcher_type, value=har_content)
 
-        har_entry = create_har_entry(indicator, matcher_type)
-        matchers_in_plugin = plugin._get_matchers(matcher_type, 'indicators')
-
-        # Call presence method in related matcher class
+        # Verify presence using matcher class
+        matchers = plugin.get_matchers(matcher_type)
         matcher_instance = MATCHERS[matcher_type]
-        assert matcher_instance.check_presence(har_entry, *matchers_in_plugin)
+
+        assert matcher_instance.get_info(
+            har_entry,
+            *matchers,
+        ) == create_pm(presence=True)
 
         assert plugin.get_information(har_entry)['name'] == name
