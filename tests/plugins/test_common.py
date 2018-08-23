@@ -61,16 +61,13 @@ class TestCommonMatches:
 
     def test_matches(self, plugin, yaml_dict):
         pm = self._get_plugin_match(plugin, yaml_dict)
-        was_asserted = False  # At least one assert was done
 
-        # yaml_dict contains one of the asserters
-        for asserter in ['version', 'name', 'presence']:
-            value = yaml_dict.get(asserter)
-            if value:
-                assert pm == create_pm(**{asserter: value})
-                was_asserted = True
-
-        assert was_asserted
+        # More than one value could be asserted, then we need to create this dict
+        asserter = {
+            k: v
+            for k, v in yaml_dict.items() if k in ['version', 'name', 'presence']
+        }
+        assert pm == create_pm(**asserter)
 
     def test_dom_matches(self, plugin, yaml_dict):
         was_asserted = False  # At least one assert was done
@@ -89,6 +86,7 @@ class TestCommonMatches:
                 if version_statement:
                     version = interpreter.evaljs(version_statement)
                     assert yaml_dict['version'] == version
+
                     was_asserted = True
                     break
                 else:
