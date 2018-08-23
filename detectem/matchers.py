@@ -73,12 +73,12 @@ class UrlMatcher:
             if not name:
                 name = extract_name(url, *matchers)
 
-            version = extract_version(url, *matchers)
-            if version:
-                if version == 'presence':
-                    presence = True
-                    version = None
-                    break
+            if not version:
+                version = extract_version(url, *matchers)
+                if version:
+                    if version == 'presence':
+                        presence = True
+                        version = None
 
         return PluginMatch(name=name, version=version, presence=presence)
 
@@ -121,11 +121,12 @@ class HeaderMatcher:
             if not name:
                 name = extract_name(hstring, hmatcher)
 
-            version = extract_version(hstring, hmatcher)
-            if version == 'presence':
-                presence = True
-                version = None
-                break
+            if not version:
+                version = extract_version(hstring, hmatcher)
+                if version:
+                    if version == 'presence':
+                        presence = True
+                        version = None
 
         return PluginMatch(name=name, version=version, presence=presence)
 
