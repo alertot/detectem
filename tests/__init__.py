@@ -4,6 +4,8 @@ from collections import defaultdict
 
 from yaml import load
 
+from detectem.matchers import PluginMatch
+
 
 def load_from_yaml(test_dir, relative_yaml_file):
     final_path = os.path.join(test_dir, relative_yaml_file)
@@ -20,3 +22,7 @@ def load_from_yaml(test_dir, relative_yaml_file):
 
 def tree():
     return defaultdict(tree)
+
+
+def create_pm(name=None, version=None, presence=False):
+    return PluginMatch(name, version, presence)

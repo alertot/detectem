@@ -3,7 +3,6 @@ import re
 import pytest
 
 from detectem.matchers import (
-    PluginMatch,
     extract_named_group,
     extract_version,
     extract_name,
@@ -13,9 +12,7 @@ from detectem.matchers import (
     XPathMatcher,
 )
 
-
-def create_pm(name=None, version=None, presence=False):
-    return PluginMatch(name, version, presence)
+from tests import create_pm
 
 
 def res_text(text):
