@@ -57,7 +57,7 @@ class TestCommonMatches(object):
         }
         field = [k for k in yaml_dict.keys() if k in self.FIELDS][0]
         method = getattr(MATCHERS[field], method_name)
-        har_entry = create_har_entry(yaml_dict, field)
+        har_entry = create_har_entry(field, yaml_dict)
 
         matchers = plugin._get_matchers(field, source=sources[method_name])
         return method(har_entry, *matchers)
