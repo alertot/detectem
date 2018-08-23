@@ -98,23 +98,16 @@ def to_javascript_data(plugins):
         return re.sub('"', '\\"', v)
 
     def dom_matchers(p):
-        dom_matchers = [m for m in p.matchers if 'dom' in m]
+        dom_matchers = p.get_matchers('dom')
         escaped_dom_matchers = []
 
         for dm in dom_matchers:
-            dm_tuple = dm['dom']
-
-            try:
-                # Version case
-                check, version = dm_tuple
-            except ValueError:
-                # Presence case
-                check = dm_tuple[0]
-                version = ''
+            check_statement, version_statement = dm
 
             escaped_dom_matchers.append({
-                'check_statement': escape(check),
-                'version_statement': escape(version),
+                'check_statement': escape(check_statement),
+                # Escape '' and not None
+                'version_statement': escape(version_statement or ''),
             })
 
         return escaped_dom_matchers
