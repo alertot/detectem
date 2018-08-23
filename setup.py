@@ -15,14 +15,10 @@ setup(
     url='https://github.com/alertot/detectem',
     packages=find_packages(exclude=('tests', 'docs')),
     package_dir={'detectem': 'detectem'},
-    entry_points={
-        'console_scripts': [
-            'det=detectem.cli:main'
-        ]
-    },
+    entry_points={'console_scripts': ['det=detectem.cli:main']},
     include_package_data=True,
     install_requires=requirements,
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     license="MIT",
     zip_safe=False,
     keywords='detector detection',
@@ -31,7 +27,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
     tests_require=test_requirements

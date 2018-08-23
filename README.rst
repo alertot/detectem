@@ -1,6 +1,9 @@
 detectem
 ========
 
+.. note::
+    Python 3.6 or greater is required.
+
 
 .. image:: https://img.shields.io/pypi/v/detectem.svg
         :target: https://pypi.python.org/pypi/detectem
@@ -60,7 +63,7 @@ Installation
 
     $ docker pull scrapinghub/splash
 
-3. Create a virtual environment with Python >= 3.5 .
+3. Create a virtual environment with Python >= 3.6 .
 
 4. Install detectem::
 
