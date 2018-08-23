@@ -1,9 +1,7 @@
 detectem
 ========
 
-.. note::
-    Python 3.6 or greater is required.
-
+**Python 3.6 or greater is required.**
 
 .. image:: https://img.shields.io/pypi/v/detectem.svg
         :target: https://pypi.python.org/pypi/detectem
