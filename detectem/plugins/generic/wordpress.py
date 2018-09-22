@@ -1,9 +1,8 @@
 import re
-import os
 import json
+import pkgutil
 
 from detectem.plugin import GenericPlugin
-from detectem.settings import DATA_DIR
 from detectem.utils import get_url
 
 
@@ -16,10 +15,10 @@ class WordpressGenericPlugin(GenericPlugin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        with open(os.path.join(DATA_DIR, 'wordpress.jl')) as f:
-            for line in f:
-                data = json.loads(line)
-                self.plugins[data['name']] = data['vendor']
+        wordpress_data = pkgutil.get_data('detectem', 'data/wordpress.jl')
+        for line in wordpress_data.splitlines():
+            data = json.loads(line)
+            self.plugins[data['name']] = data['vendor']
 
     matchers = [{'url': '/wp-content/plugins/'}]
 

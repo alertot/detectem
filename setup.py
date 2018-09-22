@@ -14,6 +14,7 @@ setup(
     author_email='csalazar@spect.cl',
     url='https://github.com/alertot/detectem',
     packages=find_packages(exclude=('tests', 'docs')),
+    package_data={'detectem': ['data/*']},
     package_dir={'detectem': 'detectem'},
     entry_points={'console_scripts': ['det=detectem.cli:main']},
     include_package_data=True,
