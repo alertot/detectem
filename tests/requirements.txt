@@ -1,5 +1,5 @@
-pytest==3.3.2
+pytest==3.8.1
 pyyaml==3.13
-dukpy==0.1.0
-pytest-mock==1.6.3
-boddle==0.2.7
+dukpy==0.2.2
+pytest-mock==1.10.0
+boddle==0.2.8
