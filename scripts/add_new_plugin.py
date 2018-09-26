@@ -31,14 +31,10 @@ from detectem.plugin import Plugin
 class {title}Plugin(Plugin):
     name = '{name}'
     homepage = ''
+    tags = []
     matchers = [
         {{'{matcher}': 'Plugin signature v(?P<version>[0-9\.]+)'}},
     ]
-    """
-    js_matchers = [
-        {{'check': '', 'version': ''}},
-    ]
-    """
 '''.format(
         name=name, title=name.title(), matcher=matcher
     ).lstrip()
