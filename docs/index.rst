@@ -5,7 +5,7 @@ Welcome to detectem's documentation!
 
 This documentation contains everything you need to know about detectem.
 
-detectem is a specialized software detector.
+detectem is a passive software detector.
 Let's see it in action.
 
 .. code-block:: bash
@@ -15,11 +15,11 @@ Let's see it in action.
    {'name': 'apache-mod_bwlimited', 'version': '1.4'},
    {'name': 'apache-mod_fcgid', 'version': '2.3.9'},
    {'name': 'jquery', 'version': '1.11.3'},
-   {'name': 'crayon-syntax-highlighter', 'version': '_2.7.2_beta'}]
+   {'name': 'crayon-syntax-highlighter', 'version': '2.7.2'}]
 
 
 Using a serie of indicators, it's able to detect software running on a site
-and extract accurately its version information.
+and in most cases extract accurately its version information.
 It uses Splash_ API
 to render the website and start the detection routine.
 It does full analysis on requests, responses and even on the DOM_!
@@ -37,6 +37,7 @@ Features
 * Browser support provided by Splash_.
 * Analysis on requests made and responses received by the browser.
 * Get software information from the DOM.
+* Match by file fingerprints.
 * Great performance (less than 10 seconds to get a fingerprint).
 * Plugin system to add new software easily.
 * Test suite to ensure plugin result integrity.
@@ -55,11 +56,11 @@ Documentation
 -------------
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 1
 
-   installation
-   matchers
-   plugin_development
+  installation
+  matchers
+  plugin_development
 
 
 .. _DOM: https://en.wikipedia.org/wiki/Document_Object_Model

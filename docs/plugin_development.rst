@@ -25,9 +25,9 @@ which creates both plugin and test file.
 
 .. code-block:: bash
 
-  $ python scripts/add_new_plugin.py example --matcher url --category infraestructure
+  $ python scripts/add_new_plugin.py --matcher=url example
 
-  Created plugin file at detectem/detectem/plugins/infraestructure/example.py
+  Created plugin file at detectem/detectem/plugins/example.py
   Created test file at detectem/tests/plugins/fixtures/example.yml
 
 
@@ -35,10 +35,10 @@ Plugin file
 ^^^^^^^^^^^
 
 We're creating an example plugin
-for a ficticious software called ``examplelib``.
+for a ficticious software called *examplelib*.
 We can detect it easily since it's included as an external library
-and in its ``URL`` it contains the version.
-Then we will use the ``URL`` matcher for this case.
+and in its *URL* it contains the version.
+Then we will use the :ref:`url_matcher` for this case.
 
 
 .. code-block:: python
@@ -52,17 +52,9 @@ Then we will use the ``URL`` matcher for this case.
       matchers = [
           {'url': '/examplelib\.v(?P<version>[0-9\.]+)-min\.js$'},
       ]
-      """
-      js_matchers = [
-          {{'check': '', 'version': ''}},
-      ]
-      """
 
-It contains the attributes enforced by the interface.
-There also Javascript matchers (``js_matchers``)
-which works on the page DOM_ to get dynamic information.
-
-Review :ref:`matchers <matchers>` page to meet the available options.
+Review :ref:`matchers <matchers>` page to meet the available matchers
+to write your own plugin.
 
 
 Test file
@@ -98,7 +90,7 @@ When you need to support a new signature
 and it's not supported by current signatures,
 you must modify your plugin file
 and add a new test to the list to see
-that your changes didn't break previous detected versions.
+that your changes don't break previous detected versions.
 
 
 References
@@ -107,7 +99,3 @@ References
 .. autointerface:: detectem.plugin.IPlugin
 
 .. autoclass:: detectem.plugin.Plugin
-
-
-
-.. _DOM: https://en.wikipedia.org/wiki/Document_Object_Model

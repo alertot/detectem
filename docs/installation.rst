@@ -7,7 +7,7 @@ Installation
 
     $ docker pull scrapinghub/splash
 
-3. Create a virtual environment with Python >= 3.5 .
+3. Create a virtual environment with Python >= 3.6 .
 
 4. Install detectem::
 
