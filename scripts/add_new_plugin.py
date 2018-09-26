@@ -13,7 +13,7 @@ PLUGIN_DIRECTORIES = [
 @click.command()
 @click.option(
     '--matcher',
-    type=click.Choice(['url', 'body', 'header', 'xpath']),
+    type=click.Choice(['url', 'body', 'header', 'xpath', 'dom']),
     required=True,
     help='Set the matcher type.',
 )
