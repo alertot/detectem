@@ -5,8 +5,9 @@ services:
     image: scrapinghub/splash:3.0
 
   detectem:
+    image: detectem:latest
     build:
-      context: ./
+      context: .
       dockerfile: Dockerfile-alternate
     environment:
       - SETUP_SPLASH=False
