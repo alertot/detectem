@@ -99,7 +99,7 @@ Installation
 
 2. Add your user to the docker group and logout::
 
-    $ sudo usermod -a -G docker you
+    $ sudo usermod -aG docker $USER
 
 3. Make sure you have logout to apply changes, then log in again.
 
