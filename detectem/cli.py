@@ -1,15 +1,15 @@
 import logging
 import sys
-import click
-
 from operator import attrgetter
 
-from detectem.response import get_response
-from detectem.plugin import load_plugins
+import click
+
 from detectem.core import Detector
-from detectem.exceptions import DockerStartError, SplashError, NoPluginsError
+from detectem.exceptions import DockerStartError, NoPluginsError, SplashError
+from detectem.plugin import load_plugins
+from detectem.response import get_response
+from detectem.settings import CMD_OUTPUT, JSON_OUTPUT, SPLASH_TIMEOUT
 from detectem.utils import create_printer
-from detectem.settings import SPLASH_TIMEOUT, CMD_OUTPUT, JSON_OUTPUT
 
 DUMMY_URL = "http://domain.tld"
 
@@ -95,9 +95,14 @@ def get_detection_results(url, timeout, metadata):
 
     response = get_response(url, plugins, timeout)
     det = Detector(response, plugins, url)
-    results = det.get_results(metadata=metadata)
+    softwares = det.get_results(metadata=metadata)
 
-    return results
+    output = {
+        'url': url,
+        'softwares': softwares,
+    }
+
+    return output
 
 
 def get_plugins(metadata):
