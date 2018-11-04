@@ -150,10 +150,10 @@ def create_printer(format):
 
 def get_url(entry):
     """ Return URL from response if it was received otherwise requested URL. """
-    if 'response' in entry:
+    try:
         return entry['response']['url']
-
-    return entry['request']['url']
+    except KeyError:
+        return entry['request']['url']
 
 
 def get_response_body(entry):
