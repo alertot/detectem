@@ -28,14 +28,16 @@ MATCHERS = {
 
 class HarProcessor:
     ''' This class process the HAR list returned by Splash
-        adding some markers useful for matcher application
+        adding some useful markers for matcher application
     '''
 
     @staticmethod
     def _set_entry_type(entry, entry_type):
+        ''' Set entry type (detectem internal metadata) '''
         entry.setdefault('detectem', {})['type'] = entry_type
 
-    def _get_location(self, entry):
+    @staticmethod
+    def _get_location(entry):
         ''' Return `Location` header value if it's present in ``entry`` '''
         headers = entry['response'].get('headers', [])
 
@@ -44,6 +46,18 @@ class HarProcessor:
                 return header['value']
 
         return None
+
+    @classmethod
+    def _script_to_har_entry(cls, script, url):
+        ''' Return entry for embed script '''
+        entry = {
+            'request': {'url': url},
+            'response': {'url': url, 'content': {'text': script}}
+        }
+
+        cls._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
+
+        return entry
 
     def mark_entries(self, entries):
         ''' Mark one entry as main entry and the rest as resource entry.
@@ -72,16 +86,6 @@ class HarProcessor:
         else:
             # In fail case, set the first entry
             self._set_entry_type(main_entry, MAIN_ENTRY)
-
-    def _script_to_har_entry(self, script, url):
-        ''' Return entry for embed script '''
-        entry = {
-            'request': {'url': url},
-            'response': {'url': url, 'content': {'text': script}}
-        }
-
-        self._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
-        return entry
 
     def prepare(self, response, url):
         har = response.get('har', [])
