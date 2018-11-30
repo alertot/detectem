@@ -17,12 +17,14 @@ class Result():
         homepage=None,
         from_url=None,
         type=VERSION_TYPE,
+        plugin=None,
     ):
         self.name = name
         self.type = type
         self.version = version
         self.homepage = homepage
         self.from_url = from_url
+        self.plugin = plugin
 
     def __hash__(self):
         return hash((self.name, self.version, self.type))

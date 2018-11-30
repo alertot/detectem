@@ -125,6 +125,7 @@ class Detector():
                     homepage=hint_plugin.homepage,
                     from_url=self.requested_url,
                     type=HINT_TYPE,
+                    plugin=plugin.name,
                 )
                 hints.append(hint_result)
 
@@ -213,6 +214,7 @@ class Detector():
                             version=pm.version,
                             homepage=plugin.homepage,
                             from_url=get_url(entry),
+                            plugin=plugin.name,
                         )
                     )
                 elif pm.presence:
@@ -225,6 +227,7 @@ class Detector():
                                 version=version,
                                 homepage=plugin.homepage,
                                 from_url=get_url(entry),
+                                plugin=plugin.name,
                             )
                         )
                     else:
@@ -234,6 +237,7 @@ class Detector():
                                 homepage=plugin.homepage,
                                 from_url=get_url(entry),
                                 type=INDICATOR_TYPE,
+                                plugin=plugin.name,
                             )
                         )
                 hints += self.get_hints(plugin)
@@ -251,6 +255,7 @@ class Detector():
                                 homepage=plugin_data['homepage'],
                                 from_url=get_url(entry),
                                 type=GENERIC_TYPE,
+                                plugin=plugin.name,
                             )
                         )
 
@@ -273,6 +278,7 @@ class Detector():
                 rdict['homepage'] = rt.homepage
                 rdict['type'] = rt.type
                 rdict['from_url'] = rt.from_url
+                rdict['plugin'] = rt.plugin
 
             results_data.append(rdict)
 
