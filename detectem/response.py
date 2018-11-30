@@ -3,7 +3,6 @@ import json
 import logging
 import re
 import urllib.parse
-
 from string import Template
 
 import pkg_resources
@@ -67,7 +66,7 @@ def get_charset(response):
     # Set default charset
     charset = DEFAULT_CHARSET
 
-    m = re.findall(';charset=(.*)', response.get('mimeType', ''))
+    m = re.findall(r';charset=(.*)', response.get('mimeType', ''))
     if m:
         charset = m[0]
 
@@ -97,7 +96,7 @@ def to_javascript_data(plugins):
     """
 
     def escape(v):
-        return re.sub('"', '\\"', v)
+        return re.sub(r'"', r'\\"', v)
 
     def dom_matchers(p):
         dom_matchers = p.get_matchers('dom')
@@ -127,11 +126,7 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
     """
     lua_script = create_lua_script(plugins)
     lua = urllib.parse.quote_plus(lua_script)
-        '{0}/execute?url={1}&timeout={2}&lua_source={3}'.format(
-            SPLASH_URL, url, timeout, lua
-        )
-        .format(SPLASH_URL, url, timeout, lua)
-    )
+    page_url = f'{SPLASH_URL}/execute?url={url}&timeout={timeout}&lua_source={lua}'
 
     try:
         with docker_container():
@@ -190,7 +185,7 @@ def get_evaljs_error(json_data):
     if 'errors' in json_data and 'evaljs' in json_data['errors']:
         res = json_data['errors']['evaljs']
         if isinstance(res, str):
-            m = re.search("'message': '(.*?)'[,}]", res)
+            m = re.search(r"'message': '(.*?)'[,}]", res)
             if m:
                 error = bytes(m.group(1), 'utf-8').decode('unicode_escape')
     return error

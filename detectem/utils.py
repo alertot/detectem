@@ -50,7 +50,7 @@ def docker_error(method):
         try:
             method(self)
         except docker.errors.DockerException as e:
-            raise DockerStartError("Docker error: {}".format(e))
+            raise DockerStartError(f'Docker error: {e}')
 
     return run_method
 
@@ -71,7 +71,7 @@ class DockerManager:
             )
 
     def _get_splash_args(self):
-        return '--max-timeout {}'.format(SPLASH_MAX_TIMEOUT)
+        return f'--max-timeout {SPLASH_MAX_TIMEOUT}'
 
     def _get_container(self):
         try:
@@ -87,12 +87,12 @@ class DockerManager:
                         '8051/tcp': 8051,
                     },
                     command=self._get_splash_args(),
-                    "using DOCKER_SPLASH_IMAGE environment variable.".
-                    format(DOCKER_SPLASH_IMAGE)
+                )
+            except docker.errors.ImageNotFound:
                 raise DockerStartError(
-                    "Docker image {} not found. Please install it or set an image "
-                    "using DOCKER_SPLASH_IMAGE environment variable."
-                    .format(DOCKER_SPLASH_IMAGE)
+                    f'Docker image {DOCKER_SPLASH_IMAGE} not found.'
+                    f'Please install it or set an image '
+                    f'using DOCKER_SPLASH_IMAGE environment variable.'
                 )
 
     @docker_error
@@ -100,19 +100,17 @@ class DockerManager:
         container = self._get_container()
         if container.status != 'running':
             try:
-                    "There was an error running Splash container: {}".format(
-                        e.explanation
-                    )
+                container.start()
+                self._wait_container()
             except docker.errors.APIError as e:
                 raise DockerStartError(
-                    "There was an error running Splash container: {}"
-                    .format(e.explanation)
+                    f'There was an error running Splash container: {e.explanation}'
                 )
 
     def _wait_container(self):
         for t in [1, 2, 4, 6, 8, 10]:
             try:
-                requests.get('{}/_ping'.format(SPLASH_URL))
+                requests.get(f'{SPLASH_URL}/_ping')
                 break
             except requests.exceptions.RequestException:
                 time.sleep(t)
@@ -135,17 +133,17 @@ def docker_container():
         dm.start_container()
 
     try:
-        requests.post('{}/_gc'.format(SPLASH_URL))
+        requests.post(f'{SPLASH_URL}/_gc')
     except requests.exceptions.RequestException:
         pass
 
     yield
 
 
-def create_printer(format):
-    if format == CMD_OUTPUT:
+def create_printer(oformat):
+    if oformat == CMD_OUTPUT:
         return pprint.pprint
-    elif format == JSON_OUTPUT:
+    elif oformat == JSON_OUTPUT:
 
         def json_printer(data):
             print(json.dumps(data))
