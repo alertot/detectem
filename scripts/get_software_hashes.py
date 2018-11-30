@@ -1,15 +1,15 @@
-import os
-import re
-import io
-import zipfile
-import tempfile
 import hashlib
-import pprint
+import io
 import logging
+import os
+import pprint
+import re
+import tempfile
+import zipfile
 
-import requests
 import click
 import click_log
+import requests
 
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
@@ -18,15 +18,18 @@ FILE_REGEX = r'^v?(\d+\.\d+\.?\d+?)$'  # avoid beta releases
 N_RESULTS = 100
 
 
-def get_files_from_github(user_and_repo, filedir):
+def get_files_from_github(user_and_repo, filedir, regex, prefer_tags):
     ''' Return dictionary of version:directory and directory has extracted files. '''
     github_url = f'https://api.github.com/repos/{user_and_repo}'
     args = f'?per_page={N_RESULTS}'
     results = []
+    json_data = None
 
     # Determine the right url
-    url = f'{github_url}/releases{args}'
-    json_data = requests.get(url).json()
+    if not prefer_tags:
+        url = f'{github_url}/releases{args}'
+        json_data = requests.get(url).json()
+
     if not json_data:
         url = f'{github_url}/tags{args}'
         json_data = requests.get(url).json()
@@ -49,7 +52,7 @@ def get_files_from_github(user_and_repo, filedir):
     directories = {}
     for result in results:
         name = result['name']
-        m = re.match(FILE_REGEX, name)
+        m = re.match(regex, name)
         if not m:
             continue
 
@@ -71,29 +74,46 @@ def get_files_from_github(user_and_repo, filedir):
 
 @click.command()
 @click.option('--github', default=None, type=str, help='user/repository')
+@click.option(
+    '--directory',
+    default=None,
+    type=str,
+    help='local directory containing version directories'
+)
+@click.option(
+    '--regex', default=FILE_REGEX, type=str, help='regex to select the releases'
+)
+@click.option('--prefer-tags', is_flag=True, help='prefer tags over releases')
 @click_log.simple_verbosity_option(logger, default='error')
 @click.argument('filepath', type=str)
-def main(github, filepath):
-    with tempfile.TemporaryDirectory() as filedir:
-        logger.debug(f'[+] Using {filedir} as temporary directory.')
+def main(github, directory, regex, filepath, prefer_tags):
+    directories = []
 
-        directories = []
-        if github:
-            directories = get_files_from_github(github, filedir)
+    if github:
+        with tempfile.TemporaryDirectory() as filedir:
+            logger.debug(f'[+] Using {filedir} as temporary directory.')
 
-        logger.debug('[+] Creating hashes ..')
+            directories = get_files_from_github(github, filedir, regex, prefer_tags)
+    else:
+        directories = {f.name: f.path for f in os.scandir(directory) if f.is_dir()}
 
-        hashes = {}
-        for version, path in directories.items():
-            target_file = os.path.join(path, filepath)
-            with open(target_file) as f:
-                content = f.read().encode('utf-8')
-                m = hashlib.sha256()
-                m.update(content)
-                h = m.hexdigest()
-                hashes[version] = h
+    logger.debug('[+] Creating hashes ..')
 
-        pprint.pprint({filepath: hashes})
+    hashes = {}
+    for version, path in directories.items():
+        target_file = os.path.join(path, filepath)
+        if not os.path.exists(target_file):
+            logger.error(f'version {version} not contains target file')
+            continue
+
+        with open(target_file) as f:
+            content = f.read().encode('utf-8')
+            m = hashlib.sha256()
+            m.update(content)
+            h = m.hexdigest()
+            hashes[version] = h
+
+    pprint.pprint({filepath: hashes})
 
 
 if __name__ == '__main__':
