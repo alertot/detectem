@@ -1,8 +1,8 @@
-import time
-import logging
-import json
-import pprint
 import hashlib
+import json
+import logging
+import pprint
+import time
 
 from contextlib import contextmanager
 
@@ -11,8 +11,12 @@ import requests
 
 from detectem.exceptions import DockerStartError
 from detectem.settings import (
-    SPLASH_URL, SETUP_SPLASH, DOCKER_SPLASH_IMAGE, SPLASH_MAX_TIMEOUT, JSON_OUTPUT,
-    CMD_OUTPUT
+    CMD_OUTPUT,
+    DOCKER_SPLASH_IMAGE,
+    JSON_OUTPUT,
+    SETUP_SPLASH,
+    SPLASH_MAX_TIMEOUT,
+    SPLASH_URL,
 )
 
 logger = logging.getLogger('detectem')
@@ -83,8 +87,8 @@ class DockerManager:
                         '8051/tcp': 8051,
                     },
                     command=self._get_splash_args(),
-                )
-            except docker.errors.ImageNotFound:
+                    "using DOCKER_SPLASH_IMAGE environment variable.".
+                    format(DOCKER_SPLASH_IMAGE)
                 raise DockerStartError(
                     "Docker image {} not found. Please install it or set an image "
                     "using DOCKER_SPLASH_IMAGE environment variable."
@@ -96,8 +100,9 @@ class DockerManager:
         container = self._get_container()
         if container.status != 'running':
             try:
-                container.start()
-                self._wait_container()
+                    "There was an error running Splash container: {}".format(
+                        e.explanation
+                    )
             except docker.errors.APIError as e:
                 raise DockerStartError(
                     "There was an error running Splash container: {}"

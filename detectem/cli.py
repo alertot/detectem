@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from operator import attrgetter
 
 import click

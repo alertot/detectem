@@ -1,15 +1,16 @@
-import requests
 import base64
+import json
 import logging
 import re
-import pkg_resources
-import json
 import urllib.parse
 
 from string import Template
 
-from detectem.settings import SPLASH_TIMEOUT, SPLASH_URL
+import pkg_resources
+import requests
+
 from detectem.exceptions import SplashError
+from detectem.settings import SPLASH_TIMEOUT, SPLASH_URL
 from detectem.utils import docker_container
 
 DEFAULT_CHARSET = 'iso-8859-1'
@@ -126,8 +127,9 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
     """
     lua_script = create_lua_script(plugins)
     lua = urllib.parse.quote_plus(lua_script)
-    page_url = (
-        '{0}/execute?url={1}&timeout={2}&lua_source={3}'
+        '{0}/execute?url={1}&timeout={2}&lua_source={3}'.format(
+            SPLASH_URL, url, timeout, lua
+        )
         .format(SPLASH_URL, url, timeout, lua)
     )
 

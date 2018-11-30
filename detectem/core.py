@@ -1,21 +1,26 @@
 import logging
 import urllib.parse
 
-from detectem.utils import (
-    get_url,
-    get_most_complete_pm,
-    get_version_via_file_hashes,
+from detectem.matchers import (
+    BodyMatcher,
+    HeaderMatcher,
+    UrlMatcher,
+    XPathMatcher,
 )
+from detectem.results import Result, ResultCollection
 from detectem.settings import (
-    INDICATOR_TYPE,
+    GENERIC_TYPE,
     HINT_TYPE,
+    INDICATOR_TYPE,
+    INLINE_SCRIPT_ENTRY,
     MAIN_ENTRY,
     RESOURCE_ENTRY,
-    INLINE_SCRIPT_ENTRY,
-    GENERIC_TYPE,
 )
-from detectem.matchers import (UrlMatcher, BodyMatcher, HeaderMatcher, XPathMatcher)
-from detectem.results import Result, ResultCollection
+from detectem.utils import (
+    get_most_complete_pm,
+    get_url,
+    get_version_via_file_hashes,
+)
 
 logger = logging.getLogger('detectem')
 MATCHERS = {

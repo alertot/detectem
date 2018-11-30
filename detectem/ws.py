@@ -1,5 +1,9 @@
-import sys
 import json
+import sys
+
+from detectem.cli import get_detection_results
+from detectem.exceptions import NoPluginsError, SplashError
+from detectem.settings import DEBUG, SPLASH_TIMEOUT
 
 try:
     import bottle
@@ -8,9 +12,6 @@ except ImportError:
     print('[+] Install bottle to use the web service')
     sys.exit(0)
 
-from detectem.exceptions import SplashError, NoPluginsError
-from detectem.cli import get_detection_results
-from detectem.settings import DEBUG, SPLASH_TIMEOUT
 
 
 @post('/detect')

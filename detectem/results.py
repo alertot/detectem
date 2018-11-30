@@ -2,10 +2,10 @@ from collections import defaultdict
 from distutils.version import LooseVersion
 
 from detectem.settings import (
-    VERSION_TYPE,
-    INDICATOR_TYPE,
-    HINT_TYPE,
     GENERIC_TYPE,
+    HINT_TYPE,
+    INDICATOR_TYPE,
+    VERSION_TYPE,
 )
 
 

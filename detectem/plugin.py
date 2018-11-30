@@ -1,13 +1,13 @@
-import re
+import glob
 import inspect
 import logging
-import glob
+import re
 
 from importlib.util import find_spec, module_from_spec
 
-from zope.interface import implementer, Interface, Attribute
-from zope.interface.verify import verifyObject
+from zope.interface import Attribute, Interface, implementer
 from zope.interface.exceptions import BrokenImplementation
+from zope.interface.verify import verifyObject
 
 from detectem.settings import PLUGIN_PACKAGES
 

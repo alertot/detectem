@@ -1,7 +1,7 @@
-import re
-import sys
 import os
 import pprint
+import re
+import sys
 
 import click
 
@@ -19,9 +19,7 @@ except KeyError:
 
 
 def get_headers(text):
-    header_string = re.findall(
-        '^(.*?)(?:[\r\n]{3,4})', text, flags=re.DOTALL | re.I
-    )
+    header_string = re.findall('^(.*?)(?:[\r\n]{3,4})', text, flags=re.DOTALL | re.I)
     if not header_string:
         return None
 
@@ -37,24 +35,9 @@ def get_headers(text):
 
 
 @click.command()
-@click.option(
-    '--filter',
-    default=None,
-    type=str,
-    help='Filter by header'
-)
-@click.option(
-    '--stats',
-    default=False,
-    is_flag=True,
-    help='Include stats'
-)
-@click.option(
-    '--show-names',
-    default=False,
-    is_flag=True,
-    help='Show header names'
-)
+@click.option('--filter', default=None, type=str, help='Filter by header')
+@click.option('--stats', default=False, is_flag=True, help='Include stats')
+@click.option('--show-names', default=False, is_flag=True, help='Show header names')
 @click.argument('query')
 def main(filter, stats, show_names, query):
     counter = 0

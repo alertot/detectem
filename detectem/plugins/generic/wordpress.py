@@ -1,6 +1,6 @@
-import re
 import json
 import pkgutil
+import re
 
 from detectem.plugin import GenericPlugin
 from detectem.utils import get_url

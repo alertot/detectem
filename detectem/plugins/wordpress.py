@@ -1,4 +1,5 @@
 from detectem.plugin import Plugin
+
 from .helpers import meta_generator
 
 
