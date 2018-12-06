@@ -47,9 +47,7 @@ logger.addHandler(ch)
     help='Include this flag to return plugin metadata.',
 )
 @click.option(
-    '--plugins',
-    'list_plugins',
-    default=False,
+    '--list-plugins',
     is_flag=True,
     help='List registered plugins',
 )
