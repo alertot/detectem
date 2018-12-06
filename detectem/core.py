@@ -249,20 +249,24 @@ class Detector():
 
             for plugin in generic_plugins:
                 pm = self.apply_plugin_matchers(plugin, entry)
-                if pm:
-                    plugin_data = plugin.get_information(entry)
+                if not pm:
+                    continue
 
-                    # Only add to results if it's a valid result
-                    if 'name' in plugin_data:
-                        self._results.add_result(
-                            Result(
-                                name=plugin_data['name'],
-                                homepage=plugin_data['homepage'],
-                                from_url=get_url(entry),
-                                type=GENERIC_TYPE,
-                                plugin=plugin.name,
-                            )
+                plugin_data = plugin.get_information(entry)
+
+                # Only add to results if it's a valid result
+                if 'name' in plugin_data:
+                    self._results.add_result(
+                        Result(
+                            name=plugin_data['name'],
+                            homepage=plugin_data['homepage'],
+                            from_url=get_url(entry),
+                            type=GENERIC_TYPE,
+                            plugin=plugin.name,
                         )
+                    )
+
+                hints += self.get_hints(plugin)
 
         for hint in hints:
             self._results.add_result(hint)
