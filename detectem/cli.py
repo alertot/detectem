@@ -1,9 +1,9 @@
 import logging
 import sys
-
 from operator import attrgetter
 
 import click
+import click_log
 
 from detectem.core import Detector
 from detectem.exceptions import DockerStartError, NoPluginsError, SplashError
@@ -19,15 +19,10 @@ logger = logging.getLogger('detectem')
 ch = logging.StreamHandler()
 logger.setLevel(logging.ERROR)
 logger.addHandler(ch)
+click_log.basic_config(logger)
 
 
 @click.command()
-@click.option(
-    '--debug',
-    default=False,
-    is_flag=True,
-    help='Include this flag to enable debug messages.',
-)
 @click.option(
     '--timeout',
     default=SPLASH_TIMEOUT,
@@ -51,18 +46,12 @@ logger.addHandler(ch)
     is_flag=True,
     help='List registered plugins',
 )
+@click_log.simple_verbosity_option(logger, default='error')
 @click.argument('url', default=DUMMY_URL, required=True)
-def main(debug, timeout, format, metadata, list_plugins, url):
+def main(timeout, format, metadata, list_plugins, url):
     if not list_plugins and url == DUMMY_URL:
         click.echo(click.get_current_context().get_help())
         sys.exit(1)
-
-    if debug:
-        click.echo("[+] Enabling debug mode.")
-        ch.setLevel(logging.DEBUG)
-        logger.setLevel(logging.DEBUG)
-    else:
-        ch.setLevel(logging.ERROR)
 
     printer = create_printer(format)
     try:
