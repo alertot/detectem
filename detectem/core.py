@@ -156,6 +156,7 @@ class Detector():
                     name=plugin.name,
                     homepage=plugin.homepage,
                     from_url=self.requested_url,
+                    plugin=plugin.name,
                     **additional_data,
                 )
             )
