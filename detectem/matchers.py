@@ -104,10 +104,13 @@ class BodyMatcher:
 class HeaderMatcher:
     @classmethod
     def _get_matches(cls, headers, *matchers):
-        for matcher_name, matcher_value in matchers:
-            for header in headers:
-                if header['name'] == matcher_name:
-                    yield header['value'], matcher_value
+        try:
+            for matcher_name, matcher_value in matchers:
+                for header in headers:
+                    if header['name'] == matcher_name:
+                        yield header['value'], matcher_value
+        except ValueError:
+            raise ValueError('Header matcher value must be a tuple')
 
     @classmethod
     def get_info(cls, entry, *matchers):
