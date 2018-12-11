@@ -1,5 +1,7 @@
+import json
 import logging
 import sys
+import tempfile
 from operator import attrgetter
 
 import click
@@ -16,9 +18,6 @@ DUMMY_URL = "http://domain.tld"
 
 # Set up logging
 logger = logging.getLogger('detectem')
-ch = logging.StreamHandler()
-logger.setLevel(logging.ERROR)
-logger.addHandler(ch)
 click_log.basic_config(logger)
 
 
@@ -46,19 +45,24 @@ click_log.basic_config(logger)
     is_flag=True,
     help='List registered plugins',
 )
-@click_log.simple_verbosity_option(logger, default='error')
+@click.option(
+    '--save-har',
+    is_flag=True,
+    help='Save har to file',
+)
+@click_log.simple_verbosity_option(logger, default='info')
 @click.argument('url', default=DUMMY_URL, required=True)
-def main(timeout, format, metadata, list_plugins, url):
+def main(timeout, format, metadata, list_plugins, save_har, url):
     if not list_plugins and url == DUMMY_URL:
         click.echo(click.get_current_context().get_help())
         sys.exit(1)
 
     printer = create_printer(format)
     try:
-        if not list_plugins:
-            results = get_detection_results(url, timeout, metadata)
-        else:
+        if list_plugins:
             results = get_plugins(metadata)
+        else:
+            results = get_detection_results(url, timeout, metadata, save_har)
     except (NoPluginsError, DockerStartError, SplashError) as e:
         printer(str(e))
         sys.exit(1)
@@ -66,7 +70,7 @@ def main(timeout, format, metadata, list_plugins, url):
     printer(results)
 
 
-def get_detection_results(url, timeout, metadata):
+def get_detection_results(url, timeout, metadata=False, save_har=False):
     """ Return results from detector.
 
     This function prepares the environment loading the plugins,
@@ -82,6 +86,15 @@ def get_detection_results(url, timeout, metadata):
     logger.debug('[+] Starting detection with %(n)d plugins', {'n': len(plugins)})
 
     response = get_response(url, plugins, timeout)
+
+    # Save HAR
+    if save_har:
+        fd, path = tempfile.mkstemp(suffix='.har')
+        logger.info(f'Saving HAR file to {path}')
+
+        with open(fd, 'w') as f:
+            json.dump(response['har'], f)
+
     det = Detector(response, plugins, url)
     softwares = det.get_results(metadata=metadata)
 
