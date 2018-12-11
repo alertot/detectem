@@ -2,7 +2,6 @@ import glob
 import inspect
 import logging
 import re
-
 from importlib.util import find_spec, module_from_spec
 
 from zope.interface import Attribute, Interface, implementer
@@ -26,7 +25,7 @@ PRODUCT_TAGS = [
     'joomla!', 'drupal', 'underscore.js', 'marionette.js', 'moment timezone', 'moment.js',
     'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql', 'octopress',
     'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion', 'jekill', 'less',
-    'windows server', 'mysql'
+    'windows server', 'mysql', 'waf'
 ]
 CATEGORY_TAGS = [
     'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
