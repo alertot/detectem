@@ -3,7 +3,7 @@ function main(splash)
   splash.response_body_enabled = true
 
   local url = splash.args.url
-  assert(splash:go(url))
+  splash:go(url)
   assert(splash:wait(5))
 
   local detectFunction = [[
