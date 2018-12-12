@@ -210,12 +210,12 @@ def get_valid_har(har_data):
         if not is_valid_mimetype(response):
             continue
 
-        # Some responses are empty, we delete them
-        if not response.get('text'):
-            continue
+        if response.get('text'):
+            charset = get_charset(response)
+            response['text'] = base64.b64decode(response['text']).decode(charset)
+        else:
+            response['text'] = ''
 
-        charset = get_charset(response)
-        response['text'] = base64.b64decode(response['text']).decode(charset)
         new_entries.append(entry)
 
         logger.debug('[+] Added URL: %(url)s ...', {'url': url[:100]})
