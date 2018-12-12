@@ -1,20 +1,11 @@
 import pytest
 
 import detectem.utils
-
-from detectem.response import (
-    DEFAULT_CHARSET,
-    is_url_allowed,
-    is_valid_mimetype,
-    get_charset,
-    create_lua_script,
-    get_evaljs_error,
-    get_valid_har,
-    get_response,
-)
 from detectem.exceptions import SplashError
-from detectem.plugin import PluginCollection, Plugin
-from detectem.response import requests
+from detectem.plugin import Plugin, PluginCollection
+from detectem.response import (DEFAULT_CHARSET, create_lua_script, get_charset,
+                               get_evaljs_error, get_response, get_valid_har,
+                               is_url_allowed, is_valid_mimetype, requests)
 
 
 @pytest.mark.parametrize("url,result", [
@@ -115,7 +106,7 @@ def test_get_response_with_error_status_codes(monkeypatch):
                 ]
             }
         },
-        0
+        1
     ),
     (
         {
