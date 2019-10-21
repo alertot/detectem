@@ -1,0 +1,8 @@
+- plugin: vue
+  matches:
+    - body: <div data-v-46b21138=""></div>
+      presence: true
+    - url: https://cdn.jsdelivr.net/npm/vue@2.6.0
+      version: 2.6.0
+    - dom: "window.Vue = {'version': '2.6.10' }"
+      version: 2.6.10
