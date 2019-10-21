@@ -3,3 +3,4 @@ pyyaml==3.13
 dukpy==0.2.2
 pytest-mock==1.10.0
 boddle==0.2.8
+attrs==19.1.0
