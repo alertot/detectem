@@ -18,7 +18,7 @@ LANGUAGE_TAGS = [
 ]
 FRAMEWORK_TAGS = [
     'django', 'angular', 'backbone', 'react', 'symfony', 'bootstrap', 'vue', 'laravel',
-    'woltlab'
+    'woltlab', 'knockout', 'ember'
 ]
 PRODUCT_TAGS = [
     'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
