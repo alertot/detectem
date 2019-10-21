@@ -2,5 +2,5 @@
   matches:
     - body: <app-root ng-version="6.1.2">
       version: 6.1.2
-    - dom: "window.getAllAngularRootElements = function () { return [{'attributes': {'ng-version': {'value': '6.1.2'}}}]}"
-      version: 6.1.2
+    - dom: "window.ng = {'coreTokens': {}}"
+      presence: true
