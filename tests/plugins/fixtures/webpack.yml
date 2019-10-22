@@ -1,0 +1,4 @@
+- plugin: webpack
+  matches:
+    - dom: "window.webpackJsonp = []"
+      presence: true
