@@ -18,14 +18,14 @@ LANGUAGE_TAGS = [
 ]
 FRAMEWORK_TAGS = [
     'django', 'angular', 'backbone', 'react', 'symfony', 'bootstrap', 'vue', 'laravel',
-    'woltlab'
+    'woltlab', 'knockout', 'ember'
 ]
 PRODUCT_TAGS = [
     'wordpress', 'mysql', 'jquery', 'mootools', 'apache', 'iis', 'nginx', 'ssl',
     'joomla!', 'drupal', 'underscore.js', 'marionette.js', 'moment timezone', 'moment.js',
     'devtools', 'teamcity', 'google code prettyfy', 'solr', 'postgresql', 'octopress',
     'k2', 'sobi 2', 'sobipro', 'virtuemart', 'tomcat', 'coldfusion', 'jekill', 'less',
-    'windows server', 'mysql', 'waf'
+    'windows server', 'mysql', 'waf', 'webpack'
 ]
 CATEGORY_TAGS = [
     'cms', 'seo', 'blog', 'advertising networks', 'analytics', 'wiki',
@@ -34,7 +34,7 @@ CATEGORY_TAGS = [
     'editor', 'ecommerce', 'accounting', 'database manager', 'photo gallery',
     'issue tracker', 'mobile framework', 'slider', 'accounting', 'programming language',
     'hosting panel', 'lms', 'js graphic', 'exhibit', 'marketing automation',
-    'search engine', 'documentation tool', 'database', 'template engine'
+    'search engine', 'documentation tool', 'database', 'template engine', 'module bundler'
 ]
 PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
 

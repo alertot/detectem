@@ -1,0 +1,6 @@
+- plugin: angular
+  matches:
+    - body: <app-root ng-version="6.1.2">
+      version: 6.1.2
+    - dom: "window.ng = {'coreTokens': {}}"
+      presence: true

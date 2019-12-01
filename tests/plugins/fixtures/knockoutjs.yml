@@ -1,0 +1,14 @@
+- plugin: knockoutjs
+  matches:
+    - body: // Knockout.js 3.4.2
+      version: 3.4.2
+    - url: https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.0/knockout-min.js
+      version: 3.4.0
+    - url: http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js
+      version: 3.4.2
+    - dom: "window.ko = {'version': '3.4.0' }"
+      version: 3.4.0
+    - xpath: |
+        <script type="text/javascript" charset="utf-8" data-requiremodule="knockout" src="./../downloads/knockout-latest.js">
+        </script>
+      presence: true
