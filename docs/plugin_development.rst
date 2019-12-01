@@ -75,16 +75,7 @@ Then running the test is simple:
 
 .. code-block:: bash
 
-  $ py.test tests/plugins/test_generic.py --plugin example
-  ===== test session starts ==============================
-  platform linux -- Python 3.5.2, pytest-3.0.6, py-1.4.32, pluggy-0.4.0
-  plugins: mock-1.5.0, cov-2.4.0
-  collected 2 items
-
-  tests/plugins/test_generic.py .s
-
-  ===== 1 passed, 1 skipped in 0.20 seconds ==============
-
+  $ pytest tests/plugins/test_common.py --plugin example
 
 When you need to support a new signature
 and it's not supported by current signatures,
