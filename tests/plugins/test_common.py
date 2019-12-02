@@ -25,7 +25,7 @@ class TestCommonMatches:
             package_dir = find_spec(package).submodule_search_locations[0]
             test_dir = os.path.join(package_dir, os.pardir, 'tests')
 
-            plugin = pytest.config.getoption('plugin', None)
+            plugin = metafunc.config.getoption('plugin', None)
             data = load_from_yaml(test_dir, 'plugins/fixtures/')
 
             only_dom_matches = fname == 'test_dom_matches'

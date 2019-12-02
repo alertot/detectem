@@ -1,10 +1,12 @@
 language: python
 python:
   - 3.6
+  - 3.7
 
 install:
-  - pip install -r requirements.txt
-  - pip install -r tests/requirements.txt
+  - pip install -r requirements/base.txt
+  - pip install -r requirements/devel.txt
+  - pip install -r requirements/tests.txt
 
 script:
   - pytest

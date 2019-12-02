@@ -2,7 +2,7 @@ import os
 import glob
 from collections import defaultdict
 
-from yaml import load
+from yaml import load, FullLoader
 
 from detectem.matchers import PluginMatch
 
@@ -13,9 +13,9 @@ def load_from_yaml(test_dir, relative_yaml_file):
 
     if os.path.isdir(final_path):
         for filepath in glob.glob('{}/**.yml'.format(final_path)):
-            lines += [line for line in load(open(filepath))]
+            lines += [line for line in load(open(filepath), Loader=FullLoader)]
     else:
-        lines = [line for line in load(open(final_path))]
+        lines = [line for line in load(open(final_path), Loader=FullLoader)]
 
     return lines
 

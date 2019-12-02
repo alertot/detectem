@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from setuptools import setup, find_packages
 
-requirements = open('requirements.txt').read().splitlines()
-test_requirements = open('tests/requirements.txt').read().splitlines()
+def get_requirements(name):
+    return open(Path(__file__).parent.joinpath(f"requirements/{name}.txt")).read().splitlines()
+
+requirements = get_requirements("base")
+test_requirements = get_requirements("tests")
 
 setup(
     name='detectem',
