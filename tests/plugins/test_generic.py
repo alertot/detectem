@@ -1,8 +1,9 @@
 import pytest
 
 from detectem.core import MATCHERS
-from detectem.plugin import load_plugins, GenericPlugin
+from detectem.plugin import GenericPlugin, load_plugins
 from tests import create_pm
+
 from .utils import create_har_entry
 
 
@@ -19,15 +20,18 @@ class TestGenericPlugin:
         with pytest.raises(NotImplementedError):
             x.get_information(entry=None)
 
-        assert x.ptype == 'generic'
+        assert x.ptype == "generic"
 
     @pytest.mark.parametrize(
-        'plugin_name,matcher_type,har_content,name', [(
-            'wordpress_generic',
-            'url',
-            'http://domain.tld/wp-content/plugins/example/',
-            'example',
-        )]
+        "plugin_name,matcher_type,har_content,name",
+        [
+            (
+                "wordpress_generic",
+                "url",
+                "http://domain.tld/wp-content/plugins/example/",
+                "example",
+            )
+        ],
     )
     def test_real_generic_plugin(
         self, plugin_name, matcher_type, har_content, name, plugins
@@ -39,9 +43,6 @@ class TestGenericPlugin:
         matchers = plugin.get_matchers(matcher_type)
         matcher_class = MATCHERS[matcher_type]
 
-        assert matcher_class.get_info(
-            har_entry,
-            *matchers,
-        ) == create_pm(presence=True)
+        assert matcher_class.get_info(har_entry, *matchers) == create_pm(presence=True)
 
-        assert plugin.get_information(har_entry)['name'] == name
+        assert plugin.get_information(har_entry)["name"] == name

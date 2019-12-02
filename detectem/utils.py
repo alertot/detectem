@@ -19,7 +19,7 @@ from detectem.settings import (
     SPLASH_URL,
 )
 
-logger = logging.getLogger('detectem')
+logger = logging.getLogger("detectem")
 
 
 def get_most_complete_pm(pms):
@@ -50,7 +50,7 @@ def docker_error(method):
         try:
             method(self)
         except docker.errors.DockerException as e:
-            raise DockerStartError(f'Docker error: {e}')
+            raise DockerStartError(f"Docker error: {e}")
 
     return run_method
 
@@ -62,8 +62,8 @@ class DockerManager:
 
     def __init__(self):
         try:
-            self.docker_cli = docker.from_env(version='auto')
-            self.container_name = 'splash-detectem'
+            self.docker_cli = docker.from_env(version="auto")
+            self.container_name = "splash-detectem"
         except docker.errors.DockerException:
             raise DockerStartError(
                 "Could not connect to Docker daemon. "
@@ -71,7 +71,7 @@ class DockerManager:
             )
 
     def _get_splash_args(self):
-        return f'--max-timeout {SPLASH_MAX_TIMEOUT}'
+        return f"--max-timeout {SPLASH_MAX_TIMEOUT}"
 
     def _get_container(self):
         try:
@@ -81,36 +81,32 @@ class DockerManager:
                 return self.docker_cli.containers.create(
                     name=self.container_name,
                     image=DOCKER_SPLASH_IMAGE,
-                    ports={
-                        '5023/tcp': 5023,
-                        '8050/tcp': 8050,
-                        '8051/tcp': 8051,
-                    },
+                    ports={"5023/tcp": 5023, "8050/tcp": 8050, "8051/tcp": 8051},
                     command=self._get_splash_args(),
                 )
             except docker.errors.ImageNotFound:
                 raise DockerStartError(
-                    f'Docker image {DOCKER_SPLASH_IMAGE} not found.'
-                    f'Please install it or set an image '
-                    f'using DOCKER_SPLASH_IMAGE environment variable.'
+                    f"Docker image {DOCKER_SPLASH_IMAGE} not found."
+                    f"Please install it or set an image "
+                    f"using DOCKER_SPLASH_IMAGE environment variable."
                 )
 
     @docker_error
     def start_container(self):
         container = self._get_container()
-        if container.status != 'running':
+        if container.status != "running":
             try:
                 container.start()
                 self._wait_container()
             except docker.errors.APIError as e:
                 raise DockerStartError(
-                    f'There was an error running Splash container: {e.explanation}'
+                    f"There was an error running Splash container: {e.explanation}"
                 )
 
     def _wait_container(self):
         for t in [1, 2, 4, 6, 8, 10]:
             try:
-                requests.get(f'{SPLASH_URL}/_ping')
+                requests.get(f"{SPLASH_URL}/_ping")
                 break
             except requests.exceptions.RequestException:
                 time.sleep(t)
@@ -133,7 +129,7 @@ def docker_container():
         dm.start_container()
 
     try:
-        requests.post(f'{SPLASH_URL}/_gc')
+        requests.post(f"{SPLASH_URL}/_gc")
     except requests.exceptions.RequestException:
         pass
 
@@ -154,22 +150,22 @@ def create_printer(oformat):
 def get_url(entry):
     """ Return URL from response if it was received otherwise requested URL. """
     try:
-        return entry['response']['url']
+        return entry["response"]["url"]
     except KeyError:
-        return entry['request']['url']
+        return entry["request"]["url"]
 
 
 def get_response_body(entry):
-    return entry['response']['content']['text']
+    return entry["response"]["content"]["text"]
 
 
 def get_version_via_file_hashes(plugin, entry):
-    file_hashes = getattr(plugin, 'file_hashes', {})
+    file_hashes = getattr(plugin, "file_hashes", {})
     if not file_hashes:
         return
 
     url = get_url(entry)
-    body = get_response_body(entry).encode('utf-8')
+    body = get_response_body(entry).encode("utf-8")
     for file, hash_dict in file_hashes.items():
         if file not in url:
             continue

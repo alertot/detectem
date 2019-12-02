@@ -1,15 +1,10 @@
 from collections import defaultdict
 from distutils.version import LooseVersion
 
-from detectem.settings import (
-    GENERIC_TYPE,
-    HINT_TYPE,
-    INDICATOR_TYPE,
-    VERSION_TYPE,
-)
+from detectem.settings import GENERIC_TYPE, HINT_TYPE, INDICATOR_TYPE, VERSION_TYPE
 
 
-class Result():
+class Result:
     def __init__(
         self,
         name,
@@ -37,15 +32,15 @@ class Result():
 
     def __lt__(self, o):
         def to_tuple(rt):
-            return (rt.name, LooseVersion(rt.version or '0'), rt.type)
+            return (rt.name, LooseVersion(rt.version or "0"), rt.type)
 
         return to_tuple(self) < to_tuple(o)
 
     def __repr__(self):
-        return str({'name': self.name, 'version': self.version, 'type': self.type})
+        return str({"name": self.name, "version": self.version, "type": self.type})
 
 
-class ResultCollection():
+class ResultCollection:
     def __init__(self):
         self._results = defaultdict(list)
 

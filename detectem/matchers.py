@@ -6,11 +6,11 @@ from parsel import Selector
 
 from detectem.utils import get_response_body
 
-PluginMatch = namedtuple('PluginMatch', 'name,version,presence')
+PluginMatch = namedtuple("PluginMatch", "name,version,presence")
 
 
 def extract_named_group(text, named_group, matchers, return_presence=False):
-    ''' Return ``named_group`` match from ``text`` reached
+    """ Return ``named_group`` match from ``text`` reached
         by using a matcher from ``matchers``.
 
         It also supports matching without a ``named_group`` in a matcher,
@@ -18,7 +18,7 @@ def extract_named_group(text, named_group, matchers, return_presence=False):
 
         ``presence`` is only returned if ``return_presence=True``.
 
-    '''
+    """
     presence = False
 
     for matcher in matchers:
@@ -43,17 +43,17 @@ def extract_named_group(text, named_group, matchers, return_presence=False):
                 return v
 
     if return_presence and presence:
-        return 'presence'
+        return "presence"
 
     return None
 
 
 def extract_version(text, *matchers):
-    return extract_named_group(text, 'version', matchers, return_presence=True)
+    return extract_named_group(text, "version", matchers, return_presence=True)
 
 
 def extract_name(text, *matchers):
-    return extract_named_group(text, 'name', matchers)
+    return extract_named_group(text, "name", matchers)
 
 
 class UrlMatcher:
@@ -63,9 +63,9 @@ class UrlMatcher:
         version = None
         presence = False
 
-        for rtype in ['request', 'response']:
+        for rtype in ["request", "response"]:
             try:
-                url = entry[rtype]['url']
+                url = entry[rtype]["url"]
             except KeyError:
                 # It could not contain response
                 continue
@@ -76,7 +76,7 @@ class UrlMatcher:
             if not version:
                 version = extract_version(url, *matchers)
                 if version:
-                    if version == 'presence':
+                    if version == "presence":
                         presence = True
                         version = None
 
@@ -94,7 +94,7 @@ class BodyMatcher:
         name = extract_name(body, *matchers)
         version = extract_version(body, *matchers)
         if version:
-            if version == 'presence':
+            if version == "presence":
                 presence = True
                 version = None
 
@@ -107,17 +107,17 @@ class HeaderMatcher:
         try:
             for matcher_name, matcher_value in matchers:
                 for header in headers:
-                    if header['name'] == matcher_name:
-                        yield header['value'], matcher_value
+                    if header["name"] == matcher_name:
+                        yield header["value"], matcher_value
         except ValueError:
-            raise ValueError('Header matcher value must be a tuple')
+            raise ValueError("Header matcher value must be a tuple")
 
     @classmethod
     def get_info(cls, entry, *matchers):
         name = None
         version = None
         presence = False
-        headers = entry['response']['headers']
+        headers = entry["response"]["headers"]
 
         for hstring, hmatcher in cls._get_matches(headers, *matchers):
             # Avoid overriding
@@ -127,7 +127,7 @@ class HeaderMatcher:
             if not version:
                 version = extract_version(hstring, hmatcher)
                 if version:
-                    if version == 'presence':
+                    if version == "presence":
                         presence = True
                         version = None
 
@@ -160,7 +160,7 @@ class XPathMatcher:
                     name = extract_name(value, regexp)
 
                 version = extract_version(value, regexp)
-                if version == 'presence':
+                if version == "presence":
                     presence = True
                     version = None
                     break
