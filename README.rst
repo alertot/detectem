@@ -9,11 +9,6 @@ detectem
 .. image:: https://img.shields.io/travis/alertot/detectem.svg
         :target: https://travis-ci.org/alertot/detectem
 
-.. image:: https://pyup.io/repos/github/alertot/detectem/shield.svg
-     :target: https://pyup.io/repos/github/alertot/detectem/
-     :alt: Updates
-
-
 detectem is a specialized software detector.
 Let's see it in action.
 
@@ -24,7 +19,7 @@ Let's see it in action.
    {'name': 'apache-mod_bwlimited', 'version': '1.4'},
    {'name': 'apache-mod_fcgid', 'version': '2.3.9'},
    {'name': 'jquery', 'version': '1.11.3'},
-   {'name': 'crayon-syntax-highlighter', 'version': '_2.7.2_beta'}]
+   {'name': 'crayon-syntax-highlighter', 'version': '2.7.2_beta'}]
 
 
 Using a serie of indicators, it's able to detect software running on a site
@@ -87,7 +82,7 @@ Let's see it in action.
    {'name': 'apache-mod_bwlimited', 'version': '1.4'},
    {'name': 'apache-mod_fcgid', 'version': '2.3.9'},
    {'name': 'jquery', 'version': '1.11.3'},
-   {'name': 'crayon-syntax-highlighter', 'version': '_2.7.2_beta'}]
+   {'name': 'crayon-syntax-highlighter', 'version': '2.7.2_beta'}]
 
 But first that all we must do:
 
