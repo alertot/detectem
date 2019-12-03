@@ -1,5 +1,0 @@
-pytest==4.0.1
-pyyaml==3.13
-dukpy==0.2.2
-pytest-mock==1.10.0
-boddle==0.2.8

@@ -1,12 +1,7 @@
 import logging
 import urllib.parse
 
-from detectem.matchers import (
-    BodyMatcher,
-    HeaderMatcher,
-    UrlMatcher,
-    XPathMatcher,
-)
+from detectem.matchers import BodyMatcher, HeaderMatcher, UrlMatcher, XPathMatcher
 from detectem.results import Result, ResultCollection
 from detectem.settings import (
     GENERIC_TYPE,
@@ -16,48 +11,44 @@ from detectem.settings import (
     MAIN_ENTRY,
     RESOURCE_ENTRY,
 )
-from detectem.utils import (
-    get_most_complete_pm,
-    get_url,
-    get_version_via_file_hashes,
-)
+from detectem.utils import get_most_complete_pm, get_url, get_version_via_file_hashes
 
-logger = logging.getLogger('detectem')
+logger = logging.getLogger("detectem")
 MATCHERS = {
-    'url': UrlMatcher(),
-    'body': BodyMatcher(),
-    'header': HeaderMatcher(),
-    'xpath': XPathMatcher(),
+    "url": UrlMatcher(),
+    "body": BodyMatcher(),
+    "header": HeaderMatcher(),
+    "xpath": XPathMatcher(),
 }
 
 
 class HarProcessor:
-    ''' This class process the HAR list returned by Splash
+    """ This class process the HAR list returned by Splash
         adding some useful markers for matcher application
-    '''
+    """
 
     @staticmethod
     def _set_entry_type(entry, entry_type):
-        ''' Set entry type (detectem internal metadata) '''
-        entry.setdefault('detectem', {})['type'] = entry_type
+        """ Set entry type (detectem internal metadata) """
+        entry.setdefault("detectem", {})["type"] = entry_type
 
     @staticmethod
     def _get_location(entry):
-        ''' Return `Location` header value if it's present in ``entry`` '''
-        headers = entry['response'].get('headers', [])
+        """ Return `Location` header value if it's present in ``entry`` """
+        headers = entry["response"].get("headers", [])
 
         for header in headers:
-            if header['name'] == 'Location':
-                return header['value']
+            if header["name"] == "Location":
+                return header["value"]
 
         return None
 
     @classmethod
     def _script_to_har_entry(cls, script, url):
-        ''' Return entry for embed script '''
+        """ Return entry for embed script """
         entry = {
-            'request': {'url': url},
-            'response': {'url': url, 'content': {'text': script}}
+            "request": {"url": url},
+            "response": {"url": url, "content": {"text": script}},
         }
 
         cls._set_entry_type(entry, INLINE_SCRIPT_ENTRY)
@@ -65,11 +56,11 @@ class HarProcessor:
         return entry
 
     def mark_entries(self, entries):
-        ''' Mark one entry as main entry and the rest as resource entry.
+        """ Mark one entry as main entry and the rest as resource entry.
 
             Main entry is the entry that contain response's body
             of the requested URL.
-        '''
+        """
 
         for entry in entries:
             self._set_entry_type(entry, RESOURCE_ENTRY)
@@ -93,36 +84,36 @@ class HarProcessor:
             self._set_entry_type(main_entry, MAIN_ENTRY)
 
     def prepare(self, response, url):
-        har = response.get('har', [])
+        har = response.get("har", [])
         if har:
             self.mark_entries(har)
 
         # Detect embed scripts and add them to HAR list
-        for script in response.get('scripts', []):
+        for script in response.get("scripts", []):
             har.append(self._script_to_har_entry(script, url))
 
         return har
 
 
-class Detector():
+class Detector:
     def __init__(self, response, plugins, requested_url):
         self.requested_url = requested_url
         self.har = HarProcessor().prepare(response, requested_url)
 
-        self._softwares_from_splash = response['softwares']
+        self._softwares_from_splash = response["softwares"]
         self._plugins = plugins
         self._results = ResultCollection()
 
     @staticmethod
     def _get_entry_type(entry):
-        ''' Return entry type. '''
-        return entry['detectem']['type']
+        """ Return entry type. """
+        return entry["detectem"]["type"]
 
     def get_hints(self, plugin):
-        ''' Return plugin hints from ``plugin``. '''
+        """ Return plugin hints from ``plugin``. """
         hints = []
 
-        for hint_name in getattr(plugin, 'hints', []):
+        for hint_name in getattr(plugin, "hints", []):
             hint_plugin = self._plugins.get(hint_name)
             if hint_plugin:
                 hint_result = Result(
@@ -134,22 +125,22 @@ class Detector():
                 )
                 hints.append(hint_result)
 
-                logger.debug(f'{plugin.name} & hint {hint_result.name} detected')
+                logger.debug(f"{plugin.name} & hint {hint_result.name} detected")
             else:
-                logger.error(f'{plugin.name} hints an invalid plugin: {hint_name}')
+                logger.error(f"{plugin.name} hints an invalid plugin: {hint_name}")
 
         return hints
 
     def process_from_splash(self):
-        ''' Add softwares found in the DOM '''
+        """ Add softwares found in the DOM """
         for software in self._softwares_from_splash:
-            plugin = self._plugins.get(software['name'])
+            plugin = self._plugins.get(software["name"])
 
             # Determine if it's a version or presence result
             try:
-                additional_data = {'version': software['version']}
+                additional_data = {"version": software["version"]}
             except KeyError:
-                additional_data = {'type': INDICATOR_TYPE}
+                additional_data = {"type": INDICATOR_TYPE}
 
             self._results.add_result(
                 Result(
@@ -172,13 +163,13 @@ class Detector():
                 del grouped_matchers[group]
 
         if self._get_entry_type(entry) == MAIN_ENTRY:
-            remove_group('body')
-            remove_group('url')
+            remove_group("body")
+            remove_group("url")
         else:
-            remove_group('header')
-            remove_group('xpath')
+            remove_group("header")
+            remove_group("xpath")
 
-        remove_group('dom')
+        remove_group("dom")
 
         return grouped_matchers
 
@@ -209,7 +200,7 @@ class Detector():
 
                 # Set name if matchers could detect modular name
                 if pm.name:
-                    name = '{}-{}'.format(plugin.name, pm.name)
+                    name = "{}-{}".format(plugin.name, pm.name)
                 else:
                     name = plugin.name
 
@@ -256,11 +247,11 @@ class Detector():
                 plugin_data = plugin.get_information(entry)
 
                 # Only add to results if it's a valid result
-                if 'name' in plugin_data:
+                if "name" in plugin_data:
                     self._results.add_result(
                         Result(
-                            name=plugin_data['name'],
-                            homepage=plugin_data['homepage'],
+                            name=plugin_data["name"],
+                            homepage=plugin_data["homepage"],
                             from_url=get_url(entry),
                             type=GENERIC_TYPE,
                             plugin=plugin.name,
@@ -280,15 +271,15 @@ class Detector():
         self.process_from_splash()
 
         for rt in sorted(self._results.get_results()):
-            rdict = {'name': rt.name}
+            rdict = {"name": rt.name}
             if rt.version:
-                rdict['version'] = rt.version
+                rdict["version"] = rt.version
 
             if metadata:
-                rdict['homepage'] = rt.homepage
-                rdict['type'] = rt.type
-                rdict['from_url'] = rt.from_url
-                rdict['plugin'] = rt.plugin
+                rdict["homepage"] = rt.homepage
+                rdict["type"] = rt.type
+                rdict["from_url"] = rt.from_url
+                rdict["plugin"] = rt.plugin
 
             results_data.append(rdict)
 

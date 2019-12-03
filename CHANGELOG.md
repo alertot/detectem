@@ -8,9 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Unreleased
 ----------
+0.7.1 - 2018-09-26
+------------------
+## Added
+- Update dependencies
+- Include black and isort in tests
 
 0.7.0 - 2018-09-26
 ------------------
+## Added
+- Improve Javascript support
+- Add updated documentation
+- Add generic plugins
+- Add multiple scripts
+- Many minor improvements
 
 0.6.1 - 2017-09-07
 ------------------

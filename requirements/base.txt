@@ -1,0 +1,6 @@
+click==7.0
+click-log==0.3.2
+docker==4.1.0
+parsel==1.5.2
+requests==2.22.0
+zope.interface==4.7.1
