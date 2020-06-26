@@ -81,7 +81,11 @@ class DockerManager:
                 return self.docker_cli.containers.create(
                     name=self.container_name,
                     image=DOCKER_SPLASH_IMAGE,
-                    ports={"5023/tcp": 5023, "8050/tcp": 8050, "8051/tcp": 8051},
+                    ports={
+                        "5023/tcp": ("127.0.0.1", 5023),
+                        "8050/tcp": ("127.0.0.1", 8050),
+                        "8051/tcp": ("127.0.0.1", 8051),
+                    },
                     command=self._get_splash_args(),
                 )
             except docker.errors.ImageNotFound:
