@@ -30,11 +30,11 @@ from detectem.plugin import Plugin
 
 
 class {title}Plugin(Plugin):
-    name = '{name}'
-    homepage = ''
+    name = "{name}"
+    homepage = ""
     tags = []
     matchers = [
-        {{'{matcher}': 'Plugin signature v(?P<version>[0-9\.]+)'}},
+        {{"{matcher}": "Plugin signature v(?P<version>[0-9\.]+)"}},
     ]
 """.format(
         name=name, title=name.title(), matcher=matcher
