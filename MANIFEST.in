@@ -8,7 +8,7 @@ include README.rst
 include requirements/*.txt
 include detectem/script.lua
 
-recursive-include tests *
+recursive-exclude tests/*
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 
