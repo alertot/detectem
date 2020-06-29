@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 Unreleased
 ----------
 
+0.7.2 - 2020-06-29
+------------------
+## Added
+- Meaningful message in test failure
+
+## Updated
+- Start splash container listening only locally
+
+## Fixed
+- Some plugins
+
 0.7.1 - 2019-12-03
 ------------------
 ## Added
