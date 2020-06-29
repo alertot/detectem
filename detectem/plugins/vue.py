@@ -9,5 +9,5 @@ class VuePlugin(Plugin):
     matchers = [
         {"url": r"/vue@(?P<version>[0-9a-z\.-]+)"},
         {"dom": ("window.Vue", "window.Vue.version")},
-        {"body": r"<[^>]+data-v(ue)?-"},
+        {"xpath": ("//*[contains(local-name(@*),'data-v-')]", None)},
     ]

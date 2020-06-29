@@ -6,7 +6,7 @@ class AngularPlugin(Plugin):
     homepage = "https://angular.io/"
     tags = ["angular", "js framework"]
     matchers = [
-        {"body": r"<[^>]+ ng-version=\"(?P<version>[0-9a-z\.-]+)\""},
+        {"xpath": ("//app-root/@ng-version", r"(?P<version>[0-9a-z\.-]+)")},
         {
             "dom": (
                 "window.getAllAngularRootElements",
