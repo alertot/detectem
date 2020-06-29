@@ -33,6 +33,7 @@ def is_url_allowed(url):
         r"\.jpe?g",
         r"\.gif",
         r"\.svg",
+        r"\.otf",
     ]
 
     for ft in blacklist:
