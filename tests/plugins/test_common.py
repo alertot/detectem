@@ -41,13 +41,21 @@ class TestCommonMatches:
                     ):
                         continue
 
+                    target_plugin_name = entry["plugin"]
+
                     if plugin:
                         # Case if plugin was provided by developer
-                        if plugin == entry["plugin"]:
-                            p = all_plugins.get(entry["plugin"])
+                        if plugin == target_plugin_name:
+                            p = all_plugins.get(target_plugin_name)
                             cases.append([p, yaml_dict])
                     else:
-                        p = all_plugins.get(entry["plugin"])
+                        p = all_plugins.get(target_plugin_name)
+                        if not p:
+                            pytest.fail(
+                                f"Plugin name `{target_plugin_name}` extracted from fixture doesn't exist. "
+                                "Verify that both plugin and fixture file refer to the same name."
+                            )
+
                         cases.append([p, yaml_dict])
 
         metafunc.parametrize("plugin,yaml_dict", cases)
