@@ -6,8 +6,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-Unreleased
-----------
+0.7.3 - 2020-07-02
+------------------
+## Added
+- Support for input file (1st approach)
+
+## Fixed
+- Remove tests from deliverables
+- Handling of JS errors
+
 
 0.7.2 - 2020-06-29
 ------------------
