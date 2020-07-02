@@ -15,8 +15,6 @@ from detectem.response import get_response
 from detectem.settings import CMD_OUTPUT, JSON_OUTPUT, SPLASH_TIMEOUT
 from detectem.utils import create_printer
 
-DUMMY_URL = "http://domain.tld"
-
 # Set up logging
 logger = logging.getLogger("detectem")
 click_log.basic_config(logger)
@@ -43,22 +41,43 @@ click_log.basic_config(logger)
 )
 @click.option("--list-plugins", is_flag=True, help="List registered plugins")
 @click.option("--save-har", is_flag=True, help="Save har to file")
-@click_log.simple_verbosity_option(logger, default="info")
-@click.argument("url", default=DUMMY_URL, required=True)
-def main(timeout, format, metadata, list_plugins, save_har, url):
-    if not list_plugins and url == DUMMY_URL:
+@click.option("-i", "--input-file", type=click.File("r"), help="Read URLs from file")
+@click_log.simple_verbosity_option(logger, default="error")
+@click.argument("input_url", required=False)
+def main(timeout, format, metadata, list_plugins, save_har, input_file, input_url):
+    # Gather urls
+    urls = []
+    if input_file:
+        urls += input_file.read().splitlines()
+    if input_url:
+        urls.append(input_url)
+
+    OPTIONS_WITHOUT_URLS = [list_plugins]
+
+    # Exit if neither urls were defined nor an option that works without urls
+    if not urls and not any(OPTIONS_WITHOUT_URLS):
         click.echo(click.get_current_context().get_help())
         sys.exit(1)
 
     printer = create_printer(format)
-    try:
-        if list_plugins:
+    results = []
+
+    if list_plugins:
+        try:
             results = get_plugins(metadata)
-        else:
-            results = get_detection_results(url, timeout, metadata, save_har)
-    except (NoPluginsError, DockerStartError, SplashError) as e:
-        printer(str(e))
-        sys.exit(1)
+        except NoPluginsError as e:
+            printer(str(e))
+            sys.exit(1)
+    else:
+        for url in urls:
+            logger.debug(f"[+] Starting to process {url} ..")
+
+            try:
+                result = get_detection_results(url, timeout, metadata, save_har)
+            except (NoPluginsError, DockerStartError, SplashError) as e:
+                result = {"url": url, "error": str(e)}
+
+            results.append(result)
 
     printer(results)
 

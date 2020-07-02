@@ -5,6 +5,7 @@ import re
 import urllib.parse
 
 from string import Template
+from typing import Optional
 
 import pkg_resources
 import requests
@@ -139,10 +140,14 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
 
     try:
         with docker_container():
-            logger.debug("[+] Sending request to Splash instance")
-            res = requests.get(page_url)
+            logger.debug("[+] Sending request to Splash instance ..")
+
+            # Force timeout in the request handler too
+            res = requests.get(page_url, timeout=timeout)
     except requests.exceptions.ConnectionError:
         raise SplashError("Could not connect to Splash server {}".format(SPLASH_URL))
+    except requests.exceptions.ReadTimeout:
+        raise SplashError("Connection to Splash server timed out")
 
     logger.debug("[+] Response received")
 
@@ -157,9 +162,10 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
 
     js_error = get_evaljs_error(json_data)
     if js_error:
-        logger.debug("[+] WARNING: failed to eval JS matchers: %(n)s", {"n": js_error})
+        logger.warning(f"[-] Failed to eval JS matchers: {js_error}")
     else:
         logger.debug("[+] Detected %(n)d softwares from the DOM", {"n": len(softwares)})
+
     logger.debug("[+] Detected %(n)d scripts from the DOM", {"n": len(scripts)})
     logger.debug("[+] Final HAR has %(n)d valid entries", {"n": len(har)})
 
@@ -189,15 +195,18 @@ def get_splash_error(json_data):
     return msg
 
 
-def get_evaljs_error(json_data):
-    error = None
-    if "errors" in json_data and "evaljs" in json_data["errors"]:
-        res = json_data["errors"]["evaljs"]
-        if isinstance(res, str):
-            m = re.search(r"'message': '(.*?)'[,}]", res)
-            if m:
-                error = bytes(m.group(1), "utf-8").decode("unicode_escape")
-    return error
+def get_evaljs_error(json_data: dict) -> Optional[str]:
+    try:
+        evaljs_message = json_data["errors"]["evaljs"]
+    except KeyError:
+        return None
+
+    if isinstance(evaljs_message, str):
+        m = re.search(r"'js_error': \"(.*?)\", '", evaljs_message)
+        if m:
+            return m.group(1)
+
+    return None
 
 
 def get_valid_har(har_data):
