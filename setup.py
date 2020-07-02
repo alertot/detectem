@@ -19,7 +19,7 @@ test_requirements = get_requirements("tests")
 
 setup(
     name="detectem",
-    version="0.7.2",
+    version="0.7.3",
     description="Detect software in websites.",
     author="Claudio Salazar",
     author_email="csalazar@spect.cl",
