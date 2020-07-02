@@ -72,7 +72,10 @@ def test_get_response(monkeypatch):
         def json(self):
             return {"har": {}, "softwares": [], "scripts": {}}
 
-    monkeypatch.setattr(requests, "get", lambda v: TestResponse())
+    def __mock_requests_get(url, timeout=None):
+        return TestResponse()
+
+    monkeypatch.setattr(requests, "get", __mock_requests_get)
     monkeypatch.setattr(requests, "post", lambda v: v)
     monkeypatch.setattr(detectem.utils, "SETUP_SPLASH", False)
 
@@ -89,7 +92,10 @@ def test_get_response_with_error_status_codes(monkeypatch):
         def json(self):
             return {"description": "error 100"}
 
-    monkeypatch.setattr(requests, "get", lambda v: TestResponse())
+    def __mock_requests_get(url, timeout=None):
+        return TestResponse()
+
+    monkeypatch.setattr(requests, "get", __mock_requests_get)
     monkeypatch.setattr(requests, "post", lambda v: v)
     monkeypatch.setattr(detectem.utils, "SETUP_SPLASH", False)
 
@@ -166,7 +172,7 @@ def test_get_evaljs_error():
             "{"
             "'js_error_type': 'ReferenceError', "
             "'message': 'JS error: \"ReferenceError: Can\\'t find variable: softwareData\"', "  # noqa: E501
-            "'js_error': \"ReferenceError: Can't find variable: softwareData \", "
+            "'js_error': \"ReferenceError: Can't find variable: softwareData\", "
             "'js_error_message': \"Can't find variable: softwareData\", "
             "'splash_method': 'evaljs', "
             "'type': 'JS_ERROR'"
@@ -174,4 +180,4 @@ def test_get_evaljs_error():
         }
     }
     message = get_evaljs_error(json_data)
-    assert message == 'JS error: "ReferenceError: Can\'t find variable: softwareData"'
+    assert message == "ReferenceError: Can't find variable: softwareData"
