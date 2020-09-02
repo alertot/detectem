@@ -26,7 +26,11 @@ function main(splash)
 
             var version = eval(version_statement);
             if (version) {
-              rs.push({'name': s.name, 'version': version});
+                var vRegex = /^([\d\.]+)/g;
+                var matches = vRegex.exec(version);
+                if (matches) {
+                  rs.push({'name': s.name, 'version': matches[0]});
+                }
             }
           }
         }
