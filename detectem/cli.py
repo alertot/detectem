@@ -2,7 +2,6 @@ import json
 import logging
 import sys
 import tempfile
-
 from operator import attrgetter
 
 import click
@@ -83,7 +82,7 @@ def main(timeout, format, metadata, list_plugins, save_har, input_file, input_ur
 
 
 def get_detection_results(url, timeout, metadata=False, save_har=False):
-    """ Return results from detector.
+    """Return results from detector.
 
     This function prepares the environment loading the plugins,
     getting the response and passing it to the detector.
@@ -116,7 +115,7 @@ def get_detection_results(url, timeout, metadata=False, save_har=False):
 
 
 def get_plugins(metadata):
-    """ Return the registered plugins.
+    """Return the registered plugins.
 
     Load and return all registered plugins.
     """

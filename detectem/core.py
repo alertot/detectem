@@ -23,8 +23,8 @@ MATCHERS = {
 
 
 class HarProcessor:
-    """ This class process the HAR list returned by Splash
-        adding some useful markers for matcher application
+    """This class process the HAR list returned by Splash
+    adding some useful markers for matcher application
     """
 
     @staticmethod
@@ -56,10 +56,10 @@ class HarProcessor:
         return entry
 
     def mark_entries(self, entries):
-        """ Mark one entry as main entry and the rest as resource entry.
+        """Mark one entry as main entry and the rest as resource entry.
 
-            Main entry is the entry that contain response's body
-            of the requested URL.
+        Main entry is the entry that contain response's body
+        of the requested URL.
         """
 
         for entry in entries:

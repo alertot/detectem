@@ -3,7 +3,6 @@ import json
 import logging
 import pprint
 import time
-
 from contextlib import contextmanager
 
 import docker
@@ -23,8 +22,8 @@ logger = logging.getLogger("detectem")
 
 
 def get_most_complete_pm(pms):
-    """ Return plugin match with longer version, if not available
-        will return plugin match with ``presence=True``
+    """Return plugin match with longer version, if not available
+    will return plugin match with ``presence=True``
     """
     if not pms:
         return None
@@ -124,7 +123,7 @@ class DockerManager:
 
 @contextmanager
 def docker_container():
-    """ Start the Splash server on a Docker container.
+    """Start the Splash server on a Docker container.
     If the container doesn't exist, it is created and named 'splash-detectem'.
 
     """

@@ -1,5 +1,4 @@
 import re
-
 from collections import namedtuple
 
 from parsel import Selector
@@ -10,13 +9,13 @@ PluginMatch = namedtuple("PluginMatch", "name,version,presence")
 
 
 def extract_named_group(text, named_group, matchers, return_presence=False):
-    """ Return ``named_group`` match from ``text`` reached
-        by using a matcher from ``matchers``.
+    """Return ``named_group`` match from ``text`` reached
+    by using a matcher from ``matchers``.
 
-        It also supports matching without a ``named_group`` in a matcher,
-        which sets ``presence=True``.
+    It also supports matching without a ``named_group`` in a matcher,
+    which sets ``presence=True``.
 
-        ``presence`` is only returned if ``return_presence=True``.
+    ``presence`` is only returned if ``return_presence=True``.
 
     """
     presence = False

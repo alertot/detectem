@@ -3,7 +3,6 @@ import json
 import logging
 import re
 import urllib.parse
-
 from string import Template
 from typing import Optional
 
@@ -21,7 +20,7 @@ logger = logging.getLogger("detectem")
 
 
 def is_url_allowed(url):
-    """ Return ``True`` if ``url`` is not in ``blacklist``.
+    """Return ``True`` if ``url`` is not in ``blacklist``.
 
     :rtype: bool
 
@@ -45,7 +44,7 @@ def is_url_allowed(url):
 
 
 def is_valid_mimetype(response):
-    """ Return ``True`` if the mimetype is not blacklisted.
+    """Return ``True`` if the mimetype is not blacklisted.
 
     :rtype: bool
 
@@ -64,7 +63,7 @@ def is_valid_mimetype(response):
 
 
 def get_charset(response):
-    """ Return charset from ``response`` or default charset.
+    """Return charset from ``response`` or default charset.
 
     :rtype: str
 
@@ -80,7 +79,7 @@ def get_charset(response):
 
 
 def create_lua_script(plugins):
-    """ Return script template filled up with plugin javascript data.
+    """Return script template filled up with plugin javascript data.
 
     :rtype: str
 
@@ -210,7 +209,7 @@ def get_evaljs_error(json_data: dict) -> Optional[str]:
 
 
 def get_valid_har(har_data):
-    """ Return list of valid HAR entries.
+    """Return list of valid HAR entries.
 
     :rtype: list
 

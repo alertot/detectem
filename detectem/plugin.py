@@ -2,7 +2,6 @@ import glob
 import inspect
 import logging
 import re
-
 from importlib.util import find_spec, module_from_spec
 
 from zope.interface import Attribute, Interface, implementer
@@ -160,7 +159,7 @@ class _PluginLoader:
         return module_paths
 
     def _is_plugin_ok(self, instance):
-        """ Return `True` if:
+        """Return `True` if:
         1. Plugin meets plugin interface.
         2. Is not already registered in the plugin collection.
         3. Have accepted tags.
@@ -252,7 +251,7 @@ class IPlugin(Interface):
 
 @implementer(IPlugin)
 class Plugin:
-    """ Class used by normal plugins.
+    """Class used by normal plugins.
     It implements :class:`~IPlugin`.
 
     """
@@ -263,7 +262,7 @@ class Plugin:
         return [m[matcher_type] for m in self.matchers if matcher_type in m]
 
     def get_grouped_matchers(self):
-        """ Return dictionary of matchers (not empty ones)
+        """Return dictionary of matchers (not empty ones)
         with matcher type as key and matcher list as value.
 
         """
