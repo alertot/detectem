@@ -1,6 +1,5 @@
 import glob
 import os
-
 from collections import defaultdict
 
 from yaml import FullLoader, load

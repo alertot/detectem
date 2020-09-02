@@ -1,12 +1,10 @@
 import json
-
 from unittest.mock import patch
 
 from boddle import boddle
 
 from detectem.exceptions import NoPluginsError, SplashError
 from detectem.ws import do_detection
-
 
 """
 Tests run with `autospec` to match function signature in case of change

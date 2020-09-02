@@ -7,7 +7,7 @@ from detectem.settings import DEBUG, SPLASH_TIMEOUT
 
 try:
     import bottle
-    from bottle import run, post, request
+    from bottle import post, request, run
 except ImportError:
     print("[+] Install bottle to use the web service")
     sys.exit(0)

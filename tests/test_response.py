@@ -1,7 +1,6 @@
 import pytest
 
 import detectem.utils
-
 from detectem.exceptions import SplashError
 from detectem.plugin import Plugin, PluginCollection
 from detectem.response import (
