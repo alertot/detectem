@@ -229,7 +229,9 @@ def get_valid_har(har_data):
 
         if response.get("text"):
             charset = get_charset(response)
-            response["text"] = base64.b64decode(response["text"]).decode(charset)
+            response["text"] = base64.b64decode(response["text"]).decode(
+                charset, errors="ignore"
+            )
         else:
             response["text"] = ""
 
