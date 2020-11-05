@@ -76,7 +76,7 @@ def test_get_response(monkeypatch):
 
     monkeypatch.setattr(requests, "get", __mock_requests_get)
     monkeypatch.setattr(requests, "post", lambda v: v)
-    monkeypatch.setattr(detectem.utils, "SETUP_SPLASH", False)
+    monkeypatch.setattr(detectem.settings, "SETUP_SPLASH", False)
 
     response = get_response("http://domain.tld", PluginCollection())
     assert response
@@ -96,7 +96,7 @@ def test_get_response_with_error_status_codes(monkeypatch):
 
     monkeypatch.setattr(requests, "get", __mock_requests_get)
     monkeypatch.setattr(requests, "post", lambda v: v)
-    monkeypatch.setattr(detectem.utils, "SETUP_SPLASH", False)
+    monkeypatch.setattr(detectem.settings, "SETUP_SPLASH", False)
 
     with pytest.raises(SplashError):
         get_response("http://domain.tld", PluginCollection())

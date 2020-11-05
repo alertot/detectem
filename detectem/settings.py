@@ -1,31 +1,22 @@
-import os
+from environs import Env
 
+env = Env()
+env.read_env()
 
-def get_boolean_value(key, default):
-    value = None
-    string_value = os.environ.get(key)
+DEBUG = env.bool("DEBUG", False)
+PLUGIN_PACKAGES = env.list("DET_PLUGIN_PACKAGES", "detectem.plugins")
 
-    if string_value == "True":
-        value = True
-    elif string_value == "False":
-        value = False
+# General Splash configuration
+SPLASH_URLS = env.list("SPLASH_URLS", ["http://localhost:8050"])
+SETUP_SPLASH = env.bool("SETUP_SPLASH", True)
+DOCKER_SPLASH_IMAGE = env("DOCKER_SPLASH_IMAGE", "scrapinghub/splash:latest")
+NUMBER_OF_SPLASH_INSTANCES = env.int("NUMBER_OF_SPLASH_INSTANCES", 3)
 
-    if value is None:
-        value = default
-
-    return value
-
-
-PLUGIN_PACKAGES = os.environ.get("DET_PLUGIN_PACKAGES", "detectem.plugins").split(",")
-
-SPLASH_URL = os.environ.get("SPLASH_URL", "http://localhost:8050")
-SETUP_SPLASH = get_boolean_value("SETUP_SPLASH", True)
-DOCKER_SPLASH_IMAGE = os.environ.get("DOCKER_SPLASH_IMAGE", "scrapinghub/splash:latest")
-
-SPLASH_MAX_TIMEOUT = int(os.environ.get("SPLASH_MAX_TIMEOUT", "120"))
+# Splash internal settings
+SPLASH_MAX_TIMEOUT = env.int("SPLASH_MAX_TIMEOUT", 120)
 SPLASH_TIMEOUT = 30
+SPLASH_MAX_RETRIES = 3
 
-DEBUG = get_boolean_value("DEBUG", False)
 
 # CONSTANTS
 JSON_OUTPUT = "json"

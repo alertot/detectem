@@ -110,7 +110,11 @@ CATEGORY_TAGS = [
     "template engine",
     "module bundler",
 ]
-PLUGIN_TAGS = LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS
+
+HARDWARE_TAGS = ["router"]
+PLUGIN_TAGS = (
+    LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS + HARDWARE_TAGS
+)
 
 
 class PluginCollection(object):

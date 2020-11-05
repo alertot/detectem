@@ -10,8 +10,7 @@ import pkg_resources
 import requests
 
 from detectem.exceptions import SplashError
-from detectem.settings import SPLASH_TIMEOUT, SPLASH_URL
-from detectem.utils import docker_container
+from detectem.settings import SPLASH_TIMEOUT
 
 DEFAULT_CHARSET = "iso-8859-1"
 ERROR_STATUS_CODES = [400, 504]
@@ -126,7 +125,7 @@ def to_javascript_data(plugins):
     ]
 
 
-def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
+def get_response(url, plugins, timeout=SPLASH_TIMEOUT, splash_url=""):
     """
     Return response with HAR, inline scritps and software detected by JS matchers.
 
@@ -135,16 +134,12 @@ def get_response(url, plugins, timeout=SPLASH_TIMEOUT):
     """
     lua_script = create_lua_script(plugins)
     lua = urllib.parse.quote_plus(lua_script)
-    page_url = f"{SPLASH_URL}/execute?url={url}&timeout={timeout}&lua_source={lua}"
 
     try:
-        with docker_container():
-            logger.debug("[+] Sending request to Splash instance ..")
-
-            # Force timeout in the request handler too
-            res = requests.get(page_url, timeout=timeout)
+        page_url = f"{splash_url}/execute?url={url}&timeout={timeout}&lua_source={lua}"
+        res = requests.get(page_url, timeout=timeout)
     except requests.exceptions.ConnectionError:
-        raise SplashError("Could not connect to Splash server {}".format(SPLASH_URL))
+        raise SplashError(f"Could not connect to Splash server at {splash_url}")
     except requests.exceptions.ReadTimeout:
         raise SplashError("Connection to Splash server timed out")
 
