@@ -111,7 +111,7 @@ CATEGORY_TAGS = [
     "module bundler",
 ]
 
-HARDWARE_TAGS = ["router"]
+HARDWARE_TAGS = ["router", "hmi"]
 PLUGIN_TAGS = (
     LANGUAGE_TAGS + FRAMEWORK_TAGS + PRODUCT_TAGS + CATEGORY_TAGS + HARDWARE_TAGS
 )

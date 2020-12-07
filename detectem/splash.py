@@ -33,6 +33,9 @@ class SplashManagerInterface(abc.ABC):
         # State
         self._instances = self.manager.dict()
 
+    def get_number_of_available_instances(self):
+        return len(self._instances)
+
     @abc.abstractmethod
     def setup(self, n_instances: int):
         ...
@@ -190,7 +193,6 @@ class DockerSplashManager(SplashManagerInterface):
             container_name = f"splash-detectem-{container_index}"
             port = 8050 + container_index
 
-            # Add to registry
             self._instances[container_name] = {
                 "url": f"http://localhost:{port}",
                 "in_use": False,
@@ -212,7 +214,17 @@ class DockerSplashManager(SplashManagerInterface):
 
             if container.status != "running":
                 container.start()
-                self._wait_container(container_name)
+
+                try:
+                    self._wait_container(container_name)
+                except DockerStartError:
+                    # If the container didn't start it's probable to be a unrecuperable error
+                    # We stop it and delete the container to be recreated next run
+                    container.stop()
+                    container.remove()
+                    # Also it's not available to send work to
+                    del self._instances[container_name]
+                    continue
 
     @docker_error
     def teardown(self):

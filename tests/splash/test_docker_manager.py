@@ -75,6 +75,8 @@ class TestDockerSplashManager:
                 c = dm.docker_cli.containers.get(container_name)
                 assert c.status == "running"
 
+            dm.teardown()
+
     def test_teardown(self):
         dm = DockerSplashManager()
         n_instances = 3
@@ -119,3 +121,20 @@ class TestDockerSplashManager:
                 assert event["Actor"]["Attributes"]["name"] == container_name
                 break
         events.close()
+
+        dm.teardown()
+
+    def test_setup_with_container_not_starting(self):
+        dm = DockerSplashManager()
+        n_instances = 3
+
+        def _conditional_mock(*args, **kwargs):
+            # Raise exception for only one container
+            if args[0] == "splash-detectem-0":
+                raise DockerStartError()
+
+        with patch("detectem.splash.NUMBER_OF_SPLASH_INSTANCES", n_instances):
+            with patch.object(dm, "_wait_container", _conditional_mock):
+                dm.setup(n_instances)
+                assert dm.get_number_of_available_instances() == 2
+                dm.teardown()

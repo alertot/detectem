@@ -103,6 +103,12 @@ def main(timeout, format, metadata, list_plugins, save_har, input_file, input_ur
     logger.info(f"[+] Using {n_instances} Splash instances")
     logger.info(f"[+] Setting up Splash manager")
     splash_manager.setup(n_instances)
+
+    # Number of available instances could be different to `n_instances` because of issues starting instances
+    n_available_instances = splash_manager.get_number_of_available_instances()
+    if n_available_instances != n_instances:
+        logger.info(f"[+] Only {n_available_instances} instances are going to be used")
+
     logger.info(f"[+] Setting up done")
 
     # Create pool of workers
@@ -111,7 +117,7 @@ def main(timeout, format, metadata, list_plugins, save_har, input_file, input_ur
             target=process_url_worker,
             args=(splash_manager, task_queue, result_queue),
         )
-        for _ in range(n_instances)
+        for _ in range(n_available_instances)
     ]
 
     # Start the workers
